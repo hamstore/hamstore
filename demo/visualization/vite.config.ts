@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tsconfigPaths(), svgrPlugin()],
     resolve: {
       alias: {
-        'react/jsx-runtime': 'react/jsx-runtime.js',
+        'react/jsx-runtime': 'react/jsx-runtime',
       },
     },
   };

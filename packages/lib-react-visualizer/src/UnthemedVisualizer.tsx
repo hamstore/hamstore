@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { Provider } from 'react-redux';
 
 import type { JSONSchemaCommand } from '@castore/command-json-schema';

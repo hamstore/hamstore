@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, JSX } from 'react';
 
 import type { EventStore } from '@castore/core';
 import { useAggregateEvents } from '@castore/event-storage-adapter-redux';

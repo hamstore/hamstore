@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { v4 as uuid } from 'uuid';
 
 import { tuple } from '@castore/core';
@@ -15,7 +15,8 @@ import { Visualizer } from '@castore/lib-react-visualizer';
 
 import './index.css';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+root.render(
   <React.StrictMode>
     <Visualizer
       eventStores={[pokemonsEventStore, trainersEventStore]}
@@ -34,5 +35,4 @@ ReactDOM.render(
       }}
     />
   </React.StrictMode>,
-  document.getElementById('root'),
 );

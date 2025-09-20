@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
-import React from 'react';
+import React, { JSX } from 'react';
 import { BsStars } from 'react-icons/bs';
 import {
   FaRegCopy,

@@ -6,7 +6,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "removeComments": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,

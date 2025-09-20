@@ -1,6 +1,6 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import Layout from '@theme/Layout';
-import React from 'react';
+import React, { JSX } from 'react';
 
 import { tuple } from '@castore/core';
 import {

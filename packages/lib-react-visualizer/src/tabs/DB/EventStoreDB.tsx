@@ -1,5 +1,5 @@
 import { Stack } from '@mui/material';
-import React from 'react';
+import React, { JSX } from 'react';
 
 import type { EventStore } from '@castore/core';
 import { useAggregateIds } from '@castore/event-storage-adapter-redux';

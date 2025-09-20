@@ -2,12 +2,12 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+// @ts-expect-error bad typing
 const lightCodeTheme = require('prism-react-renderer/themes/vsLight');
+// @ts-expect-error bad typing
 const darkCodeTheme = require('prism-react-renderer/themes/vsDark');
 
-// @ts-expect-error bad typing
 lightCodeTheme.plain.backgroundColor = '#f8f8f8';
-// @ts-expect-error bad typing
 darkCodeTheme.plain.backgroundColor = '#242424';
 
 /** @type {import('@docusaurus/types').Config} */

@@ -1,5 +1,6 @@
 import { FormProps } from '@rjsf/core';
 import MuiForm from '@rjsf/mui';
+import { JSX } from 'react';
 
 // @ts-expect-error exported Form type is incorrect
 export const Form: (

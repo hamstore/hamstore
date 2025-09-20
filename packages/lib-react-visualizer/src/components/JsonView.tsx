@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import ReactJson from 'react-json-view';
 
 export const JsonView = ({ src }: { src: unknown }): JSX.Element => (

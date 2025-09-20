@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import type { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
-import React from 'react';
+import React, { JSX } from 'react';
 
 import type { JSONSchemaCommand } from '@castore/command-json-schema';
 import type { EventStore } from '@castore/core';
