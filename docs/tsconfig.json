@@ -29,6 +29,6 @@
     { "path": "../packages/lib-react-visualizer/tsconfig.build.json" },
     { "path": "../demo/blueprint/tsconfig.build.json" }
   ],
-  "exclude": ["./dist", "dependency-cruiser.js"],
+  "exclude": ["./dist", ".dependency-cruiser.js"],
   "include": ["."]
 }

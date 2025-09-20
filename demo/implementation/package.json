@@ -12,7 +12,7 @@
     "log": "env-cmd sls logs -t -f",
     "print": "env-cmd sls print",
     "test": "yarn test-type && yarn test-unit && yarn test-circular && yarn test-linter",
-    "test-circular": "yarn depcruise --validate dependency-cruiser.js .",
+    "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
     "test-linter": "yarn linter-base-config .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test-unit": "yarn vitest run --passWithNoTests"
@@ -32,7 +32,7 @@
     "@types/aws-lambda": "^8.10.152",
     "@types/http-errors": "^1.8.2",
     "@types/serverless": "^3.12.27",
-    "dependency-cruiser": "^11.18.0",
+    "dependency-cruiser": "^17.0.1",
     "env-cmd": "^10.1.0",
     "esbuild": "^0.14.54",
     "eslint": "^8.57.1",
