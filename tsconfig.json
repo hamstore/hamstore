@@ -3,7 +3,7 @@
     "target": "es2019",
     "esModuleInterop": true,
     "types": ["node", "vitest/globals"],
-    "lib": ["es2020"],
+    "lib": ["ESNext"],
     "removeComments": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
