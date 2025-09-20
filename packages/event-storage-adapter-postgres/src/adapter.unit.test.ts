@@ -48,7 +48,7 @@ beforeAll(async () => {
   eventStorageAdapterB = new PostgresEventStorageAdapter({
     connectionString,
   });
-});
+}, 100_000);
 
 beforeEach(async () => {
   await PostgresEventStorageAdapter.createEventTable({ connectionString });
