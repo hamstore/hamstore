@@ -55,10 +55,11 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
     inputOptions,
   });
 
-  let aggregateIds = [...storeAggregateEntries].sort((aggregateA, aggregateB) =>
-    aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp
-      ? 1
-      : -1,
+  let aggregateIds = [...storeAggregateEntries].sort(
+    (aggregateA, aggregateB) =>
+      aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp
+        ? 1
+        : -1,
   );
 
   if (initialEventAfter !== undefined) {

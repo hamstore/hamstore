@@ -47,9 +47,8 @@ describe('Commands - catchPokemon', () => {
       [pokemonsEventStoreMock, trainersEventStoreMock],
     );
 
-    const { events: pikachuEvents } = await pokemonsEventStoreMock.getEvents(
-      pikachuId,
-    );
+    const { events: pikachuEvents } =
+      await pokemonsEventStoreMock.getEvents(pikachuId);
     expect(pikachuEvents).toStrictEqual([
       pikachuAppearedEvent,
       {

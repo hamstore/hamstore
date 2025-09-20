@@ -79,23 +79,23 @@ export type EventGroupPusherResponse<GROUPED_EVENTS extends GroupedEvent[]> =
   number extends GROUPED_EVENTS['length']
     ? { event: EventDetail; nextAggregate?: Aggregate }[]
     : GROUPED_EVENTS extends [
-        infer HEAD_GROUPED_EVENT,
-        ...infer TAIL_GROUPED_EVENTS,
-      ]
-    ? HEAD_GROUPED_EVENT extends GroupedEvent
-      ? TAIL_GROUPED_EVENTS extends GroupedEvent[]
-        ? [
-            {
-              event: NonNullable<HEAD_GROUPED_EVENT['_types']>['details'];
-              nextAggregate?: NonNullable<
-                HEAD_GROUPED_EVENT['_types']
-              >['aggregate'];
-            },
-            ...EventGroupPusherResponse<TAIL_GROUPED_EVENTS>,
-          ]
+          infer HEAD_GROUPED_EVENT,
+          ...infer TAIL_GROUPED_EVENTS,
+        ]
+      ? HEAD_GROUPED_EVENT extends GroupedEvent
+        ? TAIL_GROUPED_EVENTS extends GroupedEvent[]
+          ? [
+              {
+                event: NonNullable<HEAD_GROUPED_EVENT['_types']>['details'];
+                nextAggregate?: NonNullable<
+                  HEAD_GROUPED_EVENT['_types']
+                >['aggregate'];
+              },
+              ...EventGroupPusherResponse<TAIL_GROUPED_EVENTS>,
+            ]
+          : never
         : never
-      : never
-    : [];
+      : [];
 
 export type OnEventPushed<$EVENT_DETAILS, $AGGREGATE> = (props: {
   event: $EVENT_DETAILS;

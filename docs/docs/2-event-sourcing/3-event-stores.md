@@ -131,14 +131,12 @@ The following methods interact with the data layer of your event store through i
 - <code>getEvents <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate, ordered by <code>version</code>. Returns an empty array if no event is found for this <code>aggregateId</code>.
 
   `OptionsObj` contains the following properties:
-
   - <code>minVersion <i>(?number)</i></code>: To retrieve events above a certain version
   - <code>maxVersion <i>(?number)</i></code>: To retrieve events below a certain version
   - <code>limit <i>(?number)</i></code>: Maximum number of events to retrieve
   - <code>reverse <i>(?boolean = false)</i></code>: To retrieve events in reverse order (does not require to swap <code>minVersion</code> and <code>maxVersion</code>)
 
   `ResponseObj` contains the following properties:
-
   - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
 
 ```ts
@@ -167,19 +165,16 @@ const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(
 - <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and build it.
 
   `OptionsObj` contains the following properties:
-
   - <code>maxVersion <i>(?number)</i></code>: To retrieve aggregate below a certain version
 
   `ResponseObj` contains the following properties:
-
   - <code>aggregate <i>(?Aggregate)</i></code>: The aggregate (possibly <code>undefined</code>)
   - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
   - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
 
 ```ts
-const { aggregate: myPikachu } = await pokemonsEventStore.getAggregate(
-  myPikachuId,
-);
+const { aggregate: myPikachu } =
+  await pokemonsEventStore.getAggregate(myPikachuId);
 // => typed as PokemonAggregate | undefined 🙌
 
 // 👇 Retrieve an aggregate below a certain version
@@ -187,9 +182,8 @@ const { aggregate: pikachuBelowVersion5 } =
   await pokemonsEventStore.getAggregate(myPikachuId, { maxVersion: 5 });
 
 // 👇 Returns the events if you need them
-const { aggregate, events } = await pokemonsEventStore.getAggregate(
-  myPikachuId,
-);
+const { aggregate, events } =
+  await pokemonsEventStore.getAggregate(myPikachuId);
 ```
 
 - <code>getExistingAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregate</code> method, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
@@ -207,21 +201,18 @@ expect(async () =>
 );
 // true
 
-const { aggregate } = await pokemonsEventStore.getExistingAggregate(
-  aggregateId,
-);
+const { aggregate } =
+  await pokemonsEventStore.getExistingAggregate(aggregateId);
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
 - <code>pushEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Pushes a new event to the event store. The <code>timestamp</code> is optional (we keep it available as it can be useful in tests & migrations). If not provided, it is automatically set as <code>new Date().toISOString()</code>. Throws an <code>EventAlreadyExistsError</code> if an event already exists for the corresponding <code>aggregateId</code> and <code>version</code> (see section on <a href="../pushing-events">race conditions</a>).
 
   `OptionsObj` contains the following properties:
-
   - <code>prevAggregate <i>(?Aggregate)</i></code>: The aggregate at the current version, i.e. before having pushed the event. Can be useful in some cases like when using the <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a>
   - <code>force <i>(?boolean)</i></code>: To force push the event even if one already exists for the corresponding <code>aggregateId</code> and <code>version</code>. Any existing event will be overridden, so use with extra care, mainly in <a href="https://www.npmjs.com/package/@castore/lib-dam">data migrations</a>.
 
   `ResponseObj` contains the following properties:
-
   - <code>event <i>(EventDetail)</i></code>: The complete event (includes the <code>timestamp</code>)
   - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, if the <code>prevAggregate</code> option was provided, or when using a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a> connected to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>
 
@@ -244,7 +235,6 @@ const { event: completeEvent, nextAggregate } =
 - <code>listAggregateIds <i>((opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the list of <code>aggregateId</code> of an event store, ordered by the <code>timestamp</code> of their initial event. Returns an empty array if no aggregate is found.
 
   `OptionsObj` contains the following properties:
-
   - <code>limit <i>(?number)</i></code>: Maximum number of aggregate ids to retrieve
   - <code>initialEventAfter <i>(?string)</i></code>: To retrieve aggregate ids that appeared after a certain timestamp
   - <code>initialEventBefore <i>(?string)</i></code>: To retrieve aggregate ids that appeared before a certain timestamp
@@ -252,7 +242,6 @@ const { event: completeEvent, nextAggregate } =
   - <code>pageToken <i>(?string)</i></code>: To retrieve a paginated result of aggregate ids
 
   `ResponseObj` contains the following properties:
-
   - <code>aggregateIds <i>(string[])</i></code>: The list of aggregate ids
   - <code>nextPageToken <i>(?string)</i></code>: A token for the next page of aggregate ids if one exists. The nextPageToken carries the previously used options, so you do not have to provide them again (though you can still do it to override them).
 

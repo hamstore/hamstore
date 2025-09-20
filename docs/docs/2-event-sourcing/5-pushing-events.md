@@ -73,7 +73,6 @@ Finally, Command handlers should be, as much as possible, [pure functions](https
 - <code>onEventAlreadyExists <i>(?(error: EventAlreadyExistsError, context: ContextObj) => Promise&lt;void&gt;)</i></code>: Optional callback to execute when an <code>EventAlreadyExistsError</code> is raised.
 
   The `EventAlreadyExistsError` class contains the following properties:
-
   - <code>eventStoreId <i>(?string)</i></code>: The <code>eventStoreId</code> of the aggregate on which the <code>pushEvent</code> attempt failed
   - <code>aggregateId <i>(string)</i></code>: The <code>aggregateId</code> of the aggregate
   - <code>version <i>(number)</i></code>: The <code>version</code> of the aggregate

@@ -37,14 +37,18 @@ export type InMemoryBusMessage<
   | StateCarryingMessageBus extends MESSAGE_BUS
   ? AggregateExistsMessage | StateCarryingMessage | NotificationMessage
   : MESSAGE_BUS extends StateCarryingMessageBus
-  ? EventStoreStateCarryingMessage<MessageChannelSourceEventStores<MESSAGE_BUS>>
-  : MESSAGE_BUS extends NotificationMessageBus
-  ? EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_BUS>>
-  : MESSAGE_BUS extends AggregateExistsMessageBus
-  ? EventStoreAggregateExistsMessage<
-      MessageChannelSourceEventStores<MESSAGE_BUS>
-    >
-  : never;
+    ? EventStoreStateCarryingMessage<
+        MessageChannelSourceEventStores<MESSAGE_BUS>
+      >
+    : MESSAGE_BUS extends NotificationMessageBus
+      ? EventStoreNotificationMessage<
+          MessageChannelSourceEventStores<MESSAGE_BUS>
+        >
+      : MESSAGE_BUS extends AggregateExistsMessageBus
+        ? EventStoreAggregateExistsMessage<
+            MessageChannelSourceEventStores<MESSAGE_BUS>
+          >
+        : never;
 
 export type FilterPattern<
   EVENT_STORE_ID extends string = string,

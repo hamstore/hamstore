@@ -119,7 +119,6 @@ The following methods interact with the messaging solution of your application t
 - <code>publishMessage <i>((message: Message, opt?: OptionsObj) => Promise&lt;void&gt;)</i></code>: Publish a <code>Message</code> (of the appropriate type) to the message queue.
 
   `OptionsObj` contains the following properties:
-
   - <code>replay <i>(?boolean = false)</i></code>: Signals that the event is not happening in real-time, e.g. in maintenance or migration operations. This information can be used downstream to react appropriately. Check the implementation of you adapter for more details.
 
 - <code>publishMessages <i>((messages: Message[], opt?: OptionsObj) => Promise&lt;void&gt;)</i></code>: Publish several <code>Messages</code> (of the appropriate type) to the message queue. Options are similar to the <code>publishMessage</code> options.

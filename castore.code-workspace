@@ -12,15 +12,15 @@
       "**/bundles": true,
       "**/dist": true,
       ".yarn": true,
-      "yarn.lock": true
+      "yarn.lock": true,
     },
     "[dotenv][ignore][properties][shellscript]": {
-      "editor.defaultFormatter": "foxundermoon.shell-format"
+      "editor.defaultFormatter": "foxundermoon.shell-format",
     },
     "[html][javascript][json]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
     },
-    "typescript.tsdk": "🦫  Root/node_modules/typescript/lib"
+    "typescript.tsdk": "🦫  Root/node_modules/typescript/lib",
   },
   "extensions": {
     "recommendations": [
@@ -29,101 +29,101 @@
       "editorconfig.editorconfig",
       "foxundermoon.shell-format",
       "stylelint.vscode-stylelint",
-      "styled-components.vscode-styled-components"
-    ]
+      "styled-components.vscode-styled-components",
+    ],
   },
   "folders": [
     {
       "path": "packages/core",
-      "name": "🫀  Core"
+      "name": "🫀  Core",
     },
     {
       "path": "packages/event-storage-adapter-dynamodb",
-      "name": "🔌  DynamoDB"
+      "name": "🔌  DynamoDB",
     },
     {
       "path": "packages/event-storage-adapter-http",
-      "name": "🔌  HTTP"
+      "name": "🔌  HTTP",
     },
     {
       "path": "packages/event-storage-adapter-redux",
-      "name": "🔌  Redux"
+      "name": "🔌  Redux",
     },
     {
       "path": "packages/event-storage-adapter-in-memory",
-      "name": "🔌  InMemory"
+      "name": "🔌  InMemory",
     },
     {
       "path": "packages/event-type-json-schema",
-      "name": "📆  Json Schema Event"
+      "name": "📆  Json Schema Event",
     },
     {
       "path": "packages/event-type-zod",
-      "name": "📆  Zod Event"
+      "name": "📆  Zod Event",
     },
     {
       "path": "packages/command-json-schema",
-      "name": "👮‍♀️  Json Schema Command"
+      "name": "👮‍♀️  Json Schema Command",
     },
     {
       "path": "packages/command-zod",
-      "name": "👮‍♀️  Zod Command"
+      "name": "👮‍♀️  Zod Command",
     },
     {
       "path": "packages/message-bus-adapter-event-bridge",
-      "name": "🚌  EventBridge"
+      "name": "🚌  EventBridge",
     },
     {
       "path": "packages/message-bus-adapter-event-bridge-s3",
-      "name": "🚌  EventBridge + S3"
+      "name": "🚌  EventBridge + S3",
     },
     {
       "path": "packages/message-bus-adapter-in-memory",
-      "name": "🚌  InMemory"
+      "name": "🚌  InMemory",
     },
     {
       "path": "packages/message-queue-adapter-sqs",
-      "name": "📨  SQS"
+      "name": "📨  SQS",
     },
     {
       "path": "packages/message-queue-adapter-sqs-s3",
-      "name": "📨  SQS + S3"
+      "name": "📨  SQS + S3",
     },
     {
       "path": "packages/message-queue-adapter-in-memory",
-      "name": "📨  InMemory"
+      "name": "📨  InMemory",
     },
     {
       "path": "packages/lib-test-tools",
-      "name": "🔨  Test Tools"
+      "name": "🔨  Test Tools",
     },
     {
       "path": "packages/lib-react-visualizer",
-      "name": "🔨  React Visualizer"
+      "name": "🔨  React Visualizer",
     },
     {
       "path": "packages/lib-dam",
-      "name": "🔨  Dam"
+      "name": "🔨  Dam",
     },
     {
       "path": "docs",
-      "name": "📖  Docs"
+      "name": "📖  Docs",
     },
     {
       "path": "demo/blueprint",
-      "name": "✨  Blueprint"
+      "name": "✨  Blueprint",
     },
     {
       "path": "demo/implementation",
-      "name": "✨  Implementation"
+      "name": "✨  Implementation",
     },
     {
       "path": "demo/visualization",
-      "name": "✨  Visualization"
+      "name": "✨  Visualization",
     },
     {
       "path": ".",
-      "name": "🦫  Root"
-    }
-  ]
+      "name": "🦫  Root",
+    },
+  ],
 }

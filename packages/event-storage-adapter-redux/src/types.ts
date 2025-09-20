@@ -20,16 +20,16 @@ export type EventStoresReduxState<
 > = EventStore[] extends EVENT_STORES
   ? Record<string, EventStoreReduxState>
   : EVENT_STORES extends [infer HEAD_EVENT_STORE, ...infer TAIL_EVENT_STORES]
-  ? HEAD_EVENT_STORE extends EventStore
-    ? TAIL_EVENT_STORES extends EventStore[]
-      ? Record<
-          EventStoreId<HEAD_EVENT_STORE>,
-          EventStoreReduxState<HEAD_EVENT_STORE>
-        > &
-          EventStoresReduxState<TAIL_EVENT_STORES>
+    ? HEAD_EVENT_STORE extends EventStore
+      ? TAIL_EVENT_STORES extends EventStore[]
+        ? Record<
+            EventStoreId<HEAD_EVENT_STORE>,
+            EventStoreReduxState<HEAD_EVENT_STORE>
+          > &
+            EventStoresReduxState<TAIL_EVENT_STORES>
+        : never
       : never
-    : never
-  : unknown;
+    : unknown;
 
 export type EventStoreReduxReducer<
   EVENT_STORE extends EventStore = EventStore,

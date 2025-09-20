@@ -1,5 +1,4 @@
 /* eslint-disable complexity */
-
 /* eslint-disable max-lines */
 import type { SerializableParameter } from 'postgres';
 import postgres from 'postgres';

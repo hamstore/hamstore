@@ -29,18 +29,18 @@ export type InMemoryQueueMessage<
   | NotificationMessageQueue extends MESSAGE_QUEUE
   ? Message
   : MESSAGE_QUEUE extends StateCarryingMessageQueue
-  ? EventStoreStateCarryingMessage<
-      MessageChannelSourceEventStores<MESSAGE_QUEUE>
-    >
-  : MESSAGE_QUEUE extends NotificationMessageQueue
-  ? EventStoreNotificationMessage<
-      MessageChannelSourceEventStores<MESSAGE_QUEUE>
-    >
-  : MESSAGE_QUEUE extends AggregateExistsMessageQueue
-  ? EventStoreAggregateExistsMessage<
-      MessageChannelSourceEventStores<MESSAGE_QUEUE>
-    >
-  : never;
+    ? EventStoreStateCarryingMessage<
+        MessageChannelSourceEventStores<MESSAGE_QUEUE>
+      >
+    : MESSAGE_QUEUE extends NotificationMessageQueue
+      ? EventStoreNotificationMessage<
+          MessageChannelSourceEventStores<MESSAGE_QUEUE>
+        >
+      : MESSAGE_QUEUE extends AggregateExistsMessageQueue
+        ? EventStoreAggregateExistsMessage<
+            MessageChannelSourceEventStores<MESSAGE_QUEUE>
+          >
+        : never;
 
 export type TaskContext = {
   attempt: number;

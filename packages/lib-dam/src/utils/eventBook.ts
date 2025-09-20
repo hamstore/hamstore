@@ -56,7 +56,7 @@ export class EventBook<EVENT_STORE extends EventStore> {
           ({
             eventStoreId: this.eventStore.eventStoreId,
             event,
-          } as EventStoreNotificationMessage<EVENT_STORE>),
+          }) as EventStoreNotificationMessage<EVENT_STORE>,
       ),
     );
   };

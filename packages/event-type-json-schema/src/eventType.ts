@@ -10,16 +10,16 @@ export class JSONSchemaEventType<
       ? unknown
       : never
     : PAYLOAD_SCHEMA extends JSONSchema
-    ? FromSchema<PAYLOAD_SCHEMA>
-    : never,
+      ? FromSchema<PAYLOAD_SCHEMA>
+      : never,
   METADATA_SCHEMA extends JSONSchema | undefined = JSONSchema | undefined,
   METADATA = JSONSchema extends METADATA_SCHEMA
     ? string extends TYPE
       ? unknown
       : never
     : METADATA_SCHEMA extends JSONSchema
-    ? FromSchema<METADATA_SCHEMA>
-    : never,
+      ? FromSchema<METADATA_SCHEMA>
+      : never,
 > extends EventType<TYPE, PAYLOAD, METADATA> {
   payloadSchema?: PAYLOAD_SCHEMA;
   metadataSchema?: METADATA_SCHEMA;

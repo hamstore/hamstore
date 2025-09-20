@@ -118,10 +118,14 @@ Note that if you define your infrastructure as code in TypeScript, you can direc
 
 ```ts
 import {
-  EVENT_TABLE_PK, // => aggregateId
-  EVENT_TABLE_SK, // => version
-  EVENT_TABLE_INITIAL_EVENT_INDEX_NAME, // => initialEvents
-  EVENT_TABLE_EVENT_STORE_ID_KEY, // => eventStoreId
+  EVENT_TABLE_PK,
+  // => aggregateId
+  EVENT_TABLE_SK,
+  // => version
+  EVENT_TABLE_INITIAL_EVENT_INDEX_NAME,
+  // => initialEvents
+  EVENT_TABLE_EVENT_STORE_ID_KEY,
+  // => eventStoreId
   EVENT_TABLE_TIMESTAMP_KEY, // => timestamp
 } from '@castore/event-storage-adapter-dynamodb';
 ```
@@ -350,10 +354,14 @@ Note that if you define your infrastructure as code in TypeScript, you can direc
 
 ```ts
 import {
-  EVENT_TABLE_PK, // => aggregateId
-  EVENT_TABLE_SK, // => version
-  EVENT_TABLE_INITIAL_EVENT_INDEX_NAME, // => initialEvents
-  EVENT_TABLE_IS_INITIAL_EVENT_KEY, // => isInitialEvent
+  EVENT_TABLE_PK,
+  // => aggregateId
+  EVENT_TABLE_SK,
+  // => version
+  EVENT_TABLE_INITIAL_EVENT_INDEX_NAME,
+  // => initialEvents
+  EVENT_TABLE_IS_INITIAL_EVENT_KEY,
+  // => isInitialEvent
   EVENT_TABLE_TIMESTAMP_KEY, // => timestamp
 } from '@castore/event-storage-adapter-dynamodb';
 ```

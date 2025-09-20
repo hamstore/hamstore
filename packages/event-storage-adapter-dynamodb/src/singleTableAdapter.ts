@@ -176,8 +176,8 @@ export class DynamoDBSingleTableEventStorageAdapter
               ? '#aggregateId = :aggregateId and #version between :minVersion and :maxVersion'
               : '#aggregateId = :aggregateId and #version <= :maxVersion'
             : minVersion !== undefined
-            ? '#aggregateId = :aggregateId and #version >= :minVersion'
-            : '#aggregateId = :aggregateId',
+              ? '#aggregateId = :aggregateId and #version >= :minVersion'
+              : '#aggregateId = :aggregateId',
         ExpressionAttributeNames: {
           '#aggregateId': EVENT_TABLE_PK,
           ...(maxVersion !== undefined || minVersion !== undefined
@@ -197,9 +197,8 @@ export class DynamoDBSingleTableEventStorageAdapter
         ...(limit !== undefined ? { Limit: limit } : {}),
       });
 
-      let eventsQueryResult = await this.dynamoDBClient.send(
-        eventsQueryCommand,
-      );
+      let eventsQueryResult =
+        await this.dynamoDBClient.send(eventsQueryCommand);
       marshalledEvents.push(...(eventsQueryResult.Items ?? []));
 
       while (eventsQueryResult.LastEvaluatedKey !== undefined) {
@@ -381,8 +380,8 @@ export class DynamoDBSingleTableEventStorageAdapter
               ? '#eventStoreId = :eventStoreId and #timestamp between :initialEventAfter and :initialEventBefore'
               : '#eventStoreId = :eventStoreId and #timestamp <= :initialEventBefore'
             : initialEventAfter !== undefined
-            ? '#eventStoreId = :eventStoreId and #timestamp >= :initialEventAfter'
-            : '#eventStoreId = :eventStoreId';
+              ? '#eventStoreId = :eventStoreId and #timestamp >= :initialEventAfter'
+              : '#eventStoreId = :eventStoreId';
 
         aggregateIdsQueryCommandInput.ExpressionAttributeNames = {
           ...aggregateIdsQueryCommandInput.ExpressionAttributeNames,

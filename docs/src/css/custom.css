@@ -227,8 +227,8 @@ a:hover,
 }
 
 .bg-color-gradient {
-  --tw-gradient-stops: var(--ifm-color-primary-light),
-    var(--ifm-color-primary-lightest);
+  --tw-gradient-stops:
+    var(--ifm-color-primary-light), var(--ifm-color-primary-lightest);
 }
 
 .w-\[40px\] {
@@ -287,14 +287,16 @@ a:hover,
 }
 
 .shadow-xl {
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  box-shadow:
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow);
 }
 
 .shadow-xl {
-  --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
-    0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color),
+  --tw-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --tw-shadow-colored:
+    0 20px 25px -5px var(--tw-shadow-color),
     0 10px 10px -5px var(--tw-shadow-color);
 }
 

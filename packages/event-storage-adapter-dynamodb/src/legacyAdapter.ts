@@ -165,8 +165,8 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
               ? '#aggregateId = :aggregateId and #version between :minVersion and :maxVersion'
               : '#aggregateId = :aggregateId and #version <= :maxVersion'
             : minVersion !== undefined
-            ? '#aggregateId = :aggregateId and #version >= :minVersion'
-            : '#aggregateId = :aggregateId',
+              ? '#aggregateId = :aggregateId and #version >= :minVersion'
+              : '#aggregateId = :aggregateId',
         ExpressionAttributeNames: {
           '#aggregateId': EVENT_TABLE_PK,
           ...(maxVersion !== undefined || minVersion !== undefined
@@ -186,9 +186,8 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
         ...(limit !== undefined ? { Limit: limit } : {}),
       });
 
-      let eventsQueryResult = await this.dynamoDBClient.send(
-        eventsQueryCommand,
-      );
+      let eventsQueryResult =
+        await this.dynamoDBClient.send(eventsQueryCommand);
       marshalledEvents.push(...(eventsQueryResult.Items ?? []));
 
       while (eventsQueryResult.LastEvaluatedKey !== undefined) {
@@ -366,8 +365,8 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
               ? '#isInitialEvent = :true and #timestamp between :initialEventAfter and :initialEventBefore'
               : '#isInitialEvent = :true and #timestamp <= :initialEventBefore'
             : initialEventAfter !== undefined
-            ? '#isInitialEvent = :true and #timestamp >= :initialEventAfter'
-            : '#isInitialEvent = :true';
+              ? '#isInitialEvent = :true and #timestamp >= :initialEventAfter'
+              : '#isInitialEvent = :true';
 
         aggregateIdsQueryCommandInput.ExpressionAttributeNames = {
           ...aggregateIdsQueryCommandInput.ExpressionAttributeNames,

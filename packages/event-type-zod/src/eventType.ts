@@ -10,16 +10,16 @@ export class ZodEventType<
       ? unknown
       : never
     : PAYLOAD_SCHEMA extends ZodType
-    ? z.infer<PAYLOAD_SCHEMA>
-    : never,
+      ? z.infer<PAYLOAD_SCHEMA>
+      : never,
   METADATA_SCHEMA extends ZodType | undefined = ZodType | undefined,
   METADATA = ZodType extends METADATA_SCHEMA
     ? string extends TYPE
       ? unknown
       : never
     : METADATA_SCHEMA extends ZodType
-    ? z.infer<METADATA_SCHEMA>
-    : never,
+      ? z.infer<METADATA_SCHEMA>
+      : never,
 > extends EventType<TYPE, PAYLOAD, METADATA> {
   payloadSchema?: PAYLOAD_SCHEMA;
   metadataSchema?: METADATA_SCHEMA;

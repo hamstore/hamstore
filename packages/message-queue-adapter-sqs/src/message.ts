@@ -41,12 +41,12 @@ export type SQSMessageQueueMessageBody<
         >
       >
     : MESSAGE_QUEUE extends NotificationMessageQueue
-    ? EventStoreNotificationMessage<
-        MessageChannelSourceEventStores<MESSAGE_QUEUE>
-      >
-    : MESSAGE_QUEUE extends AggregateExistsMessageQueue
-    ? EventStoreAggregateExistsMessage<
-        MessageChannelSourceEventStores<MESSAGE_QUEUE>
-      >
-    : never
+      ? EventStoreNotificationMessage<
+          MessageChannelSourceEventStores<MESSAGE_QUEUE>
+        >
+      : MESSAGE_QUEUE extends AggregateExistsMessageQueue
+        ? EventStoreAggregateExistsMessage<
+            MessageChannelSourceEventStores<MESSAGE_QUEUE>
+          >
+        : never
 >;

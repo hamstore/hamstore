@@ -141,10 +141,8 @@ describe('jsonSchemaEvent implementation', () => {
       metadataSchema,
     });
 
-    const assertExtends: A.Extends<
-      typeof fullEventType,
-      JSONSchemaEventType
-    > = 1;
+    const assertExtends: A.Extends<typeof fullEventType, JSONSchemaEventType> =
+      1;
     assertExtends;
 
     type FullEventTypeDetail = EventTypeDetail<typeof fullEventType>;
