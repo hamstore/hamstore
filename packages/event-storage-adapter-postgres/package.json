@@ -37,6 +37,9 @@
     "transpile": "babel src --extensions .ts --quiet",
     "watch": "rm -rf dist && concurrently 'yarn:package-* --watch'"
   },
+  "dependencies": {
+    "postgres": "^3.4.5"
+  },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.9",
@@ -77,8 +80,5 @@
   },
   "peerDependencies": {
     "@castore/core": "*"
-  },
-  "dependencies": {
-    "postgres": "^3.4.5"
   }
 }
