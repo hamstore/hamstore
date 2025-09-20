@@ -2,13 +2,12 @@
   "name": "@castore/demo-visualization",
   "scripts": {
     "build": "rm -rf dist && vite build",
-    "lint-fix": "yarn linter-base-config --fix",
+    "lint-fix": "yarn eslint --fix",
     "lint-fix-all": "yarn lint-fix .",
-    "linter-base-config": "eslint --ext=js,ts",
     "start": "vite",
     "test": "yarn test-type && yarn test-circular && yarn test-linter",
     "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
-    "test-linter": "yarn linter-base-config .",
+    "test-linter": "yarn eslint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false"
   },
   "browserslist": {
