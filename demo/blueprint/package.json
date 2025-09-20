@@ -43,7 +43,7 @@
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.0.1",
     "eslint": "^8.57.1",
-    "json-schema-to-ts": "^2.12.0",
+    "json-schema-to-ts": "^3.1.1",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "ts-toolbelt": "^9.6.0",
@@ -60,6 +60,6 @@
   "peerDependencies": {
     "@castore/core": "*",
     "@castore/event-type-json-schema": "*",
-    "json-schema-to-ts": "^2.0.0"
+    "json-schema-to-ts": "^2.0.0 || ^3.0.0"
   }
 }
