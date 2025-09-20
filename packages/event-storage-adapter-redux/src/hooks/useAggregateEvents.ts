@@ -28,7 +28,7 @@ export const useAggregateEvents = <EVENT_STORE extends EventStore>(
     const eventStoreSliceName = eventStorageAdapter.eventStoreSliceName;
     const eventStoreState = state[eventStoreSliceName];
 
-    if (!eventStoreState) {
+    if (eventStoreState === undefined) {
       throw new ReduxStateNotFoundError({ eventStoreSliceName });
     }
 

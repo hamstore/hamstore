@@ -3,6 +3,21 @@ import { isEventCarryingMessage } from '@castore/core';
 import type { Task } from './message';
 import type { FilterPattern } from './types';
 
+type ParsedMessage = {
+  eventStoreId: string;
+  eventType?: string;
+};
+const parseMessage = (message: Task['message']): ParsedMessage => ({
+  eventStoreId: message.eventStoreId,
+  eventType: isEventCarryingMessage(message) ? message.event.type : undefined,
+});
+
+const messageMatchesStoreIdAndEventType = (
+  parsedMessage: ParsedMessage,
+  filterPattern: FilterPattern,
+) =>
+  parsedMessage.eventStoreId === filterPattern.eventStoreId &&
+  parsedMessage.eventType === filterPattern.eventType;
 export const doesTaskMatchFilterPattern = (
   task: Task,
   filterPattern: FilterPattern,
@@ -14,26 +29,18 @@ export const doesTaskMatchFilterPattern = (
     onReplay = false,
   } = filterPattern;
 
-  let messageEventType: string | undefined = undefined;
-  const { eventStoreId: messageEventStoreId } = message;
-
-  if (isEventCarryingMessage(message)) {
-    messageEventType = message.event.type;
-  }
+  const parsedMessage = parseMessage(message);
 
   if (replay && !onReplay) {
     return false;
   }
 
   if (filterEventStoreId !== undefined && filterEventType !== undefined) {
-    return (
-      messageEventStoreId === filterEventStoreId &&
-      messageEventType === filterEventType
-    );
+    return messageMatchesStoreIdAndEventType(parsedMessage, filterPattern);
   }
 
   if (filterEventStoreId !== undefined) {
-    return messageEventStoreId === filterEventStoreId;
+    return parsedMessage.eventStoreId === filterEventStoreId;
   }
 
   return true;

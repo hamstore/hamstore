@@ -26,17 +26,14 @@ export const parseAppliedListAggregateIdsOptions = ({
     try {
       prevOptions = JSON.parse(inputPageToken) as ParsedPageToken;
     } catch (error) {
+      console.error(error);
       throw new Error('Invalid page token');
     }
   }
 
   return {
-    limit: inputOptions?.limit ?? prevOptions.limit,
-    initialEventAfter:
-      inputOptions?.initialEventAfter ?? prevOptions.initialEventAfter,
-    initialEventBefore:
-      inputOptions?.initialEventBefore ?? prevOptions.initialEventBefore,
-    reverse: inputOptions?.reverse ?? prevOptions.reverse,
+    ...prevOptions,
+    ...inputOptions,
     exclusiveStartKey: prevOptions.lastEvaluatedKey,
   };
 };

@@ -74,13 +74,16 @@ export class EventStore<
         const prevAggregate = groupedEvent?.prevAggregate;
 
         if (
-          (prevAggregate || event.version === 1) &&
+          (prevAggregate !== undefined || event.version === 1) &&
           groupedEvent?.eventStore !== undefined
         ) {
           nextAggregate = groupedEvent.eventStore.reducer(prevAggregate, event);
         }
 
-        return { event, ...(nextAggregate ? { nextAggregate } : {}) };
+        return {
+          event,
+          ...(nextAggregate !== undefined ? { nextAggregate } : {}),
+        };
       },
     );
 
@@ -162,7 +165,7 @@ export class EventStore<
     this.eventStorageAdapter = eventStorageAdapter;
 
     this.getEventStorageAdapter = () => {
-      if (!this.eventStorageAdapter) {
+      if (this.eventStorageAdapter === undefined) {
         throw new UndefinedEventStorageAdapterError({
           eventStoreId: this.eventStoreId,
         });
@@ -191,13 +194,13 @@ export class EventStore<
       )) as { event: $EVENT_DETAILS };
 
       let nextAggregate: AGGREGATE | undefined = undefined;
-      if (prevAggregate || event.version === 1) {
+      if (prevAggregate !== undefined || event.version === 1) {
         nextAggregate = this.reducer(prevAggregate, event) as AGGREGATE;
       }
 
       const response = {
         event: event as unknown as EVENT_DETAILS,
-        ...(nextAggregate ? { nextAggregate } : {}),
+        ...(nextAggregate !== undefined ? { nextAggregate } : {}),
       };
 
       if (this.onEventPushed !== undefined) {

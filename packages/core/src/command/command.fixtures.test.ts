@@ -136,7 +136,7 @@ export const incrementCounter = new Command({
     const [countersStore] = eventStores;
 
     const { aggregate } = await countersStore.getAggregate(counterId);
-    if (!aggregate) {
+    if (aggregate === undefined) {
       throw new Error();
     }
 

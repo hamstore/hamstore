@@ -1,5 +1,5 @@
 declare module 'swagger-client' {
-  import { OpenAPI } from 'openapi-types';
+  import { OpenAPI, OpenAPIV3_1 } from 'openapi-types';
   import { Api } from './types';
   export default class SwaggerClient {
     [x: string]: unknown;

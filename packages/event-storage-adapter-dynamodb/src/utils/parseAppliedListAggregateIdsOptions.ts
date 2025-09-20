@@ -23,6 +23,7 @@ export const parseAppliedListAggregateIdsOptions = ({
     try {
       prevOptions = JSON.parse(inputPageToken) as ParsedPageToken;
     } catch (error) {
+      console.error(error);
       throw new Error('Invalid page token');
     }
   }

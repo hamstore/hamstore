@@ -46,7 +46,7 @@ export const levelUpPokemonCommand = new JSONSchemaCommand({
       { prevAggregate: aggregate },
     );
 
-    if (!nextAggregate) {
+    if (nextAggregate === undefined) {
       throw new Error();
     }
 

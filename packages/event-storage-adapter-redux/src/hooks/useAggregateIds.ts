@@ -34,7 +34,7 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
     const eventStoreSliceName = eventStorageAdapter.eventStoreSliceName;
     const eventStoreState = state[eventStoreSliceName];
 
-    if (!eventStoreState) {
+    if (eventStoreState === undefined) {
       throw new ReduxStateNotFoundError({ eventStoreSliceName });
     }
 

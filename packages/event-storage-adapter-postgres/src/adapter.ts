@@ -452,6 +452,7 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
       try {
         pageTokenParsed = JSON.parse(inputOptions.pageToken) as ParsedPageToken;
       } catch (error) {
+        console.error(error);
         throw new Error('Invalid page token');
       }
     }
