@@ -1,5 +1,5 @@
 import {
-  EventAlreadyExistsError,
+  type EventAlreadyExistsError,
   isEventAlreadyExistsError,
   EventStore,
 } from '~/eventStore';
