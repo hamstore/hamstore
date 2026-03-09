@@ -22,7 +22,7 @@
     "package": "nx run-many --target=package --all --parallel=4",
     "postinstall": "husky install && syncpack format",
     "resolve-audit": "resolve-audit --yarn",
-    "set-packages-versions": "ts-node scripts/setPackagesVersions",
+    "set-packages-versions": "tsx scripts/setPackagesVersions.ts",
     "test": "nx run-many --target=test --all",
     "test-affected": "nx affected --target=test",
     "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
@@ -54,7 +54,7 @@
     "nx": "^21.5.3",
     "prettier": "^3.6.2",
     "syncpack": "^13.0.4",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.2"
   },
   "engines": {
