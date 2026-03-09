@@ -39,5 +39,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Upgrade npm for OIDC trusted publishing support
+        run: npm install -g npm@latest
+
       - name: Publish packages to npm
         run: yarn nx run-many --target=publish-package --all --parallel=1
