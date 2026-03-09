@@ -10,7 +10,6 @@ on:
 
 env:
   CI: true
-  NODE_VERSION: 22
 
 defaults:
   run:

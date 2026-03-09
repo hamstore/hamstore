@@ -58,7 +58,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": "^22.19.0"
+    "node": "^22.19.0 || ^24.0.0"
   },
   "maintainers": [
     "Thomas Aribart",

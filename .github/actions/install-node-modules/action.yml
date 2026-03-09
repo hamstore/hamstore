@@ -6,7 +6,7 @@ runs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version-file: .nvmrc
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
@@ -26,7 +26,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: '**/node_modules'
-        key: ${{ runner.os }}-modules-${{ env.NODE_VERSION }}-${{ hashFiles('./yarn.lock') }}
+        key: ${{ runner.os }}-modules-${{ hashFiles('.nvmrc') }}-${{ hashFiles('./yarn.lock') }}
 
     - name: Install node_modules
       run: if [ '${{ steps.sync-node-modules-cache.outputs.cache-hit }}' != 'true' ]; then yarn install --immutable; fi
