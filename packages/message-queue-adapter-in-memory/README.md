@@ -8,8 +8,8 @@ DRY Hamstore [`MessageQueue`](https://hamstore.github.io/hamstore/docs/reacting-
 # npm
 npm install @hamstore/message-queue-adapter-in-memory
 
-# yarn
-yarn add @hamstore/message-queue-adapter-in-memory
+# pnpm
+pnpm add @hamstore/message-queue-adapter-in-memory
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ## 👩‍💻 Usage

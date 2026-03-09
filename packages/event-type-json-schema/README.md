@@ -8,8 +8,8 @@ DRY Hamstore [`EventType`](https://hamstore.github.io/hamstore/docs/event-sourci
 # npm
 npm install @hamstore/event-type-json-schema
 
-# yarn
-yarn add @hamstore/event-type-json-schema
+# pnpm
+pnpm add @hamstore/event-type-json-schema
 ```
 
 This package has `@hamstore/core` and `json-schema-to-ts` (above v2) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` and `json-schema-to-ts` (above v2) as peer dep
 # npm
 npm install @hamstore/core json-schema-to-ts
 
-# yarn
-yarn add @hamstore/core json-schema-to-ts
+# pnpm
+pnpm add @hamstore/core json-schema-to-ts
 ```
 
 ## 👩‍💻 Usage

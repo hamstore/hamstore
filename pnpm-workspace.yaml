@@ -1,0 +1,8 @@
+packages:
+  - 'packages/*'
+  - 'demo/*'
+  - 'docs'
+
+trustPolicy: no-downgrade
+
+minimumReleaseAge: 1440

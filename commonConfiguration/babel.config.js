@@ -24,7 +24,6 @@ const defaultPlugins = [
       alias: { '~': './src' },
     },
   ],
-  '@babel/plugin-transform-runtime',
 ];
 
 const addImportExtension = (ext, options = {}) => {

@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/package
 
       - name: Build website
-        run: yarn nx run docs:build
+        run: pnpm nx run docs:build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

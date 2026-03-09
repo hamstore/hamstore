@@ -8,8 +8,8 @@ DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/ev
 # npm
 npm install @hamstore/event-storage-adapter-postgres
 
-# yarn
-yarn add @hamstore/event-storage-adapter-postgres
+# pnpm
+pnpm add @hamstore/event-storage-adapter-postgres
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ## 👩‍💻 Usage

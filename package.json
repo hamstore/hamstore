@@ -11,21 +11,16 @@
     "store",
     "typescript"
   ],
-  "workspaces": [
-    "packages/*",
-    "demo/*",
-    "docs"
-  ],
   "scripts": {
-    "check-audit": "check-audit --yarn",
+    "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
     "package": "nx run-many --target=package --all --parallel=4",
     "postinstall": "husky install && syncpack format",
-    "resolve-audit": "resolve-audit --yarn",
+    "resolve-audit": "pnpm audit --fix",
     "set-packages-versions": "tsx scripts/setPackagesVersions.ts",
     "test": "nx run-many --target=test --all",
     "test-affected": "nx affected --target=test",
-    "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
+    "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
     "test-linter": "nx run-many --target=test-linter --all --parallel=4",
     "test-type": "nx run-many --target=test-type --all --parallel=4",
     "test-unit": "nx run-many --target=test-unit --all --parallel=4",
@@ -50,7 +45,6 @@
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
-    "npm-audit-resolver": "^3.0.0-RC.0",
     "nx": "^21.5.3",
     "prettier": "^3.6.2",
     "syncpack": "^13.0.4",
@@ -67,6 +61,25 @@
     "Valentin Beggi",
     "Stanislas Hannebelle"
   ],
-  "packageManager": "yarn@4.10.2",
+  "packageManager": "pnpm@10.31.0+sha512.e3927388bfaa8078ceb79b748ffc1e8274e84d75163e67bc22e06c0d3aed43dd153151cbf11d7f8301ff4acb98c68bdc5cadf6989532801ffafe3b3e4a63c268",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@scarf/scarf",
+      "@tree-sitter-grammars/tree-sitter-yaml",
+      "aws-sdk",
+      "core-js",
+      "core-js-pure",
+      "cpu-features",
+      "es5-ext",
+      "esbuild",
+      "nx",
+      "protobufjs",
+      "serverless",
+      "ssh2",
+      "tree-sitter",
+      "tree-sitter-json"
+    ]
+  },
   "type": "module"
 }

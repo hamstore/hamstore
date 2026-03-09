@@ -120,12 +120,13 @@ export const garyOakEvents: EventStoreEventDetails<
 
 // EVENT STORES
 
-export const trainerEventStore = mockEventStore(trainersEventStore, [
-  ...ashKetchumEvents,
-  ...garyOakEvents,
-]);
+export const trainerEventStore: ReturnType<
+  typeof mockEventStore<typeof trainersEventStore>
+> = mockEventStore(trainersEventStore, [...ashKetchumEvents, ...garyOakEvents]);
 
-export const pokemonEventStore = mockEventStore(pokemonsEventStore, [
+export const pokemonEventStore: ReturnType<
+  typeof mockEventStore<typeof pokemonsEventStore>
+> = mockEventStore(pokemonsEventStore, [
   ...pikachuEvents,
   ...charizardEvents,
   ...arcanineEvents,

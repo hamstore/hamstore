@@ -2,12 +2,12 @@
   "name": "@hamstore/demo-visualization",
   "scripts": {
     "build": "rm -rf dist && vite build",
-    "lint-fix": "yarn eslint --fix",
-    "lint-fix-all": "yarn lint-fix .",
+    "lint-fix": "pnpm eslint --fix",
+    "lint-fix-all": "pnpm lint-fix .",
     "start": "vite",
-    "test": "yarn test-type && yarn test-circular && yarn test-linter",
-    "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
-    "test-linter": "yarn eslint .",
+    "test": "pnpm test-type && pnpm test-circular && pnpm test-linter",
+    "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
+    "test-linter": "pnpm eslint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false"
   },
   "browserslist": {
