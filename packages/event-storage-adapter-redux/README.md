@@ -1,39 +1,39 @@
 # Redux Event Storage Adapter
 
-DRY Castore [`EventStorageAdapter`](https://castore-dev.github.io/castore/docs/event-sourcing/fetching-events/) implementation using a Redux store.
+DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/event-sourcing/fetching-events/) implementation using a Redux store.
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/event-storage-adapter-redux
+npm install @hamstore/event-storage-adapter-redux
 
 # yarn
-yarn add @castore/event-storage-adapter-redux
+yarn add @hamstore/event-storage-adapter-redux
 ```
 
-This package has `@castore/core`, `@reduxjs/toolkit` (above v1.9) and `react-redux` (above v8) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core`, `@reduxjs/toolkit` (above v1.9) and `react-redux` (above v8) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core @reduxjs/toolkit react-redux
+npm install @hamstore/core @reduxjs/toolkit react-redux
 
 # yarn
-yarn add @castore/core @reduxjs/toolkit react-redux
+yarn add @hamstore/core @reduxjs/toolkit react-redux
 ```
 
 ## 👩‍💻 Usage
 
 ### Direct usage
 
-If you do not already use Redux in your app, you can simply use the `configureCastore` util:
+If you do not already use Redux in your app, you can simply use the `configureHamstore` util:
 
 ```tsx
 import { Provider } from 'react-redux';
 
-import { configureCastore } from '@castore/event-storage-adapter-redux';
+import { configureHamstore } from '@hamstore/event-storage-adapter-redux';
 
-const store = configureCastore({
+const store = configureHamstore({
   eventStores: [pokemonsEventStore, trainersEventStore],
 });
 
@@ -44,7 +44,7 @@ const MyReactApp = () => (
 );
 ```
 
-And that's it 🙌 `configureCastore` not only configures the Redux store but also connects it to the event stores by replacing their `eventStorageAdapter`.
+And that's it 🙌 `configureHamstore` not only configures the Redux store but also connects it to the event stores by replacing their `eventStorageAdapter`.
 
 You can use the `pushEvent` method as usual:
 
@@ -69,7 +69,7 @@ You can also use the other methods, but it's simpler to use the following built-
 You can use the `useAggregateEvents`, `useAggregate`, `useExistingAggregate` and `useAggregateIds` hooks to read data from the store. Their interface is the same as the event store methods, but synchronous.
 
 ```tsx
-import { useAggregateIds } from '@castore/event-storage-adapter-redux';
+import { useAggregateIds } from '@hamstore/event-storage-adapter-redux';
 
 const AggregateIdsList = () => {
   // 🙌 Will synchronously return the store data, as well as hook the component to it
@@ -92,21 +92,21 @@ Thanks to the magic of Redux, pushing a new event to an aggregate will only trig
 
 ### Configure with another store
 
-If you already use Redux, you can merge the Castore Redux store with your own.
+If you already use Redux, you can merge the Hamstore Redux store with your own.
 
-First, know that event stores events are stored as Redux "slices". Their name is their `eventStoreId`, prefixed by a customizable string (`@castore` by default).
+First, know that event stores events are stored as Redux "slices". Their name is their `eventStoreId`, prefixed by a customizable string (`@hamstore` by default).
 
-You can use the `getCastoreReducers` util to generate the Castore Redux reducers, and merge them with your own:
+You can use the `getHamstoreReducers` util to generate the Hamstore Redux reducers, and merge them with your own:
 
 ```tsx
 import { Provider } from 'react-redux';
 
 import {
   ReduxEventStorageAdapter,
-  getCastoreReducers,
-} from '@castore/event-storage-adapter-redux';
+  getHamstoreReducers,
+} from '@hamstore/event-storage-adapter-redux';
 
-const castoreReducers = getCastoreReducers({
+const hamstoreReducers = getHamstoreReducers({
   eventStores: [pokemonsEventStore, trainersEventStore],
   // 👇 Optional
   prefix: 'customPrefix',
@@ -114,7 +114,7 @@ const castoreReducers = getCastoreReducers({
 
 const store = configureStore({
   reducer: {
-    ...castoreReducers,
+    ...hamstoreReducers,
     customReducer,
   },
 });

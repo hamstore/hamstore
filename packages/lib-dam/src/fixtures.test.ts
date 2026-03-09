@@ -1,9 +1,9 @@
-import type { EventStoreEventDetails } from '@castore/core';
+import type { EventStoreEventDetails } from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
-} from '@castore/demo-blueprint';
-import { mockEventStore } from '@castore/lib-test-tools';
+} from '@hamstore/demo-blueprint';
+import { mockEventStore } from '@hamstore/lib-test-tools';
 
 export const pokemonEvtStoreId = pokemonsEventStore.eventStoreId;
 export const trainerEvtStoreId = trainersEventStore.eventStoreId;

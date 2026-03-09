@@ -8,4 +8,4 @@ As events pile up in your event stores, the performances and costs of your comma
 
 One solution is to periodially persist **snapshots** of your aggregates (e.g. through a message bus listener), and only fetch them plus the subsequent events instead of all the events.
 
-Snapshots are not implemented in Castore yet, but we have big plans for them, so stay tuned 🙂
+Snapshots are not implemented in Hamstore yet, but we have big plans for them, so stay tuned 🙂

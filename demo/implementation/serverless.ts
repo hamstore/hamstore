@@ -4,7 +4,7 @@ import { functions } from './functions';
 import { resources } from './resources';
 
 const serverlessConfiguration: AWS = {
-  service: 'castore-demo',
+  service: 'hamstore-demo',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild'],
   provider: {

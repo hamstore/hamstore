@@ -1,13 +1,12 @@
 /* eslint-disable max-lines */
-import { vi } from 'vitest';
-
 import {
   EventStore,
   EventType,
   EventTypeDetail,
   EventStorageAdapter,
   tuple,
-} from '@castore/core';
+} from '@hamstore/core';
+import { vi } from 'vitest';
 
 import { JSONSchemaCommand } from './command';
 

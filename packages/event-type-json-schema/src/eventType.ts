@@ -1,6 +1,5 @@
+import { EventType } from '@hamstore/core';
 import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
-
-import { EventType } from '@castore/core';
 
 export class JSONSchemaEventType<
   TYPE extends string = string,

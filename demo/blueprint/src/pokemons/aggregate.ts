@@ -1,4 +1,4 @@
-import type { Aggregate } from '@castore/core';
+import type { Aggregate } from '@hamstore/core';
 
 export type PokemonAggregate = Aggregate & {
   name: string;

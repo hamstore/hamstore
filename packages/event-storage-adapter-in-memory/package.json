@@ -1,10 +1,10 @@
 {
-  "name": "@castore/event-storage-adapter-in-memory",
-  "description": "DRY Castore EventStorageAdapter implementation using a JS object",
+  "name": "@hamstore/event-storage-adapter-in-memory",
+  "description": "DRY Hamstore EventStorageAdapter implementation using a JS object",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -42,7 +42,7 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
+    "@hamstore/core": "workspace:",
     "@types/lodash.omit": "^4.5.9",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
@@ -79,7 +79,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

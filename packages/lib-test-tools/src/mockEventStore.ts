@@ -5,7 +5,7 @@ import {
   EventStoreEventDetails,
   EventStoreReducer,
   EventStoreAggregate,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { MockedEventStore } from './mockedEventStore';
 

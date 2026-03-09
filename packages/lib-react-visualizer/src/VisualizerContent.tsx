@@ -1,9 +1,8 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
 import React, { useState, JSX } from 'react';
-
-import type { JSONSchemaCommand } from '@castore/command-json-schema';
-import type { EventStore } from '@castore/core';
 
 import { DB as $DB, Commands } from './tabs';
 

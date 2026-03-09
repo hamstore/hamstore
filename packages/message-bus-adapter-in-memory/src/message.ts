@@ -2,7 +2,7 @@ import type {
   AggregateExistsMessage,
   NotificationMessage,
   StateCarryingMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 type Prettify<OBJECTS extends Record<string, unknown>> =
   OBJECTS extends infer OBJECT

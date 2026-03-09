@@ -1,7 +1,7 @@
 import {
   eventAlreadyExistsErrorCode,
   EventAlreadyExistsError,
-} from '@castore/core';
+} from '@hamstore/core';
 
 export class DynamoDBEventAlreadyExistsError
   extends Error

@@ -1,5 +1,5 @@
-import type { EventAlreadyExistsError } from '@castore/core';
-import { eventAlreadyExistsErrorCode } from '@castore/core';
+import type { EventAlreadyExistsError } from '@hamstore/core';
+import { eventAlreadyExistsErrorCode } from '@hamstore/core';
 
 export class PostgresEventAlreadyExistsError
   extends Error

@@ -9,10 +9,9 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
-import type { Message, MessageChannelAdapter } from '@castore/core';
-import { isEventCarryingMessage } from '@castore/core';
-import { EventBridgeMessageBusAdapter } from '@castore/message-bus-adapter-event-bridge';
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
+import { isEventCarryingMessage } from '@hamstore/core';
+import { EventBridgeMessageBusAdapter } from '@hamstore/message-bus-adapter-event-bridge';
 
 import {
   getFormattedMessageSize,

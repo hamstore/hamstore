@@ -1,10 +1,10 @@
 {
-  "name": "@castore/lib-test-tools",
-  "description": "Test tooling for the Castore library.",
+  "name": "@hamstore/lib-test-tools",
+  "description": "Test tooling for the Hamstore library.",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -37,7 +37,7 @@
     "watch": "rm -rf dist && concurrently 'yarn:package-* --watch'"
   },
   "dependencies": {
-    "@castore/event-storage-adapter-in-memory": "workspace:"
+    "@hamstore/event-storage-adapter-in-memory": "workspace:"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
@@ -45,8 +45,8 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
@@ -80,7 +80,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

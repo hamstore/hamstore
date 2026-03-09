@@ -1,3 +1,5 @@
+import type { EventStore } from '@hamstore/core';
+import { useAggregateEvents } from '@hamstore/event-storage-adapter-redux';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion,
@@ -11,9 +13,6 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState, JSX } from 'react';
-
-import type { EventStore } from '@castore/core';
-import { useAggregateEvents } from '@castore/event-storage-adapter-redux';
 
 import { JsonView } from '~/components/JsonView';
 

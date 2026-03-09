@@ -1,25 +1,25 @@
 # SQS Message Queue Adapter
 
-DRY Castore [`MessageQueue`](https://castore-dev.github.io/castore/docs/reacting-to-events/message-queues/) definition using [AWS SQS](https://aws.amazon.com/sqs/).
+DRY Hamstore [`MessageQueue`](https://hamstore.github.io/hamstore/docs/reacting-to-events/message-queues/) definition using [AWS SQS](https://aws.amazon.com/sqs/).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/message-queue-adapter-sqs
+npm install @hamstore/message-queue-adapter-sqs
 
 # yarn
-yarn add @castore/message-queue-adapter-sqs
+yarn add @hamstore/message-queue-adapter-sqs
 ```
 
-This package has `@castore/core` and `@aws-sdk/client-sqs` (above v3) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core` and `@aws-sdk/client-sqs` (above v3) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core @aws-sdk/client-sqs
+npm install @hamstore/core @aws-sdk/client-sqs
 
 # yarn
-yarn add @castore/core @aws-sdk/client-sqs
+yarn add @hamstore/core @aws-sdk/client-sqs
 ```
 
 ## 👩‍💻 Usage
@@ -27,7 +27,7 @@ yarn add @castore/core @aws-sdk/client-sqs
 ```ts
 import { SQSClient } from '@aws-sdk/client-sqs';
 
-import { SQSMessageQueueAdapter } from '@castore/message-queue-adapter-sqs';
+import { SQSMessageQueueAdapter } from '@hamstore/message-queue-adapter-sqs';
 
 const sqsClient = new SQSClient({});
 
@@ -149,7 +149,7 @@ On the worker side, you can use the `SQSMessageQueueMessage` and `SQSMessageQueu
 import type {
   SQSMessageQueueMessage,
   SQSMessageQueueMessageBody,
-} from '@castore/message-queue-adapter-sqs';
+} from '@hamstore/message-queue-adapter-sqs';
 
 const appMessagesWorker = async ({ Records }: SQSMessageQueueMessage) => {
   for (const { body } of Records) {

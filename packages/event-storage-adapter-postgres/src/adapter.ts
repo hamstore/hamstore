@@ -1,8 +1,5 @@
 /* eslint-disable complexity */
-import type { SerializableParameter } from 'postgres';
-import postgres from 'postgres';
-
-import { GroupedEvent } from '@castore/core';
+import { GroupedEvent } from '@hamstore/core';
 import type {
   EventDetail,
   EventsQueryOptions,
@@ -12,7 +9,9 @@ import type {
   ListAggregateIdsOutput,
   OptionalTimestamp,
   PushEventOptions,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { SerializableParameter } from 'postgres';
+import postgres from 'postgres';
 
 import { PostgresEventAlreadyExistsError } from './error';
 

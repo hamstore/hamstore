@@ -1,5 +1,3 @@
-import type { EventEmitter } from 'events';
-
 import type {
   MessageChannelSourceEventStores,
   AggregateExistsMessage,
@@ -11,7 +9,8 @@ import type {
   StateCarryingMessage,
   StateCarryingMessageBus,
   EventStoreStateCarryingMessage,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { EventEmitter } from 'events';
 
 export type ConstructorArgs = {
   eventEmitter: EventEmitter;

@@ -1,6 +1,6 @@
 # In Memory Event Storage Adapter
 
-DRY Castore [`EventStorageAdapter`](https://castore-dev.github.io/castore/docs/event-sourcing/fetching-events/) implementation using a JS object.
+DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/event-sourcing/fetching-events/) implementation using a JS object.
 
 This class is mainly useful for manual and unit tests. It is obviously not recommended for production uses 🙂
 
@@ -8,26 +8,26 @@ This class is mainly useful for manual and unit tests. It is obviously not recom
 
 ```bash
 # npm
-npm install @castore/event-storage-adapter-in-memory
+npm install @hamstore/event-storage-adapter-in-memory
 
 # yarn
-yarn add @castore/event-storage-adapter-in-memory
+yarn add @hamstore/event-storage-adapter-in-memory
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
 
 ```ts
-import { InMemoryEventStorageAdapter } from '@castore/event-storage-adapter-in-memory';
+import { InMemoryEventStorageAdapter } from '@hamstore/event-storage-adapter-in-memory';
 
 const pokemonsEventStorageAdapter = new InMemoryEventStorageAdapter({
   // 👇 You can specify an initial state for your event store

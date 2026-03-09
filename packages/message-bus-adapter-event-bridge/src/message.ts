@@ -1,5 +1,3 @@
-import type { EventBridgeEvent } from 'aws-lambda';
-
 import type {
   EventStoreEventDetails,
   EventStoreAggregate,
@@ -14,7 +12,8 @@ import type {
   MessageChannelSourceEventStores,
   __REPLAYED__,
   __AGGREGATE_EXISTS__,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { EventBridgeEvent } from 'aws-lambda';
 
 type EventBridgeStateCarryingMessageBusMessage<
   MESSAGE_BUS extends StateCarryingMessageBus,

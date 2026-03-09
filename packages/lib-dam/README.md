@@ -1,30 +1,30 @@
 # Dam
 
-Data maintenance & migration tooling for the [Castore](https://github.com/castore-dev/castore) library.
+Data maintenance & migration tooling for the [Hamstore](https://github.com/hamstore/hamstore) library.
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install --save-dev @castore/lib-dam
+npm install --save-dev @hamstore/lib-dam
 
 # yarn
-yarn add --dev @castore/lib-dam
+yarn add --dev @hamstore/lib-dam
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
 
-`@castore/lib-dam` exposes a series of utils that scan past events and re-publish them in [message channels](https://github.com/castore-dev/castore#--event-driven-architecture) – or _"pour them"_ as in _"pouring water from a container to another"_ 🫗.
+`@hamstore/lib-dam` exposes a series of utils that scan past events and re-publish them in [message channels](https://github.com/hamstore/hamstore#--event-driven-architecture) – or _"pour them"_ as in _"pouring water from a container to another"_ 🫗.
 
 Those utils are typically very useful for data maintenance and migration. They publish messages with the `replay` option enabled and can be **rate limited** to limit impact on production traffic. They are the following:
 
@@ -35,10 +35,10 @@ Those utils are typically very useful for data maintenance and migration. They p
 
 ### `pourEventStoreAggregateIds`
 
-Pour all the aggregate ids of an event store in a provided [`AggregateExistsMessageChannel`](https://github.com/castore-dev/castore#--event-driven-architecture). Aggregate ids are published in the order in which they are retrieved (by default, ordered by their initial timestamps).
+Pour all the aggregate ids of an event store in a provided [`AggregateExistsMessageChannel`](https://github.com/hamstore/hamstore#--event-driven-architecture). Aggregate ids are published in the order in which they are retrieved (by default, ordered by their initial timestamps).
 
 ```ts
-import { pourEventStoreAggregateIds } from '@castore/lib-dam';
+import { pourEventStoreAggregateIds } from '@hamstore/lib-dam';
 
 // 👇 ...or AggregateExistsMessageBus
 const maintenanceMessageQueue = new AggregateExistsMessageQueue({
@@ -71,10 +71,10 @@ const {
 
 ### `pourAggregateEvents`
 
-Pour all the events of a specific aggregate in a provided [`NotificationMessageChannel`](https://github.com/castore-dev/castore#--event-driven-architecture). Events are published in the order in which they are retrieved (by default, ordered by their timestamps).
+Pour all the events of a specific aggregate in a provided [`NotificationMessageChannel`](https://github.com/hamstore/hamstore#--event-driven-architecture). Events are published in the order in which they are retrieved (by default, ordered by their timestamps).
 
 ```ts
-import { pourAggregateEvents } from '@castore/lib-dam';
+import { pourAggregateEvents } from '@hamstore/lib-dam';
 
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({
@@ -113,10 +113,10 @@ const {
 
 ### `pourEventStoreEvents`
 
-Pour all the events of an event store in a provided [`NotificationMessageChannel`](https://github.com/castore-dev/castore#--event-driven-architecture). Events are published in the order of their timestamps (independently of their aggregate).
+Pour all the events of an event store in a provided [`NotificationMessageChannel`](https://github.com/hamstore/hamstore#--event-driven-architecture). Events are published in the order of their timestamps (independently of their aggregate).
 
 ```ts
-import { pourEventStoreEvents } from '@castore/lib-dam';
+import { pourEventStoreEvents } from '@hamstore/lib-dam';
 
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({
@@ -147,10 +147,10 @@ const {
 
 ### `pourEventStoreCollectionEvents`
 
-Pour all the events of a **collection of event stores** in a provided [`NotificationMessageChannel`](https://github.com/castore-dev/castore#--event-driven-architecture). Events are published in the order of their timestamps (independently of their aggregate and event store).
+Pour all the events of a **collection of event stores** in a provided [`NotificationMessageChannel`](https://github.com/hamstore/hamstore#--event-driven-architecture). Events are published in the order of their timestamps (independently of their aggregate and event store).
 
 ```ts
-import { pourEventStoreEvents } from '@castore/lib-dam';
+import { pourEventStoreEvents } from '@hamstore/lib-dam';
 
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({

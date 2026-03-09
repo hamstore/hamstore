@@ -1,7 +1,6 @@
+import { Command } from '@hamstore/core';
 import { A } from 'ts-toolbelt';
 import { z } from 'zod';
-
-import { Command } from '@castore/core';
 
 import { ZodCommand } from './command';
 import {

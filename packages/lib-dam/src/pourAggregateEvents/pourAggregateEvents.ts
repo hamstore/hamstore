@@ -4,7 +4,7 @@ import type {
   EventStoreNotificationMessage,
   EventsQueryOptions,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { getThrottle } from '~/utils/getThrottle';
 import { getIsBetween } from '~/utils/isBetween';

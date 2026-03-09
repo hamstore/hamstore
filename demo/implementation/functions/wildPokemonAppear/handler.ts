@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import { wildPokemonAppearCommand } from '@castore/demo-blueprint';
+import { wildPokemonAppearCommand } from '@hamstore/demo-blueprint';
 
 import { pokemonsEventStore } from '~/libs/eventStores/pokemons';
 import { applyConsoleMiddleware } from '~/libs/middlewares/console';

@@ -4,6 +4,11 @@ on:
   release:
     types: [published]
 
+# OIDC token permissions for npm publishing (to be configured)
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     name: release
@@ -23,82 +28,104 @@ jobs:
       - name: Set packages versions
         run: yarn set-packages-versions ${{ github.event.release.tag_name }}
 
-      - name: Copy paste root README to @castore/core
+      - name: Copy paste root README to @hamstore/core
         run: cp README.md ./packages/core/README.md
 
+      # Using NPM_PUBLISH_TOKEN for initial publish.
+      # After packages exist on npm, configure OIDC trusted publishing per-package
+      # and switch to provenance-based publishing (remove token, use --provenance).
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/core/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-storage-adapter-dynamodb/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-storage-adapter-postgres/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-storage-adapter-in-memory/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-storage-adapter-redux/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-storage-adapter-http/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-type-json-schema/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/event-type-zod/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/command-json-schema/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/command-zod/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-bus-adapter-event-bridge/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-bus-adapter-event-bridge-s3/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-bus-adapter-in-memory/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-queue-adapter-sqs/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-queue-adapter-sqs-s3/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/message-queue-adapter-in-memory/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/lib-test-tools/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/lib-react-visualizer/package.json
+          access: public
       - uses: JS-DevTools/npm-publish@v2
         with:
-          token: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
           package: ./packages/lib-dam/package.json
+          access: public

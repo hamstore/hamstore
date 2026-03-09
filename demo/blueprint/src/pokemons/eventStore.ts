@@ -1,4 +1,4 @@
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 import type { PokemonAggregate } from './aggregate';
 import { appearedEvent, caughtByTrainerEvent, levelledUpEvent } from './events';

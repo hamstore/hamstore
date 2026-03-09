@@ -1,4 +1,4 @@
-import { isEventCarryingMessage } from '@castore/core';
+import { isEventCarryingMessage } from '@hamstore/core';
 
 import type { Task } from './message';
 import type { FilterPattern } from './types';

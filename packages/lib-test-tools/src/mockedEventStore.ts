@@ -6,8 +6,8 @@ import {
   EventTypeDetails,
   Reducer,
   $Contravariant,
-} from '@castore/core';
-import { InMemoryEventStorageAdapter } from '@castore/event-storage-adapter-in-memory';
+} from '@hamstore/core';
+import { InMemoryEventStorageAdapter } from '@hamstore/event-storage-adapter-in-memory';
 
 export class MockedEventStore<
   EVENT_STORE_ID extends string = string,

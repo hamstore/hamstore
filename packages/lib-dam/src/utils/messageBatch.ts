@@ -1,4 +1,4 @@
-import type { EventStore, EventStoreNotificationMessage } from '@castore/core';
+import type { EventStore, EventStoreNotificationMessage } from '@hamstore/core';
 
 import { isBetween } from './isBetween';
 

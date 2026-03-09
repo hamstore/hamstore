@@ -1,5 +1,3 @@
-import { promise as fastQ, queueAsPromised } from 'fastq';
-
 import type {
   MessageChannelSourceEventStores,
   AggregateExistsMessageQueue,
@@ -10,7 +8,8 @@ import type {
   EventStoreStateCarryingMessage,
   MessageChannelAdapter,
   Message,
-} from '@castore/core';
+} from '@hamstore/core';
+import { promise as fastQ, queueAsPromised } from 'fastq';
 
 import {
   parseBackoffRate,

@@ -1,22 +1,21 @@
+import { EventStore } from '@hamstore/core';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
 
-import { EventStore } from '@castore/core';
-
 import { ReduxEventStorageAdapter } from '~/adapter';
-import { getCastoreReducers } from '~/getCastoreReducers';
+import { getHamstoreReducers } from '~/getHamstoreReducers';
 import { EventStoresReduxState } from '~/types';
 import { DEFAULT_PREFIX } from '~/utils/getEventStoreSliceName';
 
-export const configureCastore = <EVENT_STORES extends EventStore[]>({
+export const configureHamstore = <EVENT_STORES extends EventStore[]>({
   eventStores,
   prefix = DEFAULT_PREFIX,
 }: {
   eventStores: EVENT_STORES;
   prefix?: string;
 }): EnhancedStore<EventStoresReduxState<EVENT_STORES>> => {
-  const castoreReducers = getCastoreReducers({ eventStores, prefix });
+  const hamstoreReducers = getHamstoreReducers({ eventStores, prefix });
 
-  const store = configureStore({ reducer: castoreReducers });
+  const store = configureStore({ reducer: hamstoreReducers });
 
   eventStores.forEach(eventStore => {
     eventStore.eventStorageAdapter = new ReduxEventStorageAdapter({

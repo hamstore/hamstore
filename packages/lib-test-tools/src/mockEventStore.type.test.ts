@@ -1,6 +1,5 @@
+import { pokemonsEventStore } from '@hamstore/demo-blueprint';
 import type { A } from 'ts-toolbelt';
-
-import { pokemonsEventStore } from '@castore/demo-blueprint';
 
 import { mockEventStore } from './mockEventStore';
 

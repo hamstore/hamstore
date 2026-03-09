@@ -1,4 +1,4 @@
-import { ListAggregateIdsOutput } from '@castore/core';
+import { ListAggregateIdsOutput } from '@hamstore/core';
 
 import { pokemonsEventStore } from '~/libs/eventStores/pokemons';
 import { applyConsoleMiddleware } from '~/libs/middlewares/console';

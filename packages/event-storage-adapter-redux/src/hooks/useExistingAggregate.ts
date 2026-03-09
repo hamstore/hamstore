@@ -4,7 +4,7 @@ import {
   EventStoreEventDetails,
   GetAggregateOptions,
   AggregateNotFoundError,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { useAggregate } from './useAggregate';
 

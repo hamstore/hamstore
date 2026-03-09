@@ -1,6 +1,4 @@
 /* eslint-disable max-lines */
-import type { EventEmitter } from 'node:events';
-
 import {
   MessageChannelAdapter,
   Message,
@@ -9,7 +7,8 @@ import {
   NotificationMessage,
   StateCarryingMessageBus,
   StateCarryingMessage,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { EventEmitter } from 'node:events';
 
 import type { InMemoryMessageBusMessage, Task } from './message';
 import type {

@@ -1,9 +1,8 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
+import { configureHamstore } from '@hamstore/event-storage-adapter-redux';
 import React, { JSX } from 'react';
 import { Provider } from 'react-redux';
-
-import type { JSONSchemaCommand } from '@castore/command-json-schema';
-import type { EventStore } from '@castore/core';
-import { configureCastore } from '@castore/event-storage-adapter-redux';
 
 import { VisualizerContent } from './VisualizerContent';
 
@@ -16,7 +15,7 @@ export const UnthemedVisualizer = ({
   eventStores: EventStore[];
   contextsByCommandId: Record<string, unknown[]>;
 }): JSX.Element => {
-  const store = configureCastore({ eventStores });
+  const store = configureHamstore({ eventStores });
 
   const eventStoresById: Record<string, EventStore> = {};
   const eventStoreIds: string[] = [];

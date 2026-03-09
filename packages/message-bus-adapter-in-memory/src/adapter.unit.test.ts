@@ -1,18 +1,17 @@
 /* eslint-disable max-lines */
-import { EventEmitter } from 'events';
-import type { A } from 'ts-toolbelt';
-
 import {
   MessageChannelMessage,
   EventStoreNotificationMessage,
   NotificationMessageBus,
-} from '@castore/core';
+} from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
   pikachuAppearedEvent,
   pikachuCaughtEvent,
-} from '@castore/demo-blueprint';
+} from '@hamstore/demo-blueprint';
+import { EventEmitter } from 'events';
+import type { A } from 'ts-toolbelt';
 
 import { InMemoryMessageBusAdapter } from './adapter';
 import type { TaskContext } from './types';

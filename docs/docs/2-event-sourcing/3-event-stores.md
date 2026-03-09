@@ -14,7 +14,7 @@ Think of event stores as _"what tables would be in CRUD"_, except that instead o
 
 ![Event Store](../../assets/docSchemas/eventStore.png)
 
-In Castore, `EventStore` classes are NOT responsible for actually storing data (this will come with [event storage adapters](./4-fetching-events.md)). But rather to provide a boilerplate-free and type-safe interface to perform many actions such as:
+In Hamstore, `EventStore` classes are NOT responsible for actually storing data (this will come with [event storage adapters](./4-fetching-events.md)). But rather to provide a boilerplate-free and type-safe interface to perform many actions such as:
 
 - Listing aggregate ids
 - Accessing events of an aggregate
@@ -22,7 +22,7 @@ In Castore, `EventStore` classes are NOT responsible for actually storing data (
 - Pushing new events etc.
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 const pokemonsEventStore = new EventStore({
   eventStoreId: 'POKEMONS',
@@ -39,7 +39,7 @@ const pokemonsEventStore = new EventStore({
 
 :::info
 
-☝️ The `EventStore` class is the heart of Castore, it even gave it its name!
+☝️ The `EventStore` class is the heart of Hamstore, it even gave Hamstore (and [Castore](https://github.com/castore-dev/castore), which it is forked from) its name!
 
 :::
 
@@ -106,7 +106,7 @@ const eventStorageAdapter = pokemonsEventStore.eventStorageAdapter;
 - <code>getEventStorageAdapter <i>(() => EventStorageAdapter)</i></code>: Returns the event store event storage adapter if it exists. Throws an <code>UndefinedEventStorageAdapterError</code> if it doesn't.
 
 ```ts
-import { UndefinedEventStorageAdapterError } from '@castore/core';
+import { UndefinedEventStorageAdapterError } from '@hamstore/core';
 
 expect(() => pokemonsEventStore.getEventStorageAdapter()).toThrow(
   new UndefinedEventStorageAdapterError({ eventStoreId: 'POKEMONS' }),
@@ -189,7 +189,7 @@ const { aggregate, events } =
 - <code>getExistingAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregate</code> method, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
 
 ```ts
-import { AggregateNotFoundError } from '@castore/core';
+import { AggregateNotFoundError } from '@hamstore/core';
 
 expect(async () =>
   pokemonsEventStore.getExistingAggregate(unexistingId),
@@ -210,7 +210,7 @@ const { aggregate } =
 
   `OptionsObj` contains the following properties:
   - <code>prevAggregate <i>(?Aggregate)</i></code>: The aggregate at the current version, i.e. before having pushed the event. Can be useful in some cases like when using the <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a>
-  - <code>force <i>(?boolean)</i></code>: To force push the event even if one already exists for the corresponding <code>aggregateId</code> and <code>version</code>. Any existing event will be overridden, so use with extra care, mainly in <a href="https://www.npmjs.com/package/@castore/lib-dam">data migrations</a>.
+  - <code>force <i>(?boolean)</i></code>: To force push the event even if one already exists for the corresponding <code>aggregateId</code> and <code>version</code>. Any existing event will be overridden, so use with extra care, mainly in <a href="https://www.npmjs.com/package/@hamstore/lib-dam">data migrations</a>.
 
   `ResponseObj` contains the following properties:
   - <code>event <i>(EventDetail)</i></code>: The complete event (includes the <code>timestamp</code>)
@@ -270,7 +270,7 @@ if (nextPageToken) {
 - `EventStoreId`: Returns the `EventStore` id
 
 ```ts
-import type { EventStoreId } from '@castore/core';
+import type { EventStoreId } from '@hamstore/core';
 
 type PokemonsEventStoreId = EventStoreId<typeof pokemonsEventStore>;
 // => 'POKEMONS'
@@ -279,7 +279,7 @@ type PokemonsEventStoreId = EventStoreId<typeof pokemonsEventStore>;
 - `EventStoreEventTypes`: Returns the `EventStore` list of events types
 
 ```ts
-import type { EventStoreEventTypes } from '@castore/core';
+import type { EventStoreEventTypes } from '@hamstore/core';
 
 type PokemonEventTypes = EventStoreEventTypes<typeof pokemonsEventStore>;
 // => [typeof pokemonAppearedEventType, typeof pokemonCaughtEventType...]
@@ -288,7 +288,7 @@ type PokemonEventTypes = EventStoreEventTypes<typeof pokemonsEventStore>;
 - `EventStoreEventDetails`: Returns the union of all the `EventStore` possible events details
 
 ```ts
-import type { EventStoreEventDetails } from '@castore/core';
+import type { EventStoreEventDetails } from '@hamstore/core';
 
 type PokemonEventDetails = EventStoreEventDetails<typeof pokemonsEventStore>;
 // => EventTypeDetail<typeof pokemonAppearedEventType>
@@ -299,7 +299,7 @@ type PokemonEventDetails = EventStoreEventDetails<typeof pokemonsEventStore>;
 - `EventStoreReducer`: Returns the `EventStore` reducer
 
 ```ts
-import type { EventStoreReducer } from '@castore/core';
+import type { EventStoreReducer } from '@hamstore/core';
 
 type PokemonsReducer = EventStoreReducer<typeof pokemonsEventStore>;
 // => Reducer<PokemonAggregate, PokemonEventDetails>
@@ -308,7 +308,7 @@ type PokemonsReducer = EventStoreReducer<typeof pokemonsEventStore>;
 - `EventStoreAggregate`: Returns the `EventStore` aggregate
 
 ```ts
-import type { EventStoreAggregate } from '@castore/core';
+import type { EventStoreAggregate } from '@hamstore/core';
 
 type SomeAggregate = EventStoreAggregate<typeof pokemonsEventStore>;
 // => PokemonAggregate

@@ -1,7 +1,6 @@
+import { Command } from '@hamstore/core';
 import { FromSchema } from 'json-schema-to-ts';
 import { A } from 'ts-toolbelt';
-
-import { Command } from '@castore/core';
 
 import { JSONSchemaCommand } from './command';
 import {

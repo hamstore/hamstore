@@ -3,12 +3,11 @@ import {
   unmarshall,
   unmarshallOptions as UnmarshallOptions,
 } from '@aws-sdk/util-dynamodb';
-
 import type {
   EventDetail,
   EventStore,
   EventStoreNotificationMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 export class ImageParser<EVENT_STORES extends EventStore> {
   public sourceEventStores: EVENT_STORES[];

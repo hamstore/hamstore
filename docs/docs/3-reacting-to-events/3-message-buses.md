@@ -11,7 +11,7 @@ sidebar_position: 3
 You can use the `AggregateExistsMessageBus`, `NotificationMessageBus` or `StateCarryingMessageBus` classes to implement message buses:
 
 ```ts
-import { NotificationMessageBus } from '@castore/core';
+import { NotificationMessageBus } from '@hamstore/core';
 
 const appMessageBus = new NotificationMessageBus({
   messageBusId: 'APP_MESSAGE_BUSES',
@@ -33,7 +33,7 @@ await appMessageBus.publishMessage({
 Similarly to event stores, `MessageBus` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageBusAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 await messageBus.publishMessage(...);
 // ❌ Will throw an `UndefinedMessageChannelAdapterError`
@@ -60,7 +60,7 @@ You can code your own `MessageBusAdapter` (simply implement the `MessageChannelA
 The adapter packages will also expose useful generics to type the arguments of your bus listeners. For instance:
 
 ```ts
-import type { EventBridgeMessageBusMessage } from '@castore/message-bus-adapter-event-bridge';
+import type { EventBridgeMessageBusMessage } from '@hamstore/message-bus-adapter-event-bridge';
 
 const pokemonMessagesListener = async (
   // 👇 Specify that you only listen to the pokemonsEventStore messages
@@ -127,7 +127,7 @@ The following methods interact with the messaging solution of your application t
 - `MessageChannelMessage`: Given a `MessageBus`, returns the TS type of its messages
 
 ```ts
-import type { MessageChannelMessage } from '@castore/core';
+import type { MessageChannelMessage } from '@hamstore/core';
 
 type AppMessage = MessageChannelMessage<typeof appMessageBus>;
 

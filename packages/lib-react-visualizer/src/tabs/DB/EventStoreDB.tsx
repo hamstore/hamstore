@@ -1,8 +1,7 @@
+import type { EventStore } from '@hamstore/core';
+import { useAggregateIds } from '@hamstore/event-storage-adapter-redux';
 import { Stack } from '@mui/material';
 import React, { JSX } from 'react';
-
-import type { EventStore } from '@castore/core';
-import { useAggregateIds } from '@castore/event-storage-adapter-redux';
 
 import { AggregateCard } from './AggregateCard';
 

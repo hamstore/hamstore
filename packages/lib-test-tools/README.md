@@ -1,36 +1,36 @@
 # Test tools
 
-Test tooling for the [Castore](https://github.com/castore-dev/castore) library.
+Test tooling for the [Hamstore](https://github.com/hamstore/hamstore) library.
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install --save-dev @castore/lib-test-tools
+npm install --save-dev @hamstore/lib-test-tools
 
 # yarn
-yarn add --dev @castore/lib-test-tools
+yarn add --dev @hamstore/lib-test-tools
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
 
 ### MockEventStore
 
-The `mockEventStore` util returns a copy of the provided `EventStore` connected to an [`InMemoryEventStorageAdapter`](https://github.com/castore-dev/castore/tree/main/packages/event-storage-adapter-in-memory), empty or with a given initial state. It follows the `EventStore` interface but adds a `reset` method to reset it to the provided initial state. The original event store is not muted.
+The `mockEventStore` util returns a copy of the provided `EventStore` connected to an [`InMemoryEventStorageAdapter`](https://github.com/hamstore/hamstore/tree/main/packages/event-storage-adapter-in-memory), empty or with a given initial state. It follows the `EventStore` interface but adds a `reset` method to reset it to the provided initial state. The original event store is not muted.
 
 ```ts
-import { EventStore } from '@castore/core';
-import { mockEventStore } from '@castore/lib-test-tools';
+import { EventStore } from '@hamstore/core';
+import { mockEventStore } from '@hamstore/lib-test-tools';
 
 const pokemonsEventStore = new EventStore({
   ...
@@ -74,8 +74,8 @@ describe('My awesome test', () => {
 Unlike `mockEventStore`, the `muteEventStore` util mutes the original event store and replace its storage adapter with an `InMemoryEventStorageAdapter` matching the provided initial state.
 
 ```ts
-import { EventStore } from '@castore/core';
-import { muteEventStore } from '@castore/lib-test-tools';
+import { EventStore } from '@hamstore/core';
+import { muteEventStore } from '@hamstore/lib-test-tools';
 
 const pokemonsEventStore = new EventStore({
   ...

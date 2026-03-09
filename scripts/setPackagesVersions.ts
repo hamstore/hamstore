@@ -53,7 +53,7 @@ packagesNames.forEach(packageName => {
   const dependencies = packageJson.dependencies;
   if (dependencies !== undefined) {
     Object.keys(dependencies).forEach(dependencyName => {
-      if (dependencyName.startsWith('@castore/')) {
+      if (dependencyName.startsWith('@hamstore/')) {
         dependencies[dependencyName] = NEW_SEM_VER;
       }
     });
@@ -62,7 +62,7 @@ packagesNames.forEach(packageName => {
   const peerDependencies = packageJson.peerDependencies;
   if (peerDependencies !== undefined) {
     Object.keys(peerDependencies).forEach(dependencyName => {
-      if (dependencyName.startsWith('@castore/')) {
+      if (dependencyName.startsWith('@hamstore/')) {
         peerDependencies[dependencyName] = `^${NEW_SEM_VER_MAJOR}.0.0`;
       }
     });

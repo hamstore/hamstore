@@ -3,7 +3,7 @@ import type {
   EventStore,
   EventStoreEventDetails,
   EventStoreNotificationMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { MessageBatch } from './messageBatch';
 

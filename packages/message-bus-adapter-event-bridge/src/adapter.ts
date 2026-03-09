@@ -3,19 +3,18 @@ import {
   PutEventsCommand,
   PutEventsRequestEntry,
 } from '@aws-sdk/client-eventbridge';
-import chunk from 'lodash.chunk';
-
 import type {
   Message,
   MessageChannelAdapter,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 import {
   __REPLAYED__,
   __AGGREGATE_EXISTS__,
   isAggregateExistsMessage,
   isEventCarryingMessage,
-} from '@castore/core';
+} from '@hamstore/core';
+import chunk from 'lodash.chunk';
 
 export const EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE = 10;
 

@@ -3,11 +3,11 @@ import {
   NotificationMessageQueue,
   EventStoreId,
   EventsQueryOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 import {
   InMemoryMessageQueueAdapter,
   TaskContext,
-} from '@castore/message-queue-adapter-in-memory';
+} from '@hamstore/message-queue-adapter-in-memory';
 
 import {
   pokemonEventStore,

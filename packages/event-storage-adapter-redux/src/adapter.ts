@@ -1,13 +1,12 @@
 /* eslint-disable max-lines */
-import type { EnhancedStore } from '@reduxjs/toolkit';
-
 import {
   GroupedEvent,
   EventStorageAdapter,
   EventDetail,
   PushEventOptions,
   Aggregate,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { EnhancedStore } from '@reduxjs/toolkit';
 
 import {
   ReduxStoreEventAlreadyExistsError,

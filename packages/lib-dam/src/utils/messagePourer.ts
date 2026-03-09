@@ -2,7 +2,7 @@ import {
   EventStore,
   EventStoreNotificationMessage,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { getThrottle } from '~/utils/getThrottle';
 

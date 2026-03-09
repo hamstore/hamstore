@@ -1,7 +1,7 @@
 export { ReduxEventStorageAdapter } from './adapter';
 export * from './hooks';
-export { configureCastore } from './configureCastore';
-export { getCastoreReducers } from './getCastoreReducers';
+export { configureHamstore } from './configureHamstore';
+export { getHamstoreReducers } from './getHamstoreReducers';
 export type {
   EventStoreReduxState,
   EventStoresReduxState,

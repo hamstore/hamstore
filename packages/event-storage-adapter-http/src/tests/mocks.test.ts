@@ -3,10 +3,10 @@ export const swagger = {
   openapi: '3.0',
   info: {
     title: 'Test Swagger',
-    description: 'The Castore API',
+    description: 'The Hamstore API',
     version: '1.0.0',
     license: {
-      name: 'Castore',
+      name: 'Hamstore',
     },
   },
   basePath: '/api/v2',

@@ -1,10 +1,10 @@
 {
-  "name": "@castore/event-storage-adapter-dynamodb",
-  "description": "DRY Castore EventStorageAdapter implementation using DynamoDB",
+  "name": "@hamstore/event-storage-adapter-dynamodb",
+  "description": "DRY Hamstore EventStorageAdapter implementation using DynamoDB",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -46,8 +46,8 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
     "@serverless/typescript": "^3.38.0",
     "@types/lodash.omit": "^4.5.9",
     "@types/node": "^24.5.2",
@@ -87,7 +87,7 @@
   ],
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.0.0",
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

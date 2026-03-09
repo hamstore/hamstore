@@ -1,10 +1,10 @@
 {
-  "name": "@castore/lib-dam",
-  "description": "Data maintenance & migration tooling for the Castore library.",
+  "name": "@hamstore/lib-dam",
+  "description": "Data maintenance & migration tooling for the Hamstore library.",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -45,10 +45,10 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
-    "@castore/lib-test-tools": "workspace:",
-    "@castore/message-queue-adapter-in-memory": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
+    "@hamstore/lib-test-tools": "workspace:",
+    "@hamstore/message-queue-adapter-in-memory": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
@@ -83,7 +83,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

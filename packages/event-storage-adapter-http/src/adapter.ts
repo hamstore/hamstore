@@ -1,12 +1,11 @@
-import { OpenAPI } from 'openapi-types';
-
 import {
   EventDetail,
   EventStorageAdapter,
   EventsQueryOptions,
   GroupedEvent,
   ListAggregateIdsOutput,
-} from '@castore/core';
+} from '@hamstore/core';
+import { OpenAPI } from 'openapi-types';
 
 import { getApiMethod, compileOperation } from './utils/getApiMethod';
 import { getSwaggerClient } from './utils/getSwaggerClient';

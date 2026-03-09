@@ -1,4 +1,4 @@
-import { EventStoreEventDetails } from '@castore/core';
+import { EventStoreEventDetails } from '@hamstore/core';
 
 import { pokemonsEventStore } from './eventStore';
 

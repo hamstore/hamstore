@@ -1,4 +1,4 @@
-import { pokemonsEventStore } from '@castore/demo-blueprint';
+import { pokemonsEventStore } from '@hamstore/demo-blueprint';
 
 import { muteEventStore } from './muteEventStore';
 

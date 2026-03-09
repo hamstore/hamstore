@@ -1,4 +1,4 @@
-import { catchPokemonCommand } from '@castore/demo-blueprint';
+import { catchPokemonCommand } from '@hamstore/demo-blueprint';
 
 import { pokemonsEventStore } from '~/libs/eventStores/pokemons';
 import { trainersEventStore } from '~/libs/eventStores/trainers';

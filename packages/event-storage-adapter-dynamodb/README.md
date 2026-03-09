@@ -1,25 +1,25 @@
 # DynamoDB Event Storage Adapter
 
-DRY Castore [`EventStorageAdapter`](https://castore-dev.github.io/castore/docs/event-sourcing/fetching-events/) implementation using [AWS DynamoDB](https://aws.amazon.com/dynamodb/).
+DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/event-sourcing/fetching-events/) implementation using [AWS DynamoDB](https://aws.amazon.com/dynamodb/).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/event-storage-adapter-dynamodb
+npm install @hamstore/event-storage-adapter-dynamodb
 
 # yarn
-yarn add @castore/event-storage-adapter-dynamodb
+yarn add @hamstore/event-storage-adapter-dynamodb
 ```
 
-This package has `@castore/core` and `@aws-sdk/client-dynamodb` (above v3) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core` and `@aws-sdk/client-dynamodb` (above v3) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core @aws-sdk/client-dynamodb
+npm install @hamstore/core @aws-sdk/client-dynamodb
 
 # yarn
-yarn add @castore/core @aws-sdk/client-dynamodb
+yarn add @hamstore/core @aws-sdk/client-dynamodb
 ```
 
 ## Table of content
@@ -52,7 +52,7 @@ Documentation:
 ```ts
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-import { DynamoDBSingleTableEventStorageAdapter } from '@castore/event-storage-adapter-dynamodb';
+import { DynamoDBSingleTableEventStorageAdapter } from '@hamstore/event-storage-adapter-dynamodb';
 
 const dynamoDBClient = new DynamoDBClient({});
 
@@ -108,7 +108,7 @@ A [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/dev
 
 The `getEvents` method (which is used by the `getAggregate` and `getExistingAggregate` methods of the `EventStore` class) uses consistent reads, so is **always consistent**.
 
-The `pushEvent` method is a write operation and so is **always consistent**. It is conditioned to avoid race conditions, as required by the [Castore specifications](https://github.com/castore-dev/castore/blob/main/docs/building-your-own-event-storage-adapter.md).
+The `pushEvent` method is a write operation and so is **always consistent**. It is conditioned to avoid race conditions, as required by the [Hamstore specifications](https://github.com/hamstore/hamstore/blob/main/docs/building-your-own-event-storage-adapter.md).
 
 By design, the `listAggregateIds` operation can only be **eventually consistent** (GSIs reads cannot be consistent).
 
@@ -127,7 +127,7 @@ import {
   EVENT_TABLE_EVENT_STORE_ID_KEY,
   // => eventStoreId
   EVENT_TABLE_TIMESTAMP_KEY, // => timestamp
-} from '@castore/event-storage-adapter-dynamodb';
+} from '@hamstore/event-storage-adapter-dynamodb';
 ```
 
 #### CloudFormation
@@ -231,10 +231,10 @@ resource "aws_dynamodb_table" "pokemons-events-table" {
 
 ### 🤝 EventGroups
 
-This adapter implements the [EventGroups](https://castore-dev.github.io/castore/docs/event-sourcing/joining-data/) API using the [DynamoDB Transactions API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html):
+This adapter implements the [EventGroups](https://hamstore.github.io/hamstore/docs/event-sourcing/joining-data/) API using the [DynamoDB Transactions API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html):
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 // 👇 TransactWriteItems N events simultaneously
 await EventStore.pushEventGroup(
@@ -264,7 +264,7 @@ Required IAM permissions for each operations:
 This library also exposes a useful `ImageParser` class to parse [DynamoDB stream](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html) images from a `DynamoDBSingleTableEventStorageAdapter`. It will build a correctly typed `NotificationMessage` ouf of a stream image, unmarshalling it, removing the prefix of the `aggregateId` in the process and validating the `eventStoreId`:
 
 ```ts
-import { ImageParser } from '@castore/event-storage-adapter-dynamodb';
+import { ImageParser } from '@hamstore/event-storage-adapter-dynamodb';
 
 const imageParser = new ImageParser({
   sourceEventStores: [pokemonsEventStore, trainersEventStore],
@@ -291,7 +291,7 @@ const notificationMessage = imageParser.parseImage(
 ```ts
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
-import { DynamoDBEventStorageAdapter } from '@castore/event-storage-adapter-dynamodb';
+import { DynamoDBEventStorageAdapter } from '@hamstore/event-storage-adapter-dynamodb';
 
 const dynamoDBClient = new DynamoDBClient({});
 
@@ -344,7 +344,7 @@ A [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/dev
 
 The `getEvents` method (which is used by the `getAggregate` and `getExistingAggregate` methods of the `EventStore` class) uses consistent reads, so is **always consistent**.
 
-The `pushEvent` method is a write operation and so is **always consistent**. It is conditioned to avoid race conditions, as required by the [Castore specifications](https://github.com/castore-dev/castore/blob/main/docs/building-your-own-event-storage-adapter.md).
+The `pushEvent` method is a write operation and so is **always consistent**. It is conditioned to avoid race conditions, as required by the [Hamstore specifications](https://github.com/hamstore/hamstore/blob/main/docs/building-your-own-event-storage-adapter.md).
 
 By design, the `listAggregateIds` operation can only be **eventually consistent** (GSIs reads cannot be consistent).
 
@@ -363,7 +363,7 @@ import {
   EVENT_TABLE_IS_INITIAL_EVENT_KEY,
   // => isInitialEvent
   EVENT_TABLE_TIMESTAMP_KEY, // => timestamp
-} from '@castore/event-storage-adapter-dynamodb';
+} from '@hamstore/event-storage-adapter-dynamodb';
 ```
 
 #### CloudFormation
@@ -467,10 +467,10 @@ resource "aws_dynamodb_table" "pokemons-events-table" {
 
 ### 🤝 EventGroups
 
-This adapter implements the [EventGroups](https://castore-dev.github.io/castore/docs/event-sourcing/joining-data/) API using the [DynamoDB Transactions API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html):
+This adapter implements the [EventGroups](https://hamstore.github.io/hamstore/docs/event-sourcing/joining-data/) API using the [DynamoDB Transactions API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html):
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 // 👇 TransactWriteItems N events simultaneously
 await EventStore.pushEventGroup(

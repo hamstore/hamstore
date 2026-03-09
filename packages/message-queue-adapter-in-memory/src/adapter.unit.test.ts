@@ -1,17 +1,16 @@
 /* eslint-disable max-lines */
-import type { queueAsPromised } from 'fastq';
-import type { A } from 'ts-toolbelt';
-
 import {
   MessageChannelMessage,
   EventStoreNotificationMessage,
   NotificationMessageQueue,
-} from '@castore/core';
+} from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
   pikachuAppearedEvent,
-} from '@castore/demo-blueprint';
+} from '@hamstore/demo-blueprint';
+import type { queueAsPromised } from 'fastq';
+import type { A } from 'ts-toolbelt';
 
 import { Task, InMemoryMessageQueueAdapter, TaskContext } from './adapter';
 

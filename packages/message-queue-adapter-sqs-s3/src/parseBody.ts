@@ -2,8 +2,8 @@ import type {
   AggregateExistsMessageQueue,
   NotificationMessageQueue,
   StateCarryingMessageQueue,
-} from '@castore/core';
-import type { SQSMessageQueueMessageBody } from '@castore/message-queue-adapter-sqs';
+} from '@hamstore/core';
+import type { SQSMessageQueueMessageBody } from '@hamstore/message-queue-adapter-sqs';
 
 import type { OversizedEntryDetail } from './message';
 

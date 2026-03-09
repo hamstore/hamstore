@@ -1,25 +1,25 @@
 # In Memory Message Queue Adapter
 
-DRY Castore [`MessageQueue`](https://castore-dev.github.io/castore/docs/reacting-to-events/message-queues/) definition using [FastQ](https://github.com/mcollina/fastq).
+DRY Hamstore [`MessageQueue`](https://hamstore.github.io/hamstore/docs/reacting-to-events/message-queues/) definition using [FastQ](https://github.com/mcollina/fastq).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/message-queue-adapter-in-memory
+npm install @hamstore/message-queue-adapter-in-memory
 
 # yarn
-yarn add @castore/message-queue-adapter-in-memory
+yarn add @hamstore/message-queue-adapter-in-memory
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
@@ -27,7 +27,7 @@ yarn add @castore/core
 The simplest way to use this adapter is to use the `attachTo` static method:
 
 ```ts
-import { InMemoryMessageQueueAdapter } from '@castore/message-queue-adapter-in-memory';
+import { InMemoryMessageQueueAdapter } from '@hamstore/message-queue-adapter-in-memory';
 
 const messageQueueAdapter =
   InMemoryMessageQueueAdapter.attachTo(appMessageQueue);
@@ -38,8 +38,8 @@ This will make your `messageQueueAdapter` inherit from your `appMessageQueue` ty
 You can also instanciate one on its own, but notice the code duplication:
 
 ```ts
-import type { MessageQueueMessage } from '@castore/core';
-import { InMemoryMessageQueueAdapter } from '@castore/message-queue-adapter-in-memory';
+import type { MessageQueueMessage } from '@hamstore/core';
+import { InMemoryMessageQueueAdapter } from '@hamstore/message-queue-adapter-in-memory';
 
 const messageQueueAdapter = new InMemoryMessageQueueAdapter<
   MessageQueueMessage<typeof appMessageQueue>

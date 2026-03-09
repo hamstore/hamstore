@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # 🔧 Aggregates / Reducers
 
-Eventhough entities are stored as series of events, we still want to use a **simpler and stable interface to represent their states at a point in time** rather than directly using events. In Castore, it is implemented by a TS type called `Aggregate`.
+Eventhough entities are stored as series of events, we still want to use a **simpler and stable interface to represent their states at a point in time** rather than directly using events. In Hamstore, it is implemented by a TS type called `Aggregate`.
 
 :::note
 
@@ -12,12 +12,12 @@ Eventhough entities are stored as series of events, we still want to use a **sim
 
 :::
 
-In Castore, aggregates necessarily contain an `aggregateId` and `version` properties (the `version` of the latest `event`). But for the rest, it's up to you 🤷‍♂️
+In Hamstore, aggregates necessarily contain an `aggregateId` and `version` properties (the `version` of the latest `event`). But for the rest, it's up to you 🤷‍♂️
 
 For instance, we can include a `name`, `level` and `status` properties to our `PokemonAggregate`:
 
 ```ts
-import type { Aggregate } from '@castore/core';
+import type { Aggregate } from '@hamstore/core';
 
 // Represents a Pokemon at a point in time
 interface PokemonAggregate extends Aggregate {
@@ -41,7 +41,7 @@ Aggregates are derived from their events by [reducing them](https://developer.mo
 ![Aggregate](../../assets/docSchemas/aggregate.png)
 
 ```ts
-import type { Reducer } from '@castore/core';
+import type { Reducer } from '@hamstore/core';
 
 const pokemonsReducer: Reducer<PokemonAggregate, PokemonEventDetails> = (
   pokemonAggregate,

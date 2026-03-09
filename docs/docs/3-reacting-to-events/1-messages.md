@@ -6,7 +6,7 @@ sidebar_position: 1
 
 Event Sourcing integrates very well with [event-driven architectures](https://en.wikipedia.org/wiki/Event-driven_architecture). In a traditional architecture, you would need to design your system events (or **messages** for clarity) separately from your data. With Event Sourcing, they can simply **broadcast the business events you already designed**.
 
-In Castore, we distinguish three types of message:
+In Hamstore, we distinguish three types of message:
 
 - **AggregateExists messages** which only carry aggregate ids (mainly for maintenance purposes)
 - **Notification messages** which also carry event details
@@ -14,14 +14,14 @@ In Castore, we distinguish three types of message:
 
 ![Messages Types](../../assets/docSchemas/messageTypes.png)
 
-In Castore, they are implemented by the `AggregateExistsMessage`, `NotificationMessage` and `StateCarryingMessage` TS types:
+In Hamstore, they are implemented by the `AggregateExistsMessage`, `NotificationMessage` and `StateCarryingMessage` TS types:
 
 ```ts
 // AggregateExistsMessage
 import type {
   AggregateExistsMessage,
   EventStoreAggregateExistsMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 type PokemonAggregateExistsMessage = AggregateExistsMessage<'POKEMONS'>;
 
@@ -42,7 +42,7 @@ type PokemonAggregateExistsMessage = EventStoreAggregateExistsMessage<
 import type {
   NotificationMessage,
   EventStoreNotificationMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 type PokemonEventNotificationMessage = NotificationMessage<
   'POKEMONS',
@@ -66,7 +66,7 @@ type PokemonEventNotificationMessage = EventStoreNotificationMessage<
 import type {
   StateCarryingMessage,
   EventStoreStateCarryingMessage,
-} from '@castore/core';
+} from '@hamstore/core';
 
 type PokemonEventStateCarryingMessage = StateCarryingMessage<
   'POKEMONS',

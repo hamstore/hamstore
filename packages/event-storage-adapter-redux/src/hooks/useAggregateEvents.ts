@@ -1,10 +1,9 @@
-import { useSelector } from 'react-redux';
-
 import {
   EventsQueryOptions,
   EventStore,
   EventStoreEventDetails,
-} from '@castore/core';
+} from '@hamstore/core';
+import { useSelector } from 'react-redux';
 
 import { ReduxEventStorageAdapter } from '~/adapter';
 import { ReduxEventStorageAdapterNotFoundError } from '~/errors/reduxEventStorageAdapterNotFound';

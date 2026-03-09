@@ -1,3 +1,5 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion,
@@ -9,9 +11,6 @@ import {
 import type { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 import React, { JSX } from 'react';
-
-import type { JSONSchemaCommand } from '@castore/command-json-schema';
-import type { EventStore } from '@castore/core';
 
 import { Form } from '~/components/Form';
 

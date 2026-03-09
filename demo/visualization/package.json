@@ -1,5 +1,5 @@
 {
-  "name": "@castore/demo-visualization",
+  "name": "@hamstore/demo-visualization",
   "scripts": {
     "build": "rm -rf dist && vite build",
     "lint-fix": "yarn eslint --fix",
@@ -23,10 +23,10 @@
     ]
   },
   "dependencies": {
-    "@castore/command-json-schema": "workspace:",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
-    "@castore/lib-react-visualizer": "workspace:",
+    "@hamstore/command-json-schema": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
+    "@hamstore/lib-react-visualizer": "workspace:",
     "@mui/material": "^5.18.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

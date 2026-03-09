@@ -1,10 +1,10 @@
 {
-  "name": "@castore/message-queue-adapter-sqs-s3",
-  "description": "DRY Castore MessageQueue definition using AWS SQS and S3",
+  "name": "@hamstore/message-queue-adapter-sqs-s3",
+  "description": "DRY Hamstore MessageQueue definition using AWS SQS and S3",
   "license": "MIT",
-  "homepage": "https://github.com/theodo/castore#readme",
-  "bugs": "https://github.com/theodo/castore/issues",
-  "repository": "theodo/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -37,7 +37,7 @@
     "watch": "rm -rf dist && concurrently 'yarn:package-* --watch'"
   },
   "dependencies": {
-    "@castore/message-queue-adapter-sqs": "workspace:",
+    "@hamstore/message-queue-adapter-sqs": "workspace:",
     "@types/aws-lambda": "^8.10.152",
     "lodash.chunk": "^4.2.0",
     "ts-toolbelt": "^9.6.0",
@@ -52,7 +52,7 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
+    "@hamstore/core": "workspace:",
     "@types/lodash.chunk": "^4.2.9",
     "@types/node": "^24.5.2",
     "aws-sdk-client-mock": "^2.2.0",
@@ -91,7 +91,7 @@
     "@aws-sdk/client-s3": "^3.0.0",
     "@aws-sdk/client-sqs": "^3.0.0",
     "@aws-sdk/s3-request-presigner": "^3.0.0",
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

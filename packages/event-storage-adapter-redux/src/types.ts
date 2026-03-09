@@ -1,10 +1,9 @@
-import { Reducer } from '@reduxjs/toolkit';
-
 import {
   EventStore,
   EventStoreEventDetails,
   EventStoreId,
-} from '@castore/core';
+} from '@hamstore/core';
+import { Reducer } from '@reduxjs/toolkit';
 
 export type EventStoreReduxState<EVENT_STORE extends EventStore = EventStore> =
   {
