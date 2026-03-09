@@ -3,7 +3,7 @@ import {
   pokemonsEventStore,
   pikachuCaughtEvent,
   pikachuId,
-} from '@castore/demo-blueprint';
+} from '@hamstore/demo-blueprint';
 
 import { mockEventStore } from './mockEventStore';
 

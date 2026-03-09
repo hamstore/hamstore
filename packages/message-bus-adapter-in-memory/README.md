@@ -1,25 +1,25 @@
 # In Memory Message Bus Adapter
 
-DRY Castore [`MessageBus`](https://castore-dev.github.io/castore/docs/reacting-to-events/message-buses/) definition using [Event Emitters](https://nodejs.org/api/events.html#events).
+DRY Hamstore [`MessageBus`](https://hamstore.github.io/hamstore/docs/reacting-to-events/message-buses/) definition using [Event Emitters](https://nodejs.org/api/events.html#events).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/message-bus-adapter-in-memory
+npm install @hamstore/message-bus-adapter-in-memory
 
 # yarn
-yarn add @castore/message-bus-adapter-in-memory
+yarn add @hamstore/message-bus-adapter-in-memory
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
@@ -31,7 +31,7 @@ The simplest way to use this adapter is to use the `attachTo` static method:
 // Outside of NodeJS (like browsers) you can use the event-emitter package
 import { EventEmitter } from 'events';
 
-import { InMemoryMessageBusAdapter } from '@castore/message-bus-adapter-in-memory';
+import { InMemoryMessageBusAdapter } from '@hamstore/message-bus-adapter-in-memory';
 
 const eventEmitter = new EventEmitter();
 
@@ -46,8 +46,8 @@ This will make your `messageBusAdapter` inherit from your `appMessageBus` types 
 You can also instanciate one on its own, but notice the code duplication:
 
 ```ts
-import type { MessageBusMessage } from '@castore/core';
-import { InMemoryMessageBusAdapter } from '@castore/message-bus-adapter-in-memory';
+import type { MessageBusMessage } from '@hamstore/core';
+import { InMemoryMessageBusAdapter } from '@hamstore/message-bus-adapter-in-memory';
 
 const messageBusAdapter = new InMemoryMessageBusAdapter<
   MessageBusMessage<typeof appMessageBus>

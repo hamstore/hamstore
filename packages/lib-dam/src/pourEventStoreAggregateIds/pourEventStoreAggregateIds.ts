@@ -4,7 +4,7 @@ import type {
   EventStoreId,
   ListAggregateIdsOptions,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import type { ScanInfos } from '~/types';
 import { getThrottle } from '~/utils/getThrottle';

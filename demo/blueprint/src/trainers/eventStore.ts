@@ -1,4 +1,4 @@
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 import type { TrainerAggregate } from './aggregate';
 import { gameStartedEvent, pokemonCaughtEvent } from './events';

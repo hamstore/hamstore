@@ -1,10 +1,10 @@
 {
-  "name": "@castore/message-queue-adapter-in-memory",
-  "description": "DRY Castore MessageQueue definition using FastQ",
+  "name": "@hamstore/message-queue-adapter-in-memory",
+  "description": "DRY Hamstore MessageQueue definition using FastQ",
   "license": "MIT",
-  "homepage": "https://github.com/theodo/castore#readme",
-  "bugs": "https://github.com/theodo/castore/issues",
-  "repository": "theodo/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -45,8 +45,8 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
@@ -81,7 +81,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

@@ -6,7 +6,6 @@ import { BsStars } from 'react-icons/bs';
 import {
   FaRegCopy,
   FaGithub,
-  FaHeart,
   FaPuzzlePiece,
   FaHandHoldingHeart,
 } from 'react-icons/fa';
@@ -32,7 +31,7 @@ const links: Link[] = [
         <FaGithub className="text-lg" /> GitHub
       </div>
     ),
-    to: 'https://github.com/castore-dev/castore',
+    to: 'https://github.com/hamstore/hamstore',
   },
   {
     id: 'examples',
@@ -41,16 +40,7 @@ const links: Link[] = [
         <FaRegCopy className="text-lg" /> Examples
       </div>
     ),
-    to: 'https://github.com/castore-dev/castore/tree/main/demo/blueprint/src',
-  },
-  {
-    id: 'sponsor',
-    label: (
-      <div className="flex items-center gap-2">
-        <FaHeart className="text-lg" /> Sponsor
-      </div>
-    ),
-    to: 'https://github.com/sponsors/ThomasAribart',
+    to: 'https://github.com/hamstore/hamstore/tree/main/demo/blueprint/src',
   },
   {
     id: 'contact',
@@ -59,32 +49,28 @@ const links: Link[] = [
         <SlSpeech className="text-lg" /> Contact
       </div>
     ),
-    to: 'mailto:thomasa@theodo.fr',
+    to: 'mailto:it+hamstore@geostrategists.de',
   },
 ];
 
 const footerLinks = [
   {
-    label: 'Theodo',
-    to: 'https://www.theodo.fr/',
+    label: 'Geostrategists',
+    to: 'https://www.geostrategists.de/',
   },
   {
-    label: 'Serverless by Theodo',
-    to: 'https://dev.to/slsbytheodo',
-  },
-  {
-    label: '@ThomasAribart Twitter',
-    to: 'https://twitter.com/aribartt',
+    label: 'GitHub',
+    to: 'https://github.com/hamstore/hamstore',
   },
 ];
 
 const Home = (): JSX.Element => (
   <>
     <Head>
-      <title>Castore | Event sourcing made easy</title>
+      <title>Hamstore | Event sourcing made easy</title>
       <meta
         name="description"
-        content="Castore is a TypeScript library that makes Event Sourcing easy, a powerful paradigm that saves changes to your application state rather than the state itself."
+        content="Hamstore is a TypeScript library that makes Event Sourcing easy, a powerful paradigm that saves changes to your application state rather than the state itself."
       />
     </Head>
     <div className="flex flex-col gap-12 md:gap-16">
@@ -117,7 +103,7 @@ const Home = (): JSX.Element => (
               viewBox="0 0 852 852"
               enableBackground="new 0 0 852 852"
             >
-              <title>Castore Logo</title>
+              <title>Hamstore Logo</title>
               <rect
                 x="-574"
                 y="-422"
@@ -386,7 +372,7 @@ const Home = (): JSX.Element => (
           </div>
           <h1 className="inline-block font-black text-4xl md:text-6xl lg:text-7xl">
             <span className="inline-block text-transparent bg-clip-text bg-gradient-to-l bg-color-gradient">
-              Castore
+              Hamstore
             </span>
           </h1>
         </div>
@@ -433,7 +419,7 @@ const Home = (): JSX.Element => (
           <div className="flex flex-col gap-1 text-center">
             <h3 className="uppercase text-xl font-black">Stack Agnostic</h3>
             <p className="text-sm dark:text-gray-200 leading-6">
-              Castore is in <strong>TypeScript</strong>. Outside from that, it
+              Hamstore is in <strong>TypeScript</strong>. Outside from that, it
               can be used pretty much <strong>anywhere</strong>: Web apps,
               containers, Lambdas... you name it 🙌
             </p>
@@ -447,7 +433,7 @@ const Home = (): JSX.Element => (
               You can code your own <code>EventStorageAdapter</code> (simply
               implement the interface), but it's much simpler to use
               off-the-shelf adapters like the{' '}
-              <a href="https://www.npmjs.com/package/@castore/event-storage-adapter-dynamodb">
+              <a href="https://www.npmjs.com/package/@hamstore/event-storage-adapter-dynamodb">
                 DynamoDBEventStorageAdapter
               </a>
               .
@@ -461,10 +447,10 @@ const Home = (): JSX.Element => (
               Modular & Type-safe
             </h3>
             <p className="text-sm dark:text-gray-200 leading-6">
-              Castore is a{' '}
+              Hamstore is a{' '}
               <strong>collection of utility classes and helpers</strong>, but
               NOT a framework: While some classes require compatible
-              infrastructure, Castore is not responsible for deploying it.
+              infrastructure, Hamstore is not responsible for deploying it.
             </p>
             <p className="text-sm dark:text-gray-200 leading-6">
               Though that is not something we exclude in the future, we are a
@@ -489,22 +475,22 @@ const Home = (): JSX.Element => (
               <strong>We ran into them for you</strong>!
             </p>
             <p className="text-sm dark:text-gray-200 leading-6">
-              Castore is opinionated. It comes with a collection of best
+              Hamstore is opinionated. It comes with a collection of best
               practices and documented anti-patterns that we hope will help you
               out!
             </p>
             <p className="text-sm dark:text-gray-200 leading-6">
               It also comes with an awesome collection of packages that will
               make your life easy, e.g. when working on{' '}
-              <a href="https://www.npmjs.com/package/@castore/lib-test-tools">
+              <a href="https://www.npmjs.com/package/@hamstore/lib-test-tools">
                 unit tests
               </a>
               ,{' '}
-              <a href="https://www.npmjs.com/package/@castore/lib-dam">
+              <a href="https://www.npmjs.com/package/@hamstore/lib-dam">
                 data migration
               </a>{' '}
               or{' '}
-              <a href="https://www.npmjs.com/package/@castore/lib-react-visualizer">
+              <a href="https://www.npmjs.com/package/@hamstore/lib-react-visualizer">
                 data modelling
               </a>
               .
@@ -529,7 +515,8 @@ const Home = (): JSX.Element => (
           ))}
         </div>
         <div className="text-center opacity-20 mt-2">
-          &copy; {new Date().getFullYear()} Serverless by Theodo
+          &copy; 2022-2025 Serverless by Theodo, {new Date().getFullYear()}{' '}
+          Geostrategists
         </div>
       </div>
     </div>

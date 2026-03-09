@@ -1,10 +1,10 @@
 {
-  "name": "@castore/castore",
+  "name": "@hamstore/hamstore",
   "description": "Making Event Sourcing easy 😎",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",

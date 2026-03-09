@@ -4,7 +4,7 @@ import {
   EVENT_TABLE_PK,
   EVENT_TABLE_SK,
   EVENT_TABLE_TIMESTAMP_KEY,
-} from '@castore/event-storage-adapter-dynamodb';
+} from '@hamstore/event-storage-adapter-dynamodb';
 
 import { DynamoDBKeyType } from './keyType';
 

@@ -7,7 +7,7 @@ sidebar_position: 4
 For the moment, we didn't provide any actual way to store our events data. This is the responsibility of the `EventStorageAdapter` class.
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 await pokemonsEventStore.getEvents('pikachu1');
 // ❌ Will throw an `UndefinedEventStorageAdapterError`

@@ -1,14 +1,13 @@
 /* eslint-disable max-lines */
-import { vi } from 'vitest';
-import { z } from 'zod';
-
 import {
   EventStore,
   EventType,
   EventTypeDetail,
   EventStorageAdapter,
   tuple,
-} from '@castore/core';
+} from '@hamstore/core';
+import { vi } from 'vitest';
+import { z } from 'zod';
 
 import { ZodCommand } from './command';
 

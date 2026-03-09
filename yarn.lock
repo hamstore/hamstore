@@ -2843,745 +2843,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@castore/castore@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@castore/castore@workspace:."
-  dependencies:
-    "@commitlint/cli": "npm:^19.8.1"
-    "@commitlint/config-conventional": "npm:^19.8.1"
-    "@eslint/js": "npm:^9.36.0"
-    "@nx/workspace": "npm:^21.5.3"
-    "@trivago/prettier-plugin-sort-imports": "npm:^5.2.2"
-    "@types/node": "npm:^24.5.2"
-    "@typescript-eslint/eslint-plugin": "npm:^8.44.0"
-    "@typescript-eslint/parser": "npm:^8.44.0"
-    aws-sdk: "npm:^2.1692.0"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    eslint-config-prettier: "npm:^10.1.8"
-    eslint-config-vitest-globals: "npm:^2.0.2"
-    eslint-plugin-import: "npm:^2.32.0"
-    eslint-plugin-prefer-arrow: "npm:^1.2.3"
-    eslint-plugin-prettier: "npm:^5.5.4"
-    globals: "npm:^16.4.0"
-    husky: "npm:^9.1.7"
-    npm-audit-resolver: "npm:^3.0.0-RC.0"
-    nx: "npm:^21.5.3"
-    prettier: "npm:^3.6.2"
-    syncpack: "npm:^13.0.4"
-    ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.9.2"
-  languageName: unknown
-  linkType: soft
-
-"@castore/command-json-schema@workspace:, @castore/command-json-schema@workspace:packages/command-json-schema":
-  version: 0.0.0-use.local
-  resolution: "@castore/command-json-schema@workspace:packages/command-json-schema"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    json-schema-to-ts: "npm:^3.1.1"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-    json-schema-to-ts: ^2.0.0 || ^3.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/command-zod@workspace:packages/command-zod":
-  version: 0.0.0-use.local
-  resolution: "@castore/command-zod@workspace:packages/command-zod"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-    zod: "npm:^4.1.11"
-  peerDependencies:
-    "@castore/core": "*"
-    zod: ^3.25.0 || ^4.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/core@workspace:, @castore/core@workspace:packages/core":
-  version: 0.0.0-use.local
-  resolution: "@castore/core@workspace:packages/core"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@babel/runtime": "npm:^7.28.4"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vite-tsconfig-paths: "npm:^5.1.4"
-    vitest: "npm:^3.2.4"
-  languageName: unknown
-  linkType: soft
-
-"@castore/demo-blueprint@workspace:, @castore/demo-blueprint@workspace:demo/blueprint":
-  version: 0.0.0-use.local
-  resolution: "@castore/demo-blueprint@workspace:demo/blueprint"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@babel/runtime": "npm:^7.28.4"
-    "@castore/command-json-schema": "workspace:"
-    "@castore/core": "workspace:"
-    "@castore/event-type-json-schema": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    json-schema-to-ts: "npm:^3.1.1"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-  peerDependencies:
-    "@castore/core": "*"
-    "@castore/event-type-json-schema": "*"
-    json-schema-to-ts: ^2.0.0 || ^3.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/demo-implementation@workspace:demo/implementation":
-  version: 0.0.0-use.local
-  resolution: "@castore/demo-implementation@workspace:demo/implementation"
-  dependencies:
-    "@aws-sdk/client-dynamodb": "npm:^3.893.0"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@castore/event-storage-adapter-dynamodb": "workspace:"
-    "@castore/lib-test-tools": "workspace:"
-    "@middy/core": "npm:^3.6.2"
-    "@middy/validator": "npm:^3.6.2"
-    "@serverless/typescript": "npm:^3.38.0"
-    "@types/aws-lambda": "npm:^8.10.152"
-    "@types/http-errors": "npm:^1.8.2"
-    "@types/serverless": "npm:^3.12.27"
-    dependency-cruiser: "npm:^17.0.1"
-    env-cmd: "npm:^11.0.0"
-    esbuild: "npm:^0.25.10"
-    eslint: "npm:^9.36.0"
-    json-schema-to-ts: "npm:^3.1.1"
-    mockdate: "npm:^3.0.5"
-    serverless: "npm:^3.40.0"
-    serverless-esbuild: "npm:^1.55.1"
-    source-map-support: "npm:^0.5.21"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  languageName: unknown
-  linkType: soft
-
-"@castore/demo-visualization@workspace:demo/visualization":
-  version: 0.0.0-use.local
-  resolution: "@castore/demo-visualization@workspace:demo/visualization"
-  dependencies:
-    "@castore/command-json-schema": "workspace:"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@castore/lib-react-visualizer": "workspace:"
-    "@mui/material": "npm:^5.18.0"
-    "@types/react": "npm:^19.1.13"
-    "@types/react-dom": "npm:^19.1.9"
-    "@types/uuid": "npm:^11.0.0"
-    "@vitejs/plugin-react": "npm:^5.0.3"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    react: "npm:^19.1.1"
-    react-dom: "npm:^19.1.1"
-    rollup-plugin-visualizer: "npm:^6.0.3"
-    typescript: "npm:^5.9.2"
-    uuid: "npm:^13.0.0"
-    vite: "npm:^7.1.6"
-    vite-plugin-svgr: "npm:^4.5.0"
-    vite-tsconfig-paths: "npm:^5.1.4"
-    web-vitals: "npm:^5.1.0"
-  languageName: unknown
-  linkType: soft
-
-"@castore/docs@workspace:docs":
-  version: 0.0.0-use.local
-  resolution: "@castore/docs@workspace:docs"
-  dependencies:
-    "@castore/command-json-schema": "workspace:"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@castore/lib-react-visualizer": "workspace:"
-    "@docusaurus/core": "npm:3.9.1"
-    "@docusaurus/module-type-aliases": "npm:3.9.1"
-    "@docusaurus/preset-classic": "npm:3.9.1"
-    "@mdx-js/react": "npm:^3.1.1"
-    "@mui/material": "npm:^5.18.0"
-    "@types/react": "npm:^19.1.13"
-    "@types/react-dom": "npm:^19.1.9"
-    "@types/uuid": "npm:^11.0.0"
-    "@vitejs/plugin-react": "npm:^5.0.3"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prism-react-renderer: "npm:^2.4.1"
-    react: "npm:^19.1.1"
-    react-dom: "npm:^19.1.1"
-    react-icons: "npm:^5.5.0"
-    rollup-plugin-visualizer: "npm:^6.0.3"
-    typescript: "npm:^5.9.2"
-    uuid: "npm:^13.0.0"
-    vite: "npm:^7.1.6"
-    vite-plugin-svgr: "npm:^4.5.0"
-    vite-tsconfig-paths: "npm:^5.1.4"
-    web-vitals: "npm:^5.1.0"
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-storage-adapter-dynamodb@workspace:, @castore/event-storage-adapter-dynamodb@workspace:packages/event-storage-adapter-dynamodb":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-storage-adapter-dynamodb@workspace:packages/event-storage-adapter-dynamodb"
-  dependencies:
-    "@aws-sdk/client-dynamodb": "npm:^3.893.0"
-    "@aws-sdk/util-dynamodb": "npm:^3.893.0"
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@serverless/typescript": "npm:^3.38.0"
-    "@types/lodash.omit": "npm:^4.5.9"
-    "@types/node": "npm:^24.5.2"
-    aws-sdk-client-mock: "npm:^2.2.0"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.omit: "npm:^4.5.0"
-    mockdate: "npm:^3.0.5"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@aws-sdk/client-dynamodb": ^3.0.0
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-storage-adapter-http@workspace:packages/event-storage-adapter-http":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-storage-adapter-http@workspace:packages/event-storage-adapter-http"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    "@zerollup/ts-transform-paths": "npm:^1.7.18"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    openapi-types: "npm:^12.1.3"
-    prettier: "npm:^3.6.2"
-    swagger-client: "npm:^3.35.6"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-storage-adapter-in-memory@workspace:, @castore/event-storage-adapter-in-memory@workspace:packages/event-storage-adapter-in-memory":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-storage-adapter-in-memory@workspace:packages/event-storage-adapter-in-memory"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/lodash.omit": "npm:^4.5.9"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.omit: "npm:^4.5.0"
-    mockdate: "npm:^3.0.5"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-storage-adapter-postgres@workspace:packages/event-storage-adapter-postgres":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-storage-adapter-postgres@workspace:packages/event-storage-adapter-postgres"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@testcontainers/postgresql": "npm:^10.28.0"
-    "@types/lodash.omit": "npm:^4.5.9"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.omit: "npm:^4.5.0"
-    mockdate: "npm:^3.0.5"
-    postgres: "npm:^3.4.7"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-storage-adapter-redux@workspace:, @castore/event-storage-adapter-redux@workspace:packages/event-storage-adapter-redux":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-storage-adapter-redux@workspace:packages/event-storage-adapter-redux"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@reduxjs/toolkit": "npm:^1.9.7"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    react-redux: "npm:^9.2.0"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-    "@reduxjs/toolkit": ^1.9.0
-    react-redux: ^8.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-type-json-schema@workspace:, @castore/event-type-json-schema@workspace:packages/event-type-json-schema":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-type-json-schema@workspace:packages/event-type-json-schema"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    json-schema-to-ts: "npm:^3.1.1"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-    json-schema-to-ts: ^2.0.0 || ^3.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/event-type-zod@workspace:packages/event-type-zod":
-  version: 0.0.0-use.local
-  resolution: "@castore/event-type-zod@workspace:packages/event-type-zod"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-    zod: "npm:^4.1.11"
-  peerDependencies:
-    "@castore/core": "*"
-    zod: ^3.25.0 || ^4.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/lib-dam@workspace:packages/lib-dam":
-  version: 0.0.0-use.local
-  resolution: "@castore/lib-dam@workspace:packages/lib-dam"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@castore/lib-test-tools": "workspace:"
-    "@castore/message-queue-adapter-in-memory": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    throttled-queue: "npm:^3.0.0"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vite-tsconfig-paths: "npm:^5.1.4"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/lib-react-visualizer@workspace:, @castore/lib-react-visualizer@workspace:packages/lib-react-visualizer":
-  version: 0.0.0-use.local
-  resolution: "@castore/lib-react-visualizer@workspace:packages/lib-react-visualizer"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
-    "@babel/plugin-proposal-object-rest-spread": "npm:^7.20.7"
-    "@babel/plugin-proposal-private-methods": "npm:^7.18.6"
-    "@babel/plugin-proposal-private-property-in-object": "npm:^7.21.11"
-    "@babel/plugin-transform-react-constant-elements": "npm:^7.27.1"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-react": "npm:^7.27.1"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/command-json-schema": "workspace:"
-    "@castore/core": "workspace:"
-    "@castore/event-storage-adapter-redux": "workspace:"
-    "@emotion/react": "npm:^11.14.0"
-    "@emotion/styled": "npm:^11.14.1"
-    "@mui/icons-material": "npm:^5.18.0"
-    "@mui/lab": "npm:^5.0.0-alpha.177"
-    "@mui/material": "npm:^5.18.0"
-    "@reduxjs/toolkit": "npm:^1.9.7"
-    "@rjsf/core": "npm:^5.24.13"
-    "@rjsf/mui": "npm:^5.24.13"
-    "@rjsf/utils": "npm:^5.24.13"
-    "@rjsf/validator-ajv8": "npm:^5.24.13"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    babel-plugin-optimize-clsx: "npm:^2.6.2"
-    babel-plugin-transform-react-remove-prop-types: "npm:^0.4.24"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    json-schema-to-ts: "npm:^3.1.1"
-    prettier: "npm:^3.6.2"
-    react: "npm:^19.1.1"
-    react-json-view: "npm:^1.21.3"
-    react-redux: "npm:^9.2.0"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/command-json-schema": "*"
-    "@castore/core": "*"
-    react: ^19.0.0
-  languageName: unknown
-  linkType: soft
-
-"@castore/lib-test-tools@workspace:, @castore/lib-test-tools@workspace:packages/lib-test-tools":
-  version: 0.0.0-use.local
-  resolution: "@castore/lib-test-tools@workspace:packages/lib-test-tools"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@castore/event-storage-adapter-in-memory": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-bus-adapter-event-bridge-s3@workspace:packages/message-bus-adapter-event-bridge-s3":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-bus-adapter-event-bridge-s3@workspace:packages/message-bus-adapter-event-bridge-s3"
-  dependencies:
-    "@aws-sdk/client-eventbridge": "npm:^3.893.0"
-    "@aws-sdk/client-s3": "npm:^3.893.0"
-    "@aws-sdk/s3-request-presigner": "npm:^3.893.0"
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/message-bus-adapter-event-bridge": "workspace:"
-    "@types/aws-lambda": "npm:^8.10.152"
-    "@types/lodash.chunk": "npm:^4.2.9"
-    "@types/node": "npm:^24.5.2"
-    aws-sdk-client-mock: "npm:^2.2.0"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.chunk: "npm:^4.2.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    undici: "npm:^7.16.0"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@aws-sdk/client-eventbridge": ^3.0.0
-    "@aws-sdk/client-s3": ^3.0.0
-    "@aws-sdk/s3-request-presigner": ^3.0.0
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-bus-adapter-event-bridge@workspace:, @castore/message-bus-adapter-event-bridge@workspace:packages/message-bus-adapter-event-bridge":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-bus-adapter-event-bridge@workspace:packages/message-bus-adapter-event-bridge"
-  dependencies:
-    "@aws-sdk/client-eventbridge": "npm:^3.893.0"
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/aws-lambda": "npm:^8.10.152"
-    "@types/lodash.chunk": "npm:^4.2.9"
-    "@types/node": "npm:^24.5.2"
-    aws-sdk-client-mock: "npm:^2.2.0"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.chunk: "npm:^4.2.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@aws-sdk/client-eventbridge": ^3.0.0
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-bus-adapter-in-memory@workspace:packages/message-bus-adapter-in-memory":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-bus-adapter-in-memory@workspace:packages/message-bus-adapter-in-memory"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-queue-adapter-in-memory@workspace:, @castore/message-queue-adapter-in-memory@workspace:packages/message-queue-adapter-in-memory":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-queue-adapter-in-memory@workspace:packages/message-queue-adapter-in-memory"
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/demo-blueprint": "workspace:"
-    "@types/node": "npm:^24.5.2"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    fastq: "npm:^1.19.1"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-queue-adapter-sqs-s3@workspace:packages/message-queue-adapter-sqs-s3":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-queue-adapter-sqs-s3@workspace:packages/message-queue-adapter-sqs-s3"
-  dependencies:
-    "@aws-sdk/client-s3": "npm:^3.893.0"
-    "@aws-sdk/client-sqs": "npm:^3.893.0"
-    "@aws-sdk/s3-request-presigner": "npm:^3.893.0"
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@castore/message-queue-adapter-sqs": "workspace:"
-    "@types/aws-lambda": "npm:^8.10.152"
-    "@types/lodash.chunk": "npm:^4.2.9"
-    "@types/node": "npm:^24.5.2"
-    aws-sdk-client-mock: "npm:^2.2.0"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.chunk: "npm:^4.2.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    undici: "npm:^7.16.0"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@aws-sdk/client-s3": ^3.0.0
-    "@aws-sdk/client-sqs": ^3.0.0
-    "@aws-sdk/s3-request-presigner": ^3.0.0
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
-"@castore/message-queue-adapter-sqs@workspace:, @castore/message-queue-adapter-sqs@workspace:packages/message-queue-adapter-sqs":
-  version: 0.0.0-use.local
-  resolution: "@castore/message-queue-adapter-sqs@workspace:packages/message-queue-adapter-sqs"
-  dependencies:
-    "@aws-sdk/client-sqs": "npm:^3.893.0"
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.28.4"
-    "@babel/plugin-transform-runtime": "npm:^7.28.3"
-    "@babel/preset-env": "npm:^7.28.3"
-    "@babel/preset-typescript": "npm:^7.27.1"
-    "@castore/core": "workspace:"
-    "@types/aws-lambda": "npm:^8.10.152"
-    "@types/lodash.chunk": "npm:^4.2.9"
-    "@types/node": "npm:^24.5.2"
-    aws-sdk-client-mock: "npm:^2.2.0"
-    babel-plugin-module-resolver: "npm:^4.1.0"
-    concurrently: "npm:^9.2.1"
-    dependency-cruiser: "npm:^17.0.1"
-    eslint: "npm:^9.36.0"
-    lodash.chunk: "npm:^4.2.0"
-    prettier: "npm:^3.6.2"
-    ts-node: "npm:^10.9.2"
-    ts-toolbelt: "npm:^9.6.0"
-    tsc-alias: "npm:^1.8.16"
-    typescript: "npm:^5.9.2"
-    vitest: "npm:^3.2.4"
-  peerDependencies:
-    "@aws-sdk/client-sqs": ^3.0.0
-    "@castore/core": "*"
-  languageName: unknown
-  linkType: soft
-
 "@colors/colors@npm:1.5.0":
   version: 1.5.0
   resolution: "@colors/colors@npm:1.5.0"
@@ -5535,6 +4796,745 @@ __metadata:
   checksum: 10/216813bdca52cd3a84ac355ad93c2c3f54252be47327692fe666fd85baa5b1d50aa681ebc5626ab08926564fb2deae3b2ea435aa5bd883197650bbe56f2ae108
   languageName: node
   linkType: hard
+
+"@hamstore/command-json-schema@workspace:, @hamstore/command-json-schema@workspace:packages/command-json-schema":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/command-json-schema@workspace:packages/command-json-schema"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    json-schema-to-ts: "npm:^3.1.1"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+    json-schema-to-ts: ^2.0.0 || ^3.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/command-zod@workspace:packages/command-zod":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/command-zod@workspace:packages/command-zod"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+    zod: "npm:^4.1.11"
+  peerDependencies:
+    "@hamstore/core": "*"
+    zod: ^3.25.0 || ^4.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/core@workspace:, @hamstore/core@workspace:packages/core":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/core@workspace:packages/core"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@babel/runtime": "npm:^7.28.4"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vite-tsconfig-paths: "npm:^5.1.4"
+    vitest: "npm:^3.2.4"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/demo-blueprint@workspace:, @hamstore/demo-blueprint@workspace:demo/blueprint":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/demo-blueprint@workspace:demo/blueprint"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@babel/runtime": "npm:^7.28.4"
+    "@hamstore/command-json-schema": "workspace:"
+    "@hamstore/core": "workspace:"
+    "@hamstore/event-type-json-schema": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    json-schema-to-ts: "npm:^3.1.1"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+  peerDependencies:
+    "@hamstore/core": "*"
+    "@hamstore/event-type-json-schema": "*"
+    json-schema-to-ts: ^2.0.0 || ^3.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/demo-implementation@workspace:demo/implementation":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/demo-implementation@workspace:demo/implementation"
+  dependencies:
+    "@aws-sdk/client-dynamodb": "npm:^3.893.0"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@hamstore/event-storage-adapter-dynamodb": "workspace:"
+    "@hamstore/lib-test-tools": "workspace:"
+    "@middy/core": "npm:^3.6.2"
+    "@middy/validator": "npm:^3.6.2"
+    "@serverless/typescript": "npm:^3.38.0"
+    "@types/aws-lambda": "npm:^8.10.152"
+    "@types/http-errors": "npm:^1.8.2"
+    "@types/serverless": "npm:^3.12.27"
+    dependency-cruiser: "npm:^17.0.1"
+    env-cmd: "npm:^11.0.0"
+    esbuild: "npm:^0.25.10"
+    eslint: "npm:^9.36.0"
+    json-schema-to-ts: "npm:^3.1.1"
+    mockdate: "npm:^3.0.5"
+    serverless: "npm:^3.40.0"
+    serverless-esbuild: "npm:^1.55.1"
+    source-map-support: "npm:^0.5.21"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/demo-visualization@workspace:demo/visualization":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/demo-visualization@workspace:demo/visualization"
+  dependencies:
+    "@hamstore/command-json-schema": "workspace:"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@hamstore/lib-react-visualizer": "workspace:"
+    "@mui/material": "npm:^5.18.0"
+    "@types/react": "npm:^19.1.13"
+    "@types/react-dom": "npm:^19.1.9"
+    "@types/uuid": "npm:^11.0.0"
+    "@vitejs/plugin-react": "npm:^5.0.3"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    react: "npm:^19.1.1"
+    react-dom: "npm:^19.1.1"
+    rollup-plugin-visualizer: "npm:^6.0.3"
+    typescript: "npm:^5.9.2"
+    uuid: "npm:^13.0.0"
+    vite: "npm:^7.1.6"
+    vite-plugin-svgr: "npm:^4.5.0"
+    vite-tsconfig-paths: "npm:^5.1.4"
+    web-vitals: "npm:^5.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/docs@workspace:docs":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/docs@workspace:docs"
+  dependencies:
+    "@docusaurus/core": "npm:3.9.1"
+    "@docusaurus/module-type-aliases": "npm:3.9.1"
+    "@docusaurus/preset-classic": "npm:3.9.1"
+    "@hamstore/command-json-schema": "workspace:"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@hamstore/lib-react-visualizer": "workspace:"
+    "@mdx-js/react": "npm:^3.1.1"
+    "@mui/material": "npm:^5.18.0"
+    "@types/react": "npm:^19.1.13"
+    "@types/react-dom": "npm:^19.1.9"
+    "@types/uuid": "npm:^11.0.0"
+    "@vitejs/plugin-react": "npm:^5.0.3"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prism-react-renderer: "npm:^2.4.1"
+    react: "npm:^19.1.1"
+    react-dom: "npm:^19.1.1"
+    react-icons: "npm:^5.5.0"
+    rollup-plugin-visualizer: "npm:^6.0.3"
+    typescript: "npm:^5.9.2"
+    uuid: "npm:^13.0.0"
+    vite: "npm:^7.1.6"
+    vite-plugin-svgr: "npm:^4.5.0"
+    vite-tsconfig-paths: "npm:^5.1.4"
+    web-vitals: "npm:^5.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-storage-adapter-dynamodb@workspace:, @hamstore/event-storage-adapter-dynamodb@workspace:packages/event-storage-adapter-dynamodb":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-storage-adapter-dynamodb@workspace:packages/event-storage-adapter-dynamodb"
+  dependencies:
+    "@aws-sdk/client-dynamodb": "npm:^3.893.0"
+    "@aws-sdk/util-dynamodb": "npm:^3.893.0"
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@serverless/typescript": "npm:^3.38.0"
+    "@types/lodash.omit": "npm:^4.5.9"
+    "@types/node": "npm:^24.5.2"
+    aws-sdk-client-mock: "npm:^2.2.0"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.omit: "npm:^4.5.0"
+    mockdate: "npm:^3.0.5"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@aws-sdk/client-dynamodb": ^3.0.0
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-storage-adapter-http@workspace:packages/event-storage-adapter-http":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-storage-adapter-http@workspace:packages/event-storage-adapter-http"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    "@zerollup/ts-transform-paths": "npm:^1.7.18"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    openapi-types: "npm:^12.1.3"
+    prettier: "npm:^3.6.2"
+    swagger-client: "npm:^3.35.6"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-storage-adapter-in-memory@workspace:, @hamstore/event-storage-adapter-in-memory@workspace:packages/event-storage-adapter-in-memory":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-storage-adapter-in-memory@workspace:packages/event-storage-adapter-in-memory"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/lodash.omit": "npm:^4.5.9"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.omit: "npm:^4.5.0"
+    mockdate: "npm:^3.0.5"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-storage-adapter-postgres@workspace:packages/event-storage-adapter-postgres":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-storage-adapter-postgres@workspace:packages/event-storage-adapter-postgres"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@testcontainers/postgresql": "npm:^10.28.0"
+    "@types/lodash.omit": "npm:^4.5.9"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.omit: "npm:^4.5.0"
+    mockdate: "npm:^3.0.5"
+    postgres: "npm:^3.4.7"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-storage-adapter-redux@workspace:, @hamstore/event-storage-adapter-redux@workspace:packages/event-storage-adapter-redux":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-storage-adapter-redux@workspace:packages/event-storage-adapter-redux"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@reduxjs/toolkit": "npm:^1.9.7"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    react-redux: "npm:^9.2.0"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+    "@reduxjs/toolkit": ^1.9.0
+    react-redux: ^8.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-type-json-schema@workspace:, @hamstore/event-type-json-schema@workspace:packages/event-type-json-schema":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-type-json-schema@workspace:packages/event-type-json-schema"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    json-schema-to-ts: "npm:^3.1.1"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+    json-schema-to-ts: ^2.0.0 || ^3.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/event-type-zod@workspace:packages/event-type-zod":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/event-type-zod@workspace:packages/event-type-zod"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+    zod: "npm:^4.1.11"
+  peerDependencies:
+    "@hamstore/core": "*"
+    zod: ^3.25.0 || ^4.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/hamstore@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/hamstore@workspace:."
+  dependencies:
+    "@commitlint/cli": "npm:^19.8.1"
+    "@commitlint/config-conventional": "npm:^19.8.1"
+    "@eslint/js": "npm:^9.36.0"
+    "@nx/workspace": "npm:^21.5.3"
+    "@trivago/prettier-plugin-sort-imports": "npm:^5.2.2"
+    "@types/node": "npm:^24.5.2"
+    "@typescript-eslint/eslint-plugin": "npm:^8.44.0"
+    "@typescript-eslint/parser": "npm:^8.44.0"
+    aws-sdk: "npm:^2.1692.0"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    eslint-config-prettier: "npm:^10.1.8"
+    eslint-config-vitest-globals: "npm:^2.0.2"
+    eslint-plugin-import: "npm:^2.32.0"
+    eslint-plugin-prefer-arrow: "npm:^1.2.3"
+    eslint-plugin-prettier: "npm:^5.5.4"
+    globals: "npm:^16.4.0"
+    husky: "npm:^9.1.7"
+    npm-audit-resolver: "npm:^3.0.0-RC.0"
+    nx: "npm:^21.5.3"
+    prettier: "npm:^3.6.2"
+    syncpack: "npm:^13.0.4"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.9.2"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/lib-dam@workspace:packages/lib-dam":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/lib-dam@workspace:packages/lib-dam"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@hamstore/lib-test-tools": "workspace:"
+    "@hamstore/message-queue-adapter-in-memory": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    throttled-queue: "npm:^3.0.0"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vite-tsconfig-paths: "npm:^5.1.4"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/lib-react-visualizer@workspace:, @hamstore/lib-react-visualizer@workspace:packages/lib-react-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/lib-react-visualizer@workspace:packages/lib-react-visualizer"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
+    "@babel/plugin-proposal-object-rest-spread": "npm:^7.20.7"
+    "@babel/plugin-proposal-private-methods": "npm:^7.18.6"
+    "@babel/plugin-proposal-private-property-in-object": "npm:^7.21.11"
+    "@babel/plugin-transform-react-constant-elements": "npm:^7.27.1"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-react": "npm:^7.27.1"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@emotion/react": "npm:^11.14.0"
+    "@emotion/styled": "npm:^11.14.1"
+    "@hamstore/command-json-schema": "workspace:"
+    "@hamstore/core": "workspace:"
+    "@hamstore/event-storage-adapter-redux": "workspace:"
+    "@mui/icons-material": "npm:^5.18.0"
+    "@mui/lab": "npm:^5.0.0-alpha.177"
+    "@mui/material": "npm:^5.18.0"
+    "@reduxjs/toolkit": "npm:^1.9.7"
+    "@rjsf/core": "npm:^5.24.13"
+    "@rjsf/mui": "npm:^5.24.13"
+    "@rjsf/utils": "npm:^5.24.13"
+    "@rjsf/validator-ajv8": "npm:^5.24.13"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    babel-plugin-optimize-clsx: "npm:^2.6.2"
+    babel-plugin-transform-react-remove-prop-types: "npm:^0.4.24"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    json-schema-to-ts: "npm:^3.1.1"
+    prettier: "npm:^3.6.2"
+    react: "npm:^19.1.1"
+    react-json-view: "npm:^1.21.3"
+    react-redux: "npm:^9.2.0"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/command-json-schema": "*"
+    "@hamstore/core": "*"
+    react: ^19.0.0
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/lib-test-tools@workspace:, @hamstore/lib-test-tools@workspace:packages/lib-test-tools":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/lib-test-tools@workspace:packages/lib-test-tools"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@hamstore/event-storage-adapter-in-memory": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-bus-adapter-event-bridge-s3@workspace:packages/message-bus-adapter-event-bridge-s3":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-bus-adapter-event-bridge-s3@workspace:packages/message-bus-adapter-event-bridge-s3"
+  dependencies:
+    "@aws-sdk/client-eventbridge": "npm:^3.893.0"
+    "@aws-sdk/client-s3": "npm:^3.893.0"
+    "@aws-sdk/s3-request-presigner": "npm:^3.893.0"
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/message-bus-adapter-event-bridge": "workspace:"
+    "@types/aws-lambda": "npm:^8.10.152"
+    "@types/lodash.chunk": "npm:^4.2.9"
+    "@types/node": "npm:^24.5.2"
+    aws-sdk-client-mock: "npm:^2.2.0"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.chunk: "npm:^4.2.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    undici: "npm:^7.16.0"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@aws-sdk/client-eventbridge": ^3.0.0
+    "@aws-sdk/client-s3": ^3.0.0
+    "@aws-sdk/s3-request-presigner": ^3.0.0
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-bus-adapter-event-bridge@workspace:, @hamstore/message-bus-adapter-event-bridge@workspace:packages/message-bus-adapter-event-bridge":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-bus-adapter-event-bridge@workspace:packages/message-bus-adapter-event-bridge"
+  dependencies:
+    "@aws-sdk/client-eventbridge": "npm:^3.893.0"
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/aws-lambda": "npm:^8.10.152"
+    "@types/lodash.chunk": "npm:^4.2.9"
+    "@types/node": "npm:^24.5.2"
+    aws-sdk-client-mock: "npm:^2.2.0"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.chunk: "npm:^4.2.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@aws-sdk/client-eventbridge": ^3.0.0
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-bus-adapter-in-memory@workspace:packages/message-bus-adapter-in-memory":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-bus-adapter-in-memory@workspace:packages/message-bus-adapter-in-memory"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-queue-adapter-in-memory@workspace:, @hamstore/message-queue-adapter-in-memory@workspace:packages/message-queue-adapter-in-memory":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-queue-adapter-in-memory@workspace:packages/message-queue-adapter-in-memory"
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/demo-blueprint": "workspace:"
+    "@types/node": "npm:^24.5.2"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    fastq: "npm:^1.19.1"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-queue-adapter-sqs-s3@workspace:packages/message-queue-adapter-sqs-s3":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-queue-adapter-sqs-s3@workspace:packages/message-queue-adapter-sqs-s3"
+  dependencies:
+    "@aws-sdk/client-s3": "npm:^3.893.0"
+    "@aws-sdk/client-sqs": "npm:^3.893.0"
+    "@aws-sdk/s3-request-presigner": "npm:^3.893.0"
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@hamstore/message-queue-adapter-sqs": "workspace:"
+    "@types/aws-lambda": "npm:^8.10.152"
+    "@types/lodash.chunk": "npm:^4.2.9"
+    "@types/node": "npm:^24.5.2"
+    aws-sdk-client-mock: "npm:^2.2.0"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.chunk: "npm:^4.2.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    undici: "npm:^7.16.0"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@aws-sdk/client-s3": ^3.0.0
+    "@aws-sdk/client-sqs": ^3.0.0
+    "@aws-sdk/s3-request-presigner": ^3.0.0
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
+
+"@hamstore/message-queue-adapter-sqs@workspace:, @hamstore/message-queue-adapter-sqs@workspace:packages/message-queue-adapter-sqs":
+  version: 0.0.0-use.local
+  resolution: "@hamstore/message-queue-adapter-sqs@workspace:packages/message-queue-adapter-sqs"
+  dependencies:
+    "@aws-sdk/client-sqs": "npm:^3.893.0"
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.28.4"
+    "@babel/plugin-transform-runtime": "npm:^7.28.3"
+    "@babel/preset-env": "npm:^7.28.3"
+    "@babel/preset-typescript": "npm:^7.27.1"
+    "@hamstore/core": "workspace:"
+    "@types/aws-lambda": "npm:^8.10.152"
+    "@types/lodash.chunk": "npm:^4.2.9"
+    "@types/node": "npm:^24.5.2"
+    aws-sdk-client-mock: "npm:^2.2.0"
+    babel-plugin-module-resolver: "npm:^4.1.0"
+    concurrently: "npm:^9.2.1"
+    dependency-cruiser: "npm:^17.0.1"
+    eslint: "npm:^9.36.0"
+    lodash.chunk: "npm:^4.2.0"
+    prettier: "npm:^3.6.2"
+    ts-node: "npm:^10.9.2"
+    ts-toolbelt: "npm:^9.6.0"
+    tsc-alias: "npm:^1.8.16"
+    typescript: "npm:^5.9.2"
+    vitest: "npm:^3.2.4"
+  peerDependencies:
+    "@aws-sdk/client-sqs": ^3.0.0
+    "@hamstore/core": "*"
+  languageName: unknown
+  linkType: soft
 
 "@hapi/hoek@npm:^9.0.0, @hapi/hoek@npm:^9.3.0":
   version: 9.3.0

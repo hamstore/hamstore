@@ -1,7 +1,6 @@
+import type { EventTypeDetail } from '@hamstore/core';
 import type { FromSchema } from 'json-schema-to-ts';
 import type { A } from 'ts-toolbelt';
-
-import type { EventTypeDetail } from '@castore/core';
 
 import { JSONSchemaEventType } from './eventType';
 

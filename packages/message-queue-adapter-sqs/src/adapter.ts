@@ -5,15 +5,14 @@ import {
   SendMessageCommandInput,
   SendMessageBatchRequestEntry,
 } from '@aws-sdk/client-sqs';
-import chunk from 'lodash.chunk';
-
 import {
   isAggregateExistsMessage,
   isEventCarryingMessage,
   Message,
   MessageChannelAdapter,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
+import chunk from 'lodash.chunk';
 
 export const SQS_MAX_MESSAGE_BATCH_SIZE = 10;
 

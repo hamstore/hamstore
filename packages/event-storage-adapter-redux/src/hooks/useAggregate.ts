@@ -3,7 +3,7 @@ import {
   EventStoreAggregate,
   EventStoreEventDetails,
   GetAggregateOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import { useAggregateEvents } from './useAggregateEvents';
 

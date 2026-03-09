@@ -1,6 +1,5 @@
+import { EventDetail, EventStore } from '@hamstore/core';
 import { createSlice, Draft } from '@reduxjs/toolkit';
-
-import { EventDetail, EventStore } from '@castore/core';
 
 import { EventStoreReduxReducer } from '~/types';
 import {
@@ -8,14 +7,14 @@ import {
   getEventStoreSliceName,
 } from '~/utils/getEventStoreSliceName';
 
-export const getCastoreReducers = ({
+export const getHamstoreReducers = ({
   prefix = DEFAULT_PREFIX,
   eventStores,
 }: {
   prefix?: string;
   eventStores: EventStore[];
 }): Record<string, EventStoreReduxReducer> => {
-  const castoreReducers: Record<string, EventStoreReduxReducer> = {};
+  const hamstoreReducers: Record<string, EventStoreReduxReducer> = {};
 
   eventStores.forEach(eventStore => {
     const { eventStoreId } = eventStore;
@@ -89,8 +88,8 @@ export const getCastoreReducers = ({
       },
     });
 
-    castoreReducers[eventStoreSliceName] = reducer;
+    hamstoreReducers[eventStoreSliceName] = reducer;
   });
 
-  return castoreReducers;
+  return hamstoreReducers;
 };

@@ -1,13 +1,12 @@
-import type { EventBridgeEvent } from 'aws-lambda';
-
 import type {
   AggregateExistsMessageBus,
   NotificationMessageBus,
   StateCarryingMessageBus,
   MessageChannelSourceEventStoreIds,
   MessageChannelSourceEventStoreIdTypes,
-} from '@castore/core';
-import type { EventBridgeMessageBusMessage } from '@castore/message-bus-adapter-event-bridge';
+} from '@hamstore/core';
+import type { EventBridgeMessageBusMessage } from '@hamstore/message-bus-adapter-event-bridge';
+import type { EventBridgeEvent } from 'aws-lambda';
 
 export type OversizedEntryDetail = { messageUrl: string };
 

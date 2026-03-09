@@ -10,7 +10,7 @@ Events that concern the same entity (like a `Pokemon`) are aggregated through a 
 
 ![Events](../../assets/docSchemas/events.png)
 
-In Castore, stored events (also called **event details**) always have exactly the following properties:
+In Hamstore, stored events (also called **event details**) always have exactly the following properties:
 
 - <code>aggregateId <i>(string)</i></code>
 - <code>version <i>(integer ≥ 1)</i></code>
@@ -20,7 +20,7 @@ In Castore, stored events (also called **event details**) always have exactly th
 - <code>metadata <i>(?any = never)</i></code>: Some metadata of any type
 
 ```ts
-import type { EventDetail } from '@castore/core';
+import type { EventDetail } from '@hamstore/core';
 
 type PokemonAppearedEventDetail = EventDetail<
   'POKEMON_APPEARED',
@@ -39,10 +39,10 @@ type PokemonAppearedEventDetail = {
 };
 ```
 
-Events are generally classified in **events types** (not to confuse with TS types). Castore lets you declare them via the `EventType` class:
+Events are generally classified in **events types** (not to confuse with TS types). Hamstore lets you declare them via the `EventType` class:
 
 ```ts
-import { EventType } from '@castore/core';
+import { EventType } from '@hamstore/core';
 
 const pokemonAppearedEventType = new EventType<
   'POKEMON_APPEARED',
@@ -53,7 +53,7 @@ const pokemonAppearedEventType = new EventType<
 
 :::info
 
-Note that we only provided TS types for `payload` and `metadata` properties. That is because, as stated in the [core design](../../../), **Castore is meant to be as flexible as possible**, and that includes the validation library you want to use (if any): The `EventType` class can be used directly if no validation is required, or implemented by [other classes](../4-packages.md#-event-types) which will add run-time validation methods to it 👍
+Note that we only provided TS types for `payload` and `metadata` properties. That is because, as stated in the [core design](../../../), **Hamstore is meant to be as flexible as possible**, and that includes the validation library you want to use (if any): The `EventType` class can be used directly if no validation is required, or implemented by [other classes](../4-packages.md#-event-types) which will add run-time validation methods to it 👍
 
 :::
 
@@ -67,7 +67,7 @@ Note that we only provided TS types for `payload` and `metadata` properties. Tha
 - <code>type <i>(string)</i></code>: The event type
 
 ```ts
-import { EventType } from '@castore/core';
+import { EventType } from '@hamstore/core';
 
 const pokemonAppearedEventType = new EventType({
   type: 'POKEMON_APPEARED',
@@ -92,7 +92,7 @@ const eventType = pokemonAppearedEventType.type;
 - `EventTypeDetail`: Returns the event detail TS type of an `EventType`
 
 ```ts
-import type { EventTypeDetail } from '@castore/core';
+import type { EventTypeDetail } from '@hamstore/core';
 
 type PokemonAppearedEventTypeDetail = EventTypeDetail<
   typeof pokemonAppearedEventType
@@ -112,7 +112,7 @@ type PokemonCaughtEventTypeDetail = {
 - `EventTypeDetails`: Returns the events details of a list of `EventType`
 
 ```ts
-import type { EventTypeDetails } from '@castore/core';
+import type { EventTypeDetails } from '@hamstore/core';
 
 type PokemonEventTypeDetails = EventTypeDetails<
   [typeof pokemonAppearedEventType, typeof pokemonCaughtEventType]

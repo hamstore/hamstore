@@ -2,11 +2,10 @@ import {
   EventBridgeClient,
   PutEventsCommand,
 } from '@aws-sdk/client-eventbridge';
+import type { Message, PublishMessageOptions } from '@hamstore/core';
+import { __REPLAYED__ } from '@hamstore/core';
 import { mockClient } from 'aws-sdk-client-mock';
 import type { A } from 'ts-toolbelt';
-
-import type { Message, PublishMessageOptions } from '@castore/core';
-import { __REPLAYED__ } from '@castore/core';
 
 import {
   EventBridgeMessageBusAdapter,

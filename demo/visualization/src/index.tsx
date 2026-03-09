@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { v4 as uuid } from 'uuid';
 
-import { tuple } from '@castore/core';
+import { tuple } from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
@@ -10,8 +10,8 @@ import {
   wildPokemonAppearCommand,
   catchPokemonCommand,
   levelUpPokemonCommand,
-} from '@castore/demo-blueprint';
-import { Visualizer } from '@castore/lib-react-visualizer';
+} from '@hamstore/demo-blueprint';
+import { Visualizer } from '@hamstore/lib-react-visualizer';
 
 import './index.css';
 

@@ -1,10 +1,10 @@
 {
-  "name": "@castore/lib-react-visualizer",
-  "description": "React component to visualize, design and manually test Castore event stores and commands.",
+  "name": "@hamstore/lib-react-visualizer",
+  "description": "React component to visualize, design and manually test Hamstore event stores and commands.",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -37,9 +37,9 @@
     "watch": "rm -rf dist && concurrently 'yarn:package-* --watch'"
   },
   "dependencies": {
-    "@castore/event-storage-adapter-redux": "workspace:",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hamstore/event-storage-adapter-redux": "workspace:",
     "@mui/icons-material": "^5.18.0",
     "@mui/lab": "^5.0.0-alpha.177",
     "@mui/material": "^5.18.0",
@@ -63,8 +63,8 @@
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/command-json-schema": "workspace:",
-    "@castore/core": "workspace:",
+    "@hamstore/command-json-schema": "workspace:",
+    "@hamstore/core": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "babel-plugin-optimize-clsx": "^2.6.2",
@@ -102,8 +102,8 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/command-json-schema": "*",
-    "@castore/core": "*",
+    "@hamstore/command-json-schema": "*",
+    "@hamstore/core": "*",
     "react": "^19.0.0"
   },
   "type": "module"

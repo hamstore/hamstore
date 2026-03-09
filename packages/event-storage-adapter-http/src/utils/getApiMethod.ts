@@ -2,7 +2,7 @@ import { OpenAPI, OpenAPIV2, OpenAPIV3_1 } from 'openapi-types';
 
 import {
   ApiMethod,
-  CastoreOperationObject,
+  HamstoreOperationObject,
   Path,
   SwaggerClient,
 } from './types';
@@ -38,8 +38,8 @@ export const getApiMethod =
 
     const methodPath = paths.find(
       ({ route }) =>
-        // @ts-ignore x-castore-operationId is an extension of the openAPI spec
-        route['x-castore-operationId'] === methodName ||
+        // @ts-ignore x-hamstore-operationId is an extension of the openAPI spec
+        route['x-hamstore-operationId'] === methodName ||
         route.operationId === methodName,
     );
 
@@ -50,7 +50,7 @@ export const compileOperation = (
   client: SwaggerClient,
   path: Path,
 ): ApiMethod => {
-  const route = path.route as CastoreOperationObject;
+  const route = path.route as HamstoreOperationObject;
   const tag = route.tags?.[0] ?? 'default';
   const operationId = route.operationId as string;
 

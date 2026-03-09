@@ -1,9 +1,8 @@
 /* eslint-disable max-lines */
+import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
 import { randomUUID } from 'crypto';
 import omit from 'lodash.omit';
 import MockDate from 'mockdate';
-
-import { GroupedEvent, EventStorageAdapter } from '@castore/core';
 
 import { InMemoryEventStorageAdapter } from './adapter';
 import { InMemoryEventAlreadyExistsError } from './error';

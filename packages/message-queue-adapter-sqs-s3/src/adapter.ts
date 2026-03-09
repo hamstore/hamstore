@@ -10,10 +10,9 @@ import {
   SendMessageCommandInput,
 } from '@aws-sdk/client-sqs';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
-import type { Message, MessageChannelAdapter } from '@castore/core';
-import { isEventCarryingMessage } from '@castore/core';
-import { SQSMessageQueueAdapter } from '@castore/message-queue-adapter-sqs';
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
+import { isEventCarryingMessage } from '@hamstore/core';
+import { SQSMessageQueueAdapter } from '@hamstore/message-queue-adapter-sqs';
 
 import { getMessageSize, SEND_MESSAGES_SIZE_LIMIT } from './getMessageSize';
 import type { OversizedEntryDetail } from './message';

@@ -1,7 +1,6 @@
+import { EventType } from '@hamstore/core';
 import type * as z3 from 'zod/v3';
 import type * as z4 from 'zod/v4/core';
-
-import { EventType } from '@castore/core';
 
 type ZodType = z3.ZodTypeAny | z4.$ZodType;
 type inferZodType<T extends ZodType> = T extends z3.ZodTypeAny

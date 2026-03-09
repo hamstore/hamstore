@@ -1,4 +1,4 @@
-export const DEFAULT_PREFIX = '@castore';
+export const DEFAULT_PREFIX = '@hamstore';
 
 export const getEventStoreSliceName = ({
   prefix = DEFAULT_PREFIX,

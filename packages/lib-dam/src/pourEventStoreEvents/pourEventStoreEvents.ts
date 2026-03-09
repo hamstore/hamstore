@@ -2,7 +2,7 @@ import type {
   EventStore,
   EventStoreNotificationMessage,
   PublishMessageOptions,
-} from '@castore/core';
+} from '@hamstore/core';
 
 import type { ScanInfos } from '~/types';
 import { EventBook } from '~/utils/eventBook';

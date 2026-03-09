@@ -9,7 +9,7 @@ If your storage solution exposes data streaming capabilities (such as [DynamoDB 
 Otherwise, you can use the `ConnectedEventStore` class. Its interface matches the `EventStore` one, but successfully pushing a new event will automatically forward it to a message queue/bus. Successfully pushing an event group will also automatically forward the events to their respective message queues/buses:
 
 ```ts
-import { ConnectedEventStore } from '@castore/core';
+import { ConnectedEventStore } from '@hamstore/core';
 
 const connectedPokemonsEventStore = new ConnectedEventStore(
   // 👇 Original event store

@@ -1,10 +1,10 @@
 {
-  "name": "@castore/event-storage-adapter-http",
-  "description": "DRY Castore EventStorageAdapter implementation using a HTTP API",
+  "name": "@hamstore/event-storage-adapter-http",
+  "description": "DRY Hamstore EventStorageAdapter implementation using a HTTP API",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -46,7 +46,7 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
+    "@hamstore/core": "workspace:",
     "@types/node": "^24.5.2",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "babel-plugin-module-resolver": "^4.1.0",
@@ -81,7 +81,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*"
+    "@hamstore/core": "*"
   },
   "type": "module"
 }

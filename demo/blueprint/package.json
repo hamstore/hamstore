@@ -1,9 +1,9 @@
 {
-  "name": "@castore/demo-blueprint",
+  "name": "@hamstore/demo-blueprint",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "sideEffects": false,
   "files": [
     "dist"
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.28.4",
-    "@castore/command-json-schema": "workspace:"
+    "@hamstore/command-json-schema": "workspace:"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
@@ -33,8 +33,8 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
-    "@castore/event-type-json-schema": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/event-type-json-schema": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
@@ -69,8 +69,8 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*",
-    "@castore/event-type-json-schema": "*",
+    "@hamstore/core": "*",
+    "@hamstore/event-type-json-schema": "*",
     "json-schema-to-ts": "^2.0.0 || ^3.0.0"
   }
 }

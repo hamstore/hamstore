@@ -1,25 +1,25 @@
 # Zod Event
 
-DRY Castore [`EventType`](https://castore-dev.github.io/castore/docs/event-sourcing/events/) definition using [`zod`](https://github.com/colinhacks/zod).
+DRY Hamstore [`EventType`](https://hamstore.github.io/hamstore/docs/event-sourcing/events/) definition using [`zod`](https://github.com/colinhacks/zod).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/event-type-zod
+npm install @hamstore/event-type-zod
 
 # yarn
-yarn add @castore/event-type-zod
+yarn add @hamstore/event-type-zod
 ```
 
-This package has `@castore/core` and `zod` (above v3) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core` and `zod` (above v3) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core zod
+npm install @hamstore/core zod
 
 # yarn
-yarn add @castore/core zod
+yarn add @hamstore/core zod
 ```
 
 ## 👩‍💻 Usage
@@ -27,7 +27,7 @@ yarn add @castore/core zod
 ```ts
 import z from 'zod';
 
-import { ZodEventType } from '@castore/event-type-zod';
+import { ZodEventType } from '@hamstore/event-type-zod';
 
 const pokemonAppearedPayloadSchema = z.object({
   name: z.string(),
@@ -49,7 +49,7 @@ const pokemonAppearedEventType = new ZodEventType({
 👇 Equivalent to:
 
 ```ts
-import { EventType } from '@castore/core';
+import { EventType } from '@hamstore/core';
 
 const pokemonAppearedEventType = new EventType<
   'POKEMON_APPEARED',
@@ -60,7 +60,7 @@ const pokemonAppearedEventType = new EventType<
 
 ## ⚙️ Properties & Methods
 
-`ZodEventType` implements the [`EventType`](https://castore-dev.github.io/castore/docs/event-sourcing/events/) class and adds the following properties to it:
+`ZodEventType` implements the [`EventType`](https://hamstore.github.io/hamstore/docs/event-sourcing/events/) class and adds the following properties to it:
 
 - <code>payloadSchema <i>(?object)</i></code>: The event type payload zod schema
 

@@ -9,14 +9,13 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-
 import type {
   Aggregate,
   EventDetail,
   EventStorageAdapter,
   PushEventOptions,
-} from '@castore/core';
-import { GroupedEvent } from '@castore/core';
+} from '@hamstore/core';
+import { GroupedEvent } from '@hamstore/core';
 
 import {
   EVENT_TABLE_EVENT_STORE_ID_KEY,

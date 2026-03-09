@@ -1,6 +1,6 @@
 # HTTP Event Storage Adapter
 
-DRY Castore [`EventStorageAdapter`](https://castore-dev.github.io/castore/docs/event-sourcing/fetching-events/) implementation using a HTTP API.
+DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/event-sourcing/fetching-events/) implementation using a HTTP API.
 
 This class is mainly useful when you already have the logic for events implemented and you want to expose your methods for a front-end to use them, eg.
 
@@ -8,26 +8,26 @@ This class is mainly useful when you already have the logic for events implement
 
 ```bash
 # npm
-npm install @castore/event-storage-adapter-http
+npm install @hamstore/event-storage-adapter-http
 
 # yarn
-yarn add @castore/event-storage-adapter-http
+yarn add @hamstore/event-storage-adapter-http
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ### 👩‍💻 Usage
 
 ```ts
-import { HttpEventStorageAdapter } from '@castore/event-storage-adapter-http';
+import { HttpEventStorageAdapter } from '@hamstore/event-storage-adapter-http';
 import { swagger } from './swagger.json'; // your swagger file
 
 
@@ -46,7 +46,7 @@ You need to expose 2 API endpoints that will be used by the adapter. They need t
 - getEvents: `(aggregateId: string) => { events: EventDetail[] }`
 - listAggregateIds: `() => ListAggregateIdsOutput`
 
-See [here](https://castore-dev.github.io/castore/docs/event-sourcing/events/) for more details about the EventDetails type.
+See [here](https://hamstore.github.io/hamstore/docs/event-sourcing/events/) for more details about the EventDetails type.
 For the `ListAggregateIdsOutput` type:
 
 ```typescript
@@ -85,7 +85,7 @@ type Swagger = {
   paths: {
     [path: string]: {
       [verb: string]: {
-        operationId: string; // the operation id for the castore method (getEvents | listAggregateIds)
+        operationId: string; // the operation id for the hamstore method (getEvents | listAggregateIds)
         responses: {
           [statusCode: string]: {
             description: string;
@@ -153,7 +153,7 @@ Example of swagger:
             "description": "Default response for GET /events"
           }
         },
-        "x-castore-operationId": "getEvents",
+        "x-hamstore-operationId": "getEvents",
         // you can alternatively use the operationId field
         // "operationId": "getEvents",
         "parameters": [
@@ -171,4 +171,4 @@ Example of swagger:
 }
 ```
 
-Note that if you don't specify the `x-castore-operationId` or the `operationId` field, then the adapter will not be able to find the method to call.
+Note that if you don't specify the `x-hamstore-operationId` or the `operationId` field, then the adapter will not be able to find the method to call.

@@ -84,7 +84,7 @@ export default [
         {
           patterns: [
             {
-              group: ['@castore/*/*'],
+              group: ['@hamstore/*/*'],
               message:
                 'import of internal modules must be done at the root level.',
             },
@@ -193,7 +193,7 @@ export default [
         {
           patterns: [
             {
-              group: ['@castore/*/*'],
+              group: ['@hamstore/*/*'],
               message:
                 'import of internal modules must be done at the root level.',
             },

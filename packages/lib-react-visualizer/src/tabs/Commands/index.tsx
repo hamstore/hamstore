@@ -1,8 +1,7 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 import { Stack } from '@mui/material';
 import React, { JSX } from 'react';
-
-import type { JSONSchemaCommand } from '@castore/command-json-schema';
-import type { EventStore } from '@castore/core';
 
 import { CommandCard } from './CommandCard';
 

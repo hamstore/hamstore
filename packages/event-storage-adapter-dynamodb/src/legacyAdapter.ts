@@ -9,14 +9,13 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-
 import type {
   Aggregate,
   EventDetail,
   PushEventOptions,
   EventStorageAdapter,
-} from '@castore/core';
-import { GroupedEvent } from '@castore/core';
+} from '@hamstore/core';
+import { GroupedEvent } from '@hamstore/core';
 
 import {
   EVENT_TABLE_INITIAL_EVENT_INDEX_NAME,
@@ -119,7 +118,7 @@ const parseGroupedEvents = (
 };
 
 /**
- * @deprecated "use DynamoDBSingleTableEventStorageAdapter instead: https://github.com/castore-dev/castore/blob/main/packages/event-storage-adapter-dynamodb/README.md#table-of-content"
+ * @deprecated "use DynamoDBSingleTableEventStorageAdapter instead: https://github.com/hamstore/hamstore/blob/main/packages/event-storage-adapter-dynamodb/README.md#table-of-content"
  */
 export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
   getEvents: EventStorageAdapter['getEvents'];

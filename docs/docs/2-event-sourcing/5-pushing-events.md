@@ -13,7 +13,7 @@ Modifying the state of your application (i.e. pushing new events to your event s
 ![Command](../../assets/docSchemas/command.png)
 
 ```ts
-import { Command, tuple } from '@castore/core';
+import { Command, tuple } from '@hamstore/core';
 
 type Input = { name: string; level: number };
 type Output = { pokemonId: string };
@@ -47,7 +47,7 @@ const catchPokemonCommand = new Command({
 
 :::info
 
-Note that we only provided TS types for `Input` and `Output` properties. That is because, as stated in the [core design](../../../), **Castore is meant to be as flexible as possible**, and that includes the validation library you want to use (if any): The `Command` class can be used directly if no validation is required, or implemented by [other classes](../4-packages.md#-commands) which will add run-time validation methods to it 👍
+Note that we only provided TS types for `Input` and `Output` properties. That is because, as stated in the [core design](../../../), **Hamstore is meant to be as flexible as possible**, and that includes the validation library you want to use (if any): The `Command` class can be used directly if no validation is required, or implemented by [other classes](../4-packages.md#-commands) which will add run-time validation methods to it 👍
 
 :::
 
@@ -57,7 +57,7 @@ Fetching and pushing events non-simultaneously exposes your application to [race
 
 ![Command Retry](../../assets/docSchemas/commandRetry.png)
 
-Finally, Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@castore/lib-react-visualizer).
+Finally, Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@hamstore/lib-react-visualizer).
 
 <details>
 <summary>
@@ -81,7 +81,7 @@ Finally, Command handlers should be, as much as possible, [pure functions](https
   - <code>retriesLeft <i>(?number)</i></code>: The number of retries left before breaking out of the retry loop
 
 ```ts
-import { Command, tuple } from '@castore/core';
+import { Command, tuple } from '@hamstore/core';
 
 const doSomethingCommand = new Command({
   commandId: 'DO_SOMETHING',

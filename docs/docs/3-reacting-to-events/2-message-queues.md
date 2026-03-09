@@ -11,7 +11,7 @@ sidebar_position: 2
 You can use the `AggregateExistsMessageQueue`, `NotificationMessageQueue` or `StateCarryingMessageQueue` classes to implement message queues:
 
 ```ts
-import { NotificationMessageQueue } from '@castore/core';
+import { NotificationMessageQueue } from '@hamstore/core';
 
 const appMessageQueue = new NotificationMessageQueue({
   messageQueueId: 'APP_MESSAGE_QUEUE',
@@ -33,7 +33,7 @@ await appMessageQueue.publishMessage({
 Similarly to event stores, `MessageQueue` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageQueueAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
-import { EventStore } from '@castore/core';
+import { EventStore } from '@hamstore/core';
 
 await messageQueue.publishMessage(...);
 // ❌ Will throw an `UndefinedMessageChannelAdapterError`
@@ -63,7 +63,7 @@ The adapter packages will also expose useful generics to type the arguments of y
 import type {
   SQSMessageQueueMessage,
   SQSMessageQueueMessageBody,
-} from '@castore/message-queue-adapter-sqs';
+} from '@hamstore/message-queue-adapter-sqs';
 
 const appMessagesWorker = async ({ Records }: SQSMessageQueueMessage) => {
   for (const { body } of Records) {
@@ -131,7 +131,7 @@ The following methods interact with the messaging solution of your application t
 - `MessageChannelMessage`: Given a `MessageQueue`, returns the TS type of its messages
 
 ```ts
-import type { MessageChannelMessage } from '@castore/core';
+import type { MessageChannelMessage } from '@hamstore/core';
 
 type AppMessage = MessageChannelMessage<typeof appMessageQueue>;
 

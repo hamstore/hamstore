@@ -1,11 +1,10 @@
+import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
 import {
   PostgreSqlContainer,
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { randomUUID } from 'crypto';
 import omit from 'lodash.omit';
-
-import { GroupedEvent, EventStorageAdapter } from '@castore/core';
 
 import { PostgresEventStorageAdapter } from './adapter';
 import { PostgresEventAlreadyExistsError } from './error';

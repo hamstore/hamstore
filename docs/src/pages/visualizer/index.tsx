@@ -1,8 +1,5 @@
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import Layout from '@theme/Layout';
-import React, { JSX } from 'react';
-
-import { tuple } from '@castore/core';
+import { tuple } from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
@@ -10,18 +7,20 @@ import {
   wildPokemonAppearCommand,
   catchPokemonCommand,
   levelUpPokemonCommand,
-} from '@castore/demo-blueprint';
+} from '@hamstore/demo-blueprint';
+import Layout from '@theme/Layout';
+import React, { JSX } from 'react';
 
 import './index.css';
 
 const VisualizerPage = (): JSX.Element => (
   <Layout
     title="Visualizer"
-    description="Castore is a TypeScript library that makes Event Sourcing easy, a powerful paradigm that saves changes to your application state rather than the state itself."
+    description="Hamstore is a TypeScript library that makes Event Sourcing easy, a powerful paradigm that saves changes to your application state rather than the state itself."
   >
     <BrowserOnly>
       {() => {
-        const Visualizer = require('@castore/lib-react-visualizer').Visualizer;
+        const Visualizer = require('@hamstore/lib-react-visualizer').Visualizer;
         const uuid = require('uuid').v4 as () => string;
 
         return (

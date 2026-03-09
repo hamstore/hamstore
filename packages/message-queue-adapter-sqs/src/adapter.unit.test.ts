@@ -4,10 +4,9 @@ import {
   SendMessageCommand,
   SendMessageBatchCommand,
 } from '@aws-sdk/client-sqs';
+import type { Message, PublishMessageOptions } from '@hamstore/core';
 import { mockClient } from 'aws-sdk-client-mock';
 import type { A } from 'ts-toolbelt';
-
-import type { Message, PublishMessageOptions } from '@castore/core';
 
 import { SQSMessageQueueAdapter, SQS_MAX_MESSAGE_BATCH_SIZE } from './adapter';
 

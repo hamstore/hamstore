@@ -1,4 +1,4 @@
-import type { EventDetail } from '@castore/core';
+import type { EventDetail } from '@hamstore/core';
 
 export const isBetween = (
   { timestamp }: EventDetail,

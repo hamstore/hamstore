@@ -1,9 +1,9 @@
 {
-  "name": "@castore/docs",
+  "name": "@hamstore/docs",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "sideEffects": false,
   "scripts": {
     "build": "docusaurus build",
@@ -34,12 +34,12 @@
     ]
   },
   "dependencies": {
-    "@castore/command-json-schema": "workspace:",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
-    "@castore/lib-react-visualizer": "workspace:",
     "@docusaurus/core": "3.9.1",
     "@docusaurus/preset-classic": "3.9.1",
+    "@hamstore/command-json-schema": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
+    "@hamstore/lib-react-visualizer": "workspace:",
     "@mdx-js/react": "^3.1.1",
     "@mui/material": "^5.18.0",
     "prism-react-renderer": "^2.4.1",

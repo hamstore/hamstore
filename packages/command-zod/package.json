@@ -1,10 +1,10 @@
 {
-  "name": "@castore/command-zod",
-  "description": "DRY Castore Command definition using Zod",
+  "name": "@hamstore/command-zod",
+  "description": "DRY Hamstore Command definition using Zod",
   "license": "MIT",
-  "homepage": "https://github.com/theodo/castore#readme",
-  "bugs": "https://github.com/theodo/castore/issues",
-  "repository": "theodo/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -42,7 +42,7 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
+    "@hamstore/core": "workspace:",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
@@ -78,7 +78,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*",
+    "@hamstore/core": "*",
     "zod": "^3.25.0 || ^4.0.0"
   },
   "type": "module"

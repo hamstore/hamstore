@@ -1,7 +1,6 @@
+import type { EventTypeDetail } from '@hamstore/core';
 import type { A } from 'ts-toolbelt';
 import { z } from 'zod';
-
-import type { EventTypeDetail } from '@castore/core';
 
 import { ZodEventType } from './eventType';
 

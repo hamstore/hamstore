@@ -1,11 +1,10 @@
-import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
-
 import {
   Command,
   EventStore,
   $Contravariant,
   OnEventAlreadyExistsCallback,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export class JSONSchemaCommand<
   COMMAND_ID extends string = string,

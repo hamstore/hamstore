@@ -4,8 +4,8 @@ import type {
   EventDetail,
   PushEventOptions,
   EventStorageAdapter,
-} from '@castore/core';
-import { GroupedEvent } from '@castore/core';
+} from '@hamstore/core';
+import { GroupedEvent } from '@hamstore/core';
 
 import { InMemoryEventAlreadyExistsError } from './error';
 import {

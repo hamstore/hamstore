@@ -30,6 +30,6 @@ export type Path = {
   };
 };
 
-export type CastoreOperationObject = OpenAPIV3.OperationObject & {
-  'x-castore-operationId'?: string;
+export type HamstoreOperationObject = OpenAPIV3.OperationObject & {
+  'x-hamstore-operationId'?: string;
 };

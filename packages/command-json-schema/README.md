@@ -1,32 +1,32 @@
 # JSON Schema Command
 
-DRY Castore [`Command`](https://castore-dev.github.io/castore/docs/event-sourcing/pushing-events/) definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts).
+DRY Hamstore [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/command-json-schema
+npm install @hamstore/command-json-schema
 
 # yarn
-yarn add @castore/command-json-schema
+yarn add @hamstore/command-json-schema
 ```
 
-This package has `@castore/core` and `json-schema-to-ts` (above v2) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core` and `json-schema-to-ts` (above v2) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core json-schema-to-ts
+npm install @hamstore/core json-schema-to-ts
 
 # yarn
-yarn add @castore/core json-schema-to-ts
+yarn add @hamstore/core json-schema-to-ts
 ```
 
 ## 👩‍💻 Usage
 
 ```ts
-import { JSONSchemaCommand } from '@castore/command-json-schema';
-import { tuple } from '@castore/core';
+import { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import { tuple } from '@hamstore/core';
 
 const pokemonAppearedInputSchema = {
   type: 'object',
@@ -78,7 +78,7 @@ const pokemonAppearCommand = new JSONSchemaCommand({
 👇 Equivalent to:
 
 ```ts
-import { Command } from '@castore/core';
+import { Command } from '@hamstore/core';
 
 type RequiredEventStores = [typeof pokemonsEventStore];
 type CommandInput = { name: string; level: number };
@@ -104,7 +104,7 @@ const pokemonAppearCommand = new Command<
 
 ## ⚙️ Properties & Methods
 
-`JSONSchemaCommand` implements the [`Command`](https://castore-dev.github.io/castore/docs/event-sourcing/pushing-events/) class and adds the following properties to it:
+`JSONSchemaCommand` implements the [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) class and adds the following properties to it:
 
 - <code>inputSchema <i>(?object)</i></code>: The command input JSON schema
 

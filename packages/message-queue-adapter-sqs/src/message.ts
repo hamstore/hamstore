@@ -1,5 +1,3 @@
-import type { SQSRecord } from 'aws-lambda';
-
 import type {
   AggregateExistsMessageQueue,
   EventStoreAggregateExistsMessage,
@@ -8,7 +6,8 @@ import type {
   StateCarryingMessageQueue,
   EventStoreStateCarryingMessage,
   MessageChannelSourceEventStores,
-} from '@castore/core';
+} from '@hamstore/core';
+import type { SQSRecord } from 'aws-lambda';
 
 export interface SQSMessageQueueRecord extends SQSRecord {
   messageAttributes: {

@@ -1,25 +1,25 @@
 # Zod Command
 
-DRY Castore [`Command`](https://castore-dev.github.io/castore/docs/event-sourcing/pushing-events/) definition using [`zod`](https://github.com/colinhacks/zod).
+DRY Hamstore [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) definition using [`zod`](https://github.com/colinhacks/zod).
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/command-zod
+npm install @hamstore/command-zod
 
 # yarn
-yarn add @castore/command-zod
+yarn add @hamstore/command-zod
 ```
 
-This package has `@castore/core` and `zod` (above v3) as peer dependencies, so you will have to install them as well:
+This package has `@hamstore/core` and `zod` (above v3) as peer dependencies, so you will have to install them as well:
 
 ```bash
 # npm
-npm install @castore/core zod
+npm install @hamstore/core zod
 
 # yarn
-yarn add @castore/core zod
+yarn add @hamstore/core zod
 ```
 
 ## 👩‍💻 Usage
@@ -27,8 +27,8 @@ yarn add @castore/core zod
 ```ts
 import z from 'zod';
 
-import { ZodCommand } from '@castore/command-zod';
-import { tuple } from '@castore/core';
+import { ZodCommand } from '@hamstore/command-zod';
+import { tuple } from '@hamstore/core';
 
 const pokemonAppearedInputSchema = z.object({
   name: z.string(),
@@ -69,7 +69,7 @@ const pokemonAppearCommand = new ZodCommand({
 👇 Equivalent to:
 
 ```ts
-import { Command } from '@castore/core';
+import { Command } from '@hamstore/core';
 
 type RequiredEventStores = [typeof pokemonsEventStore];
 type CommandInput = { name: string; level: number };
@@ -91,7 +91,7 @@ const pokemonAppearCommand = new Command<
 
 ## ⚙️ Properties & Methods
 
-`ZodCommand` implements the [`Command`](https://castore-dev.github.io/castore/docs/event-sourcing/pushing-events/) class and adds the following properties to it:
+`ZodCommand` implements the [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) class and adds the following properties to it:
 
 - <code>inputSchema <i>(?object)</i></code>: The command input zod schema
 

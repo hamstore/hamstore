@@ -1,5 +1,5 @@
 {
-  "name": "@castore/demo-implementation",
+  "name": "@hamstore/demo-implementation",
   "license": "UNLICENSED",
   "sideEffects": false,
   "scripts": {
@@ -18,15 +18,15 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.893.0",
-    "@castore/core": "workspace:",
-    "@castore/demo-blueprint": "workspace:",
-    "@castore/event-storage-adapter-dynamodb": "workspace:",
+    "@hamstore/core": "workspace:",
+    "@hamstore/demo-blueprint": "workspace:",
+    "@hamstore/event-storage-adapter-dynamodb": "workspace:",
     "@middy/core": "^3.6.2",
     "@middy/validator": "^3.6.2",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
-    "@castore/lib-test-tools": "workspace:",
+    "@hamstore/lib-test-tools": "workspace:",
     "@serverless/typescript": "^3.38.0",
     "@types/aws-lambda": "^8.10.152",
     "@types/http-errors": "^1.8.2",

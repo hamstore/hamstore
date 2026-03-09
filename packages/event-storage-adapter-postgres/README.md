@@ -1,31 +1,31 @@
 # Postgres Event Storage Adapter
 
-DRY Castore [`EventStorageAdapter`](https://castore-dev.github.io/castore/docs/event-sourcing/fetching-events/) implementation using a Postgres database.
+DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/event-sourcing/fetching-events/) implementation using a Postgres database.
 
 ## 📥 Installation
 
 ```bash
 # npm
-npm install @castore/event-storage-adapter-postgres
+npm install @hamstore/event-storage-adapter-postgres
 
 # yarn
-yarn add @castore/event-storage-adapter-postgres
+yarn add @hamstore/event-storage-adapter-postgres
 ```
 
-This package has `@castore/core` as peer dependency, so you will have to install it as well:
+This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
 
 ```bash
 # npm
-npm install @castore/core
+npm install @hamstore/core
 
 # yarn
-yarn add @castore/core
+yarn add @hamstore/core
 ```
 
 ## 👩‍💻 Usage
 
 ```ts
-import { PostgresEventStorageAdapter } from '@castore/event-storage-adapter-postgres';
+import { PostgresEventStorageAdapter } from '@hamstore/event-storage-adapter-postgres';
 
 const pokemonsEventStorageAdapter = new PostgresEventStorageAdapter({
   // 👇 You can specify a connection string for your Postgres database

@@ -1,10 +1,10 @@
 {
-  "name": "@castore/event-storage-adapter-redux",
-  "description": "DRY Castore EventStorageAdapter implementation using a Redux store",
+  "name": "@hamstore/event-storage-adapter-redux",
+  "description": "DRY Hamstore EventStorageAdapter implementation using a Redux store",
   "license": "MIT",
-  "homepage": "https://github.com/castore-dev/castore#readme",
-  "bugs": "https://github.com/castore-dev/castore/issues",
-  "repository": "castore-dev/castore.git",
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "redux",
@@ -43,7 +43,7 @@
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@castore/core": "workspace:",
+    "@hamstore/core": "workspace:",
     "@reduxjs/toolkit": "^1.9.7",
     "@types/node": "^24.5.2",
     "babel-plugin-module-resolver": "^4.1.0",
@@ -79,7 +79,7 @@
     "Stanislas Hannebelle"
   ],
   "peerDependencies": {
-    "@castore/core": "*",
+    "@hamstore/core": "*",
     "@reduxjs/toolkit": "^1.9.0",
     "react-redux": "^8.0.0"
   },

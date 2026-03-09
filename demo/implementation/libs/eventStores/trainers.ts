@@ -1,5 +1,5 @@
-import { trainersEventStore as $trainersEventStore } from '@castore/demo-blueprint';
-import { DynamoDBSingleTableEventStorageAdapter } from '@castore/event-storage-adapter-dynamodb';
+import { trainersEventStore as $trainersEventStore } from '@hamstore/demo-blueprint';
+import { DynamoDBSingleTableEventStorageAdapter } from '@hamstore/event-storage-adapter-dynamodb';
 
 import { dynamoDBClient } from './client';
 
