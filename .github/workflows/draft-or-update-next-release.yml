@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 env:
   CI: true
   NODE_VERSION: 22
