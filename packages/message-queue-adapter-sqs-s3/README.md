@@ -12,8 +12,8 @@ Do not forget to set a [lifecycle configuration](https://docs.aws.amazon.com/Ama
 # npm
 npm install @hamstore/message-queue-adapter-sqs-s3
 
-# yarn
-yarn add @hamstore/message-queue-adapter-sqs-s3
+# pnpm
+pnpm add @hamstore/message-queue-adapter-sqs-s3
 ```
 
 This package has `@hamstore/core`, `@aws-sdk/client-sqs` (above v3), `@aws-sdk/client-s3` (above v3) and `@aws-sdk/s3-request-presigner` (above v3) as peer dependencies, so you will have to install them as well:
@@ -22,8 +22,8 @@ This package has `@hamstore/core`, `@aws-sdk/client-sqs` (above v3), `@aws-sdk/c
 # npm
 npm install @hamstore/core @aws-sdk/client-sqs @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 
-# yarn
-yarn add @hamstore/core @aws-sdk/client-sqs @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+# pnpm
+pnpm add @hamstore/core @aws-sdk/client-sqs @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
 ## 👩‍💻 Usage

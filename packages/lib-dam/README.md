@@ -8,8 +8,8 @@ Data maintenance & migration tooling for the [Hamstore](https://github.com/hamst
 # npm
 npm install --save-dev @hamstore/lib-dam
 
-# yarn
-yarn add --dev @hamstore/lib-dam
+# pnpm
+pnpm add --dev @hamstore/lib-dam
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ## 👩‍💻 Usage

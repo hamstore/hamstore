@@ -8,8 +8,8 @@ Test tooling for the [Hamstore](https://github.com/hamstore/hamstore) library.
 # npm
 npm install --save-dev @hamstore/lib-test-tools
 
-# yarn
-yarn add --dev @hamstore/lib-test-tools
+# pnpm
+pnpm add --dev @hamstore/lib-test-tools
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ## 👩‍💻 Usage

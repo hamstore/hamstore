@@ -8,8 +8,8 @@ DRY Hamstore [`MessageBus`](https://hamstore.github.io/hamstore/docs/reacting-to
 # npm
 npm install @hamstore/message-bus-adapter-event-bridge
 
-# yarn
-yarn add @hamstore/message-bus-adapter-event-bridge
+# pnpm
+pnpm add @hamstore/message-bus-adapter-event-bridge
 ```
 
 This package has `@hamstore/core` and `@aws-sdk/client-eventbridge` (above v3) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` and `@aws-sdk/client-eventbridge` (above v3) a
 # npm
 npm install @hamstore/core @aws-sdk/client-eventbridge
 
-# yarn
-yarn add @hamstore/core @aws-sdk/client-eventbridge
+# pnpm
+pnpm add @hamstore/core @aws-sdk/client-eventbridge
 ```
 
 ## 👩‍💻 Usage

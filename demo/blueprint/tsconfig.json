@@ -5,7 +5,8 @@
     "composite": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist/types",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   },
   "references": [{ "path": "../../packages/core/tsconfig.build.json" }],
   "exclude": ["./dist"],

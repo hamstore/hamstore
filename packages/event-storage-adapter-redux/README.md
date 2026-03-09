@@ -8,8 +8,8 @@ DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/ev
 # npm
 npm install @hamstore/event-storage-adapter-redux
 
-# yarn
-yarn add @hamstore/event-storage-adapter-redux
+# pnpm
+pnpm add @hamstore/event-storage-adapter-redux
 ```
 
 This package has `@hamstore/core`, `@reduxjs/toolkit` (above v1.9) and `react-redux` (above v8) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core`, `@reduxjs/toolkit` (above v1.9) and `react-re
 # npm
 npm install @hamstore/core @reduxjs/toolkit react-redux
 
-# yarn
-yarn add @hamstore/core @reduxjs/toolkit react-redux
+# pnpm
+pnpm add @hamstore/core @reduxjs/toolkit react-redux
 ```
 
 ## 👩‍💻 Usage

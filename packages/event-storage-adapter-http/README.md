@@ -10,8 +10,8 @@ This class is mainly useful when you already have the logic for events implement
 # npm
 npm install @hamstore/event-storage-adapter-http
 
-# yarn
-yarn add @hamstore/event-storage-adapter-http
+# pnpm
+pnpm add @hamstore/event-storage-adapter-http
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -20,8 +20,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ### 👩‍💻 Usage

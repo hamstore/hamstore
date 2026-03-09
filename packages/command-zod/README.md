@@ -8,8 +8,8 @@ DRY Hamstore [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing
 # npm
 npm install @hamstore/command-zod
 
-# yarn
-yarn add @hamstore/command-zod
+# pnpm
+pnpm add @hamstore/command-zod
 ```
 
 This package has `@hamstore/core` and `zod` (above v3) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` and `zod` (above v3) as peer dependencies, so 
 # npm
 npm install @hamstore/core zod
 
-# yarn
-yarn add @hamstore/core zod
+# pnpm
+pnpm add @hamstore/core zod
 ```
 
 ## 👩‍💻 Usage

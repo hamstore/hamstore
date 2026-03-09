@@ -15,4 +15,6 @@ export const getPokemonEvents = async (
   return pokemonsEventStore.getEvents(aggregateId);
 };
 
-export const main = applyConsoleMiddleware(getPokemonEvents, { inputSchema });
+export const main: ReturnType<
+  typeof applyConsoleMiddleware<Input, { events: EventDetail[] }, never>
+> = applyConsoleMiddleware(getPokemonEvents, { inputSchema });

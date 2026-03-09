@@ -8,8 +8,8 @@ DRY Hamstore [`EventStorageAdapter`](https://hamstore.github.io/hamstore/docs/ev
 # npm
 npm install @hamstore/event-storage-adapter-dynamodb
 
-# yarn
-yarn add @hamstore/event-storage-adapter-dynamodb
+# pnpm
+pnpm add @hamstore/event-storage-adapter-dynamodb
 ```
 
 This package has `@hamstore/core` and `@aws-sdk/client-dynamodb` (above v3) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` and `@aws-sdk/client-dynamodb` (above v3) as p
 # npm
 npm install @hamstore/core @aws-sdk/client-dynamodb
 
-# yarn
-yarn add @hamstore/core @aws-sdk/client-dynamodb
+# pnpm
+pnpm add @hamstore/core @aws-sdk/client-dynamodb
 ```
 
 ## Table of content

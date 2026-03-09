@@ -10,8 +10,8 @@ This class is mainly useful for manual and unit tests. It is obviously not recom
 # npm
 npm install @hamstore/event-storage-adapter-in-memory
 
-# yarn
-yarn add @hamstore/event-storage-adapter-in-memory
+# pnpm
+pnpm add @hamstore/event-storage-adapter-in-memory
 ```
 
 This package has `@hamstore/core` as peer dependency, so you will have to install it as well:
@@ -20,8 +20,8 @@ This package has `@hamstore/core` as peer dependency, so you will have to instal
 # npm
 npm install @hamstore/core
 
-# yarn
-yarn add @hamstore/core
+# pnpm
+pnpm add @hamstore/core
 ```
 
 ## 👩‍💻 Usage

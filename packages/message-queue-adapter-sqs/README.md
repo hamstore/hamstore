@@ -8,8 +8,8 @@ DRY Hamstore [`MessageQueue`](https://hamstore.github.io/hamstore/docs/reacting-
 # npm
 npm install @hamstore/message-queue-adapter-sqs
 
-# yarn
-yarn add @hamstore/message-queue-adapter-sqs
+# pnpm
+pnpm add @hamstore/message-queue-adapter-sqs
 ```
 
 This package has `@hamstore/core` and `@aws-sdk/client-sqs` (above v3) as peer dependencies, so you will have to install them as well:
@@ -18,8 +18,8 @@ This package has `@hamstore/core` and `@aws-sdk/client-sqs` (above v3) as peer d
 # npm
 npm install @hamstore/core @aws-sdk/client-sqs
 
-# yarn
-yarn add @hamstore/core @aws-sdk/client-sqs
+# pnpm
+pnpm add @hamstore/core @aws-sdk/client-sqs
 ```
 
 ## 👩‍💻 Usage

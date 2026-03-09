@@ -11,5 +11,5 @@ runs:
           node_modules/@hamstore/**/dist
         key: ${{ hashFiles('./packages/**') }}-${{ hashFiles('./demo/**') }}
     - name: Package
-      run: if [ '${{ steps.sync-packages-cache.outputs.cache-hit }}' != 'true' ]; then yarn package; fi
+      run: if [ '${{ steps.sync-packages-cache.outputs.cache-hit }}' != 'true' ]; then pnpm package; fi
       shell: bash
