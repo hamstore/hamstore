@@ -1,5 +1,8 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const newVersionTag = process.argv[2];
 
@@ -39,7 +42,7 @@ type PackageJson = {
 };
 
 const packagesPath = join(__dirname, '..', 'packages');
-const packagesNames = readdirSync(join(__dirname, '..', 'packages'));
+const packagesNames = readdirSync(packagesPath);
 
 packagesNames.forEach(packageName => {
   const packageJsonPath = join(packagesPath, packageName, 'package.json');

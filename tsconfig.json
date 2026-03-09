@@ -20,9 +20,6 @@
       "~/*": ["*"]
     }
   },
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
-  },
   "exclude": ["./dist"],
   "include": ["./**/*.ts"]
 }
