@@ -40,13 +40,4 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish packages to npm
-        run: |
-          set -e
-          yarn workspaces list --json | while read -r line; do
-            location=$(echo "$line" | jq -r '.location')
-            name=$(echo "$line" | jq -r '.name')
-            if [[ "$location" == packages/* ]]; then
-              echo "Publishing $name from $location..."
-              npm publish "./$location" --provenance --access public
-            fi
-          done
+        run: yarn nx run-many --target=publish-package --all --parallel=1
