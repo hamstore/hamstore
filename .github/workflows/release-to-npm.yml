@@ -9,7 +9,7 @@ permissions:
   id-token: write
 
 env:
-  NODE_VERSION: 22
+  NODE_VERSION: 24
 
 jobs:
   build:
@@ -38,9 +38,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Upgrade npm for OIDC trusted publishing support
-        run: npm install -g npm@latest
 
       - name: Publish packages to npm
         run: yarn nx run-many --target=publish-package --all --parallel=1
