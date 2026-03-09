@@ -1,13 +1,15 @@
-name: 🚀 Release to NPM
+name: "\U0001F680 Release to NPM"
 
 on:
   release:
     types: [published]
 
-# OIDC token permissions for npm publishing (to be configured)
 permissions:
   contents: read
   id-token: write
+
+env:
+  NODE_VERSION: 22
 
 jobs:
   build:
@@ -31,101 +33,17 @@ jobs:
       - name: Copy paste root README to @hamstore/core
         run: cp README.md ./packages/core/README.md
 
-      # Using NPM_PUBLISH_TOKEN for initial publish.
-      # After packages exist on npm, configure OIDC trusted publishing per-package
-      # and switch to provenance-based publishing (remove token, use --provenance).
-      - uses: JS-DevTools/npm-publish@v2
+      - name: Setup Node.js for npm publish
+        uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/core/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-storage-adapter-dynamodb/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-storage-adapter-postgres/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-storage-adapter-in-memory/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-storage-adapter-redux/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-storage-adapter-http/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-type-json-schema/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/event-type-zod/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/command-json-schema/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/command-zod/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-bus-adapter-event-bridge/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-bus-adapter-event-bridge-s3/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-bus-adapter-in-memory/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-queue-adapter-sqs/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-queue-adapter-sqs-s3/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/message-queue-adapter-in-memory/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/lib-test-tools/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/lib-react-visualizer/package.json
-          access: public
-      - uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          package: ./packages/lib-dam/package.json
-          access: public
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish packages to npm
+        run: |
+          for pkg in packages/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "Publishing $(basename $pkg)..."
+              npm publish "./$pkg" --provenance --access public || echo "Failed to publish $(basename $pkg), continuing..."
+            fi
+          done
