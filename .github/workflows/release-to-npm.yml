@@ -1,4 +1,4 @@
-name: "\U0001F680 Release to NPM"
+name: 🚀 Release to NPM
 
 on:
   release:
