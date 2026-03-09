@@ -41,9 +41,12 @@ jobs:
 
       - name: Publish packages to npm
         run: |
-          for pkg in packages/*/; do
-            if [ -f "$pkg/package.json" ]; then
-              echo "Publishing $(basename $pkg)..."
-              npm publish "./$pkg" --provenance --access public || echo "Failed to publish $(basename $pkg), continuing..."
+          set -e
+          yarn workspaces list --json | while read -r line; do
+            location=$(echo "$line" | jq -r '.location')
+            name=$(echo "$line" | jq -r '.name')
+            if [[ "$location" == packages/* ]]; then
+              echo "Publishing $name from $location..."
+              npm publish "./$location" --provenance --access public
             fi
           done
