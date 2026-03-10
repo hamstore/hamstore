@@ -14,7 +14,7 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/build/**',
-      '.pnpm/**',
+      '.pnpm-store/**',
       './docs/.docusaurus/**',
     ],
   },
