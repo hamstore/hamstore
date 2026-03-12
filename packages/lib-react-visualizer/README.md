@@ -10,8 +10,8 @@ Here is a [hosted example](https://hamstore.github.io/hamstore/visualizer/), bas
 # npm
 npm install --save-dev @hamstore/lib-react-visualizer
 
-# yarn
-yarn add --dev @hamstore/lib-react-visualizer
+# pnpm
+pnpm add --dev @hamstore/lib-react-visualizer
 ```
 
 This package has `@hamstore/core`, `@hamstore/command-json-schema` and `react` (above v17) as peer dependencies, so you will have to install them as well:
@@ -20,8 +20,8 @@ This package has `@hamstore/core`, `@hamstore/command-json-schema` and `react` (
 # npm
 npm install @hamstore/core @hamstore/command-json-schema react
 
-# yarn
-yarn add @hamstore/core @hamstore/command-json-schema react
+# pnpm
+pnpm add @hamstore/core @hamstore/command-json-schema react
 ```
 
 ## 👩‍💻 Usage

@@ -6,15 +6,15 @@
     "deploy": "env-cmd sls deploy",
     "deploy-function": "env-cmd sls deploy function -f",
     "invoke-local": "env-cmd sls invoke local -f",
-    "lint-fix": "yarn eslint --fix",
-    "lint-fix-all": "yarn lint-fix .",
+    "lint-fix": "pnpm eslint --fix",
+    "lint-fix-all": "pnpm lint-fix .",
     "log": "env-cmd sls logs -t -f",
     "print": "env-cmd sls print",
-    "test": "yarn test-type && yarn test-unit && yarn test-circular && yarn test-linter",
-    "test-circular": "yarn depcruise --validate .dependency-cruiser.js .",
-    "test-linter": "yarn eslint .",
+    "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
+    "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
+    "test-linter": "pnpm eslint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
-    "test-unit": "yarn vitest run --passWithNoTests"
+    "test-unit": "pnpm vitest run --passWithNoTests"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.893.0",

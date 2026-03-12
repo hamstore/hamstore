@@ -1,8 +1,7 @@
-import MockDate from 'mockdate';
-
 import { EventStoreEventDetails } from '@hamstore/core';
 import { catchPokemonCommand } from '@hamstore/demo-blueprint';
 import { mockEventStore } from '@hamstore/lib-test-tools';
+import MockDate from 'mockdate';
 
 import { pokemonsEventStore } from '~/libs/eventStores/pokemons';
 import { trainersEventStore } from '~/libs/eventStores/trainers';
