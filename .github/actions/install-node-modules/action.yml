@@ -1,5 +1,5 @@
 name: Install Node Dependencies
-description: Install dependencies using yarn
+description: Install dependencies using pnpm
 runs:
   using: composite
   steps:
@@ -8,26 +8,16 @@ runs:
       with:
         node-version-file: .nvmrc
 
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Sync yarn cache
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
 
     - name: Sync node_modules cache
       id: sync-node-modules-cache
       uses: actions/cache@v3
       with:
         path: '**/node_modules'
-        key: ${{ runner.os }}-modules-${{ hashFiles('.nvmrc') }}-${{ hashFiles('./yarn.lock') }}
+        key: ${{ runner.os }}-modules-${{ hashFiles('.nvmrc') }}-${{ hashFiles('./pnpm-lock.yaml') }}
 
     - name: Install node_modules
-      run: if [ '${{ steps.sync-node-modules-cache.outputs.cache-hit }}' != 'true' ]; then yarn install --immutable; fi
+      run: if [ '${{ steps.sync-node-modules-cache.outputs.cache-hit }}' != 'true' ]; then pnpm install --frozen-lockfile; fi
       shell: bash

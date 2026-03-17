@@ -5,12 +5,12 @@ IFS=$'\n\t'
 set -u
 
 get_path() {
-    yarn nx show project $1 --web false --json | jq -r '.root'
+    pnpm nx show project $1 --web false --json | jq -r '.root'
 }
 
 export -f get_path
 
-readonly AFFECTED_STRING=$(yarn nx show projects --affected --type lib)
+readonly AFFECTED_STRING=$(pnpm nx show projects --affected --type lib)
 readonly AFFECTED_ARRAY=($(echo "$AFFECTED_STRING" | tr ' ' '\n'))
 
 RESULT=''

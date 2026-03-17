@@ -3,7 +3,8 @@ import { DynamoDBSingleTableEventStorageAdapter } from '@hamstore/event-storage-
 
 import { dynamoDBClient } from './client';
 
-export const trainersEventStore = $trainersEventStore;
+export const trainersEventStore: typeof $trainersEventStore =
+  $trainersEventStore;
 
 trainersEventStore.eventStorageAdapter =
   new DynamoDBSingleTableEventStorageAdapter({

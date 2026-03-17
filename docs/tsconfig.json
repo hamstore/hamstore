@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "types": ["node", "@docusaurus/module-type-aliases"],
     "baseUrl": ".",
     "composite": true,
     "emitDeclarationOnly": true,

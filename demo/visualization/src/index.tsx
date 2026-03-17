@@ -1,7 +1,3 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { v4 as uuid } from 'uuid';
-
 import { tuple } from '@hamstore/core';
 import {
   pokemonsEventStore,
@@ -12,6 +8,9 @@ import {
   levelUpPokemonCommand,
 } from '@hamstore/demo-blueprint';
 import { Visualizer } from '@hamstore/lib-react-visualizer';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { v4 as uuid } from 'uuid';
 
 import './index.css';
 
