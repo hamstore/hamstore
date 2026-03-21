@@ -15,13 +15,14 @@ version-resolver:
 autolabeler:
   - label: major
     title:
+      - '/^(break(ing)?|release)(\(.+\))?!?:/'
       - '/^.+!:/'
   - label: minor
     title:
-      - '/^feat(ure)?(\(.+\))?:/'
+      - '/^(new|update|feature)(\(.+\))?:/'
   - label: patch
     title:
-      - '/^fix(\(.+\))?:/'
+      - '/^(fix|deps|docs|perf|revert|styles?|security|types?|chore|misc)(\(.+\))?:/'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 template: |
