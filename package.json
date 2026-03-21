@@ -1,16 +1,24 @@
 {
   "name": "@hamstore/hamstore",
   "description": "Making Event Sourcing easy 😎",
-  "license": "MIT",
-  "homepage": "https://github.com/hamstore/hamstore#readme",
-  "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
     "store",
     "typescript"
   ],
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "license": "MIT",
+  "maintainers": [
+    "Thomas Aribart",
+    "Charles Géry",
+    "Juliette Fournier",
+    "Valentin Beggi",
+    "Stanislas Hannebelle"
+  ],
+  "repository": "hamstore/hamstore.git",
+  "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
@@ -29,24 +37,14 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@eslint/js": "^9.36.0",
     "@nx/workspace": "^21.5.3",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^24.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.44.0",
-    "@typescript-eslint/parser": "^8.44.0",
     "aws-sdk": "^2.1692.0",
     "dependency-cruiser": "^17.0.1",
-    "eslint": "^9.36.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-config-vitest-globals": "^2.0.2",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.4.0",
     "husky": "^9.1.7",
     "nx": "^21.5.3",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "syncpack": "^13.0.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2"
@@ -54,13 +52,6 @@
   "engines": {
     "node": "^22.19.0 || ^24.0.0"
   },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "packageManager": "pnpm@10.31.0+sha512.e3927388bfaa8078ceb79b748ffc1e8274e84d75163e67bc22e06c0d3aed43dd153151cbf11d7f8301ff4acb98c68bdc5cadf6989532801ffafe3b3e4a63c268",
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -80,6 +71,5 @@
       "tree-sitter",
       "tree-sitter-json"
     ]
-  },
-  "type": "module"
+  }
 }
