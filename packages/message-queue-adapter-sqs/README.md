@@ -41,14 +41,11 @@ const messageQueueAdapter = new SQSMessageQueueAdapter({
   queueUrl: () => process.env.MY_SQS_QUEUE_URL,
   sqsClient,
 });
-```
 
-<!-- prettier-ignore -->
-```ts
 const appMessageQueue = new NotificationMessageQueue({
-  ...
-  messageQueueAdapter
-})
+  // ...
+  messageQueueAdapter,
+});
 ```
 
 This will directly plug your MessageQueue to SQS 🙌

@@ -41,14 +41,11 @@ const messageBusAdapter = new EventBridgeMessageBusAdapter({
   eventBusName: () => process.env.MY_EVENT_BUS_NAME,
   eventBridgeClient,
 });
-```
 
-<!-- prettier-ignore -->
-```ts
 const appMessageBus = new NotificationMessageBus({
-  ...
-  messageBusAdapter
-})
+  // ...
+  messageBusAdapter,
+});
 ```
 
 This will directly plug your MessageBus to EventBridge 🙌
