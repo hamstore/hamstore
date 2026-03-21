@@ -4,7 +4,11 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "packages/event-storage-adapter-redux"
+  },
   "keywords": [
     "event",
     "redux",
@@ -71,17 +75,11 @@
       "default": "./dist/esm/*.mjs"
     }
   },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "peerDependencies": {
     "@hamstore/core": "*",
     "@reduxjs/toolkit": "^1.9.0",
     "react-redux": "^8.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "owner": "@geostrategists"
 }

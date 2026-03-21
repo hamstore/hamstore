@@ -4,7 +4,10 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git"
+  },
   "keywords": [
     "event",
     "source",
@@ -54,13 +57,6 @@
   "engines": {
     "node": "^22.19.0 || ^24.0.0"
   },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "packageManager": "pnpm@10.31.0+sha512.e3927388bfaa8078ceb79b748ffc1e8274e84d75163e67bc22e06c0d3aed43dd153151cbf11d7f8301ff4acb98c68bdc5cadf6989532801ffafe3b3e4a63c268",
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -81,5 +77,6 @@
       "tree-sitter-json"
     ]
   },
-  "type": "module"
+  "type": "module",
+  "owner": "@geostrategists"
 }

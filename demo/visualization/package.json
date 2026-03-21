@@ -46,5 +46,11 @@
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "type": "module"
+  "type": "module",
+  "owner": "@geostrategists",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "demo/visualization"
+  }
 }

@@ -4,7 +4,11 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "packages/message-bus-adapter-event-bridge"
+  },
   "keywords": [
     "event",
     "source",
@@ -76,16 +80,10 @@
       "default": "./dist/esm/*.mjs"
     }
   },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "peerDependencies": {
     "@aws-sdk/client-eventbridge": "^3.0.0",
     "@hamstore/core": "*"
   },
-  "type": "module"
+  "type": "module",
+  "owner": "@geostrategists"
 }

@@ -4,7 +4,11 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "packages/command-json-schema"
+  },
   "keywords": [
     "event",
     "source",
@@ -70,16 +74,10 @@
       "default": "./dist/esm/*.mjs"
     }
   },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "peerDependencies": {
     "@hamstore/core": "*",
     "json-schema-to-ts": "^2.0.0 || ^3.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "owner": "@geostrategists"
 }
