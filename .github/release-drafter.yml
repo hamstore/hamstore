@@ -26,7 +26,7 @@ autolabeler:
       - '/^(fix|perf)(\(.+\))?:/'
   - label: ignore-for-release
     title:
-      - '/^(refactor|chore|docs|ci|test)(\(.+\))?:/'
+      - '/^(ci|test)(\(.+\))?:/'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 template: |
