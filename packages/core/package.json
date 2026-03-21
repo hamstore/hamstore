@@ -42,35 +42,24 @@
   "scripts": {
     "lint-fix": "pnpm oxlint --fix",
     "lint-fix-all": "pnpm lint-fix .",
-    "package": "rm -rf dist && pnpm package-cjs && pnpm package-esm && pnpm package-types",
-    "package-cjs": "NODE_ENV=cjs pnpm transpile --out-dir dist/cjs --source-maps --out-file-extension .cjs",
-    "package-esm": "NODE_ENV=esm pnpm transpile --out-dir dist/esm --source-maps --out-file-extension .mjs",
-    "package-types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "package": "tsdown",
     "publish-package": "npm publish --provenance --access public --tag ${NPM_DIST_TAG:-latest}",
     "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
     "test-linter": "pnpm oxlint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test-unit": "pnpm vitest run --passWithNoTests",
-    "transpile": "babel src --extensions .ts --quiet",
-    "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
-    "@babel/preset-typescript": "^7.27.1",
     "@types/node": "^24.5.2",
-    "babel-plugin-module-resolver": "^4.1.0",
-    "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.0.1",
     "oxfmt": "^0.41.0",
     "oxlint": "^1.56.0",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.16",
+    "tsdown": "^0.21.4",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"

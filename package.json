@@ -10,10 +10,7 @@
   ],
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hamstore/hamstore.git"
-  },
+  "repository": "hamstore/hamstore.git",
   "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
@@ -35,7 +32,6 @@
     "@commitlint/config-conventional": "^19.8.1",
     "@nx/workspace": "^21.5.3",
     "@types/node": "^24.5.2",
-    "aws-sdk": "^2.1692.0",
     "dependency-cruiser": "^17.0.1",
     "lefthook": "^2.1.4",
     "nx": "^21.5.3",
@@ -54,9 +50,6 @@
       "@parcel/watcher",
       "@scarf/scarf",
       "@tree-sitter-grammars/tree-sitter-yaml",
-      "aws-sdk",
-      "core-js",
-      "core-js-pure",
       "cpu-features",
       "es5-ext",
       "esbuild",

@@ -8,6 +8,11 @@
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true
   },
-  "exclude": ["./dist"],
-  "include": ["./**/*.ts"]
+  "exclude": [
+    "./dist",
+    "./tsdown.config.ts"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
 }
