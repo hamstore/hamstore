@@ -13,7 +13,7 @@ jobs:
     name: 📖 Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           ref: main
           fetch-depth: 0
@@ -28,7 +28,7 @@ jobs:
         run: pnpm nx run docs:build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/build
