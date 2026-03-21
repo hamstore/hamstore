@@ -57,17 +57,15 @@ export class ConnectedEventStore<
     >,
     'publishMessage'
   >,
-> implements
-    EventStore<
-      EVENT_STORE_ID,
-      EVENT_TYPES,
-      EVENT_DETAIL,
-      $EVENT_DETAIL,
-      REDUCER,
-      AGGREGATE,
-      $AGGREGATE
-    >
-{
+> implements EventStore<
+  EVENT_STORE_ID,
+  EVENT_TYPES,
+  EVENT_DETAIL,
+  $EVENT_DETAIL,
+  REDUCER,
+  AGGREGATE,
+  $AGGREGATE
+> {
   _types?: {
     details: EVENT_DETAIL;
     aggregate: AGGREGATE;

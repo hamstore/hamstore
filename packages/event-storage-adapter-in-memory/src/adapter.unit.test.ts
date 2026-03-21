@@ -331,13 +331,17 @@ describe('in-memory storage adapter', () => {
 
       const { events: eventsA } = await eventStorageAdapterA.getEvents(
         aggregateIdMock1,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsA).toStrictEqual([eventMock1]);
 
       const { events: eventsB } = await eventStorageAdapterB.getEvents(
         aggregateIdMock2,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsB).toStrictEqual([aggregate2EventMock]);
     });
@@ -430,13 +434,17 @@ describe('in-memory storage adapter', () => {
 
       const { events: eventsA } = await eventStorageAdapterA.getEvents(
         aggregateIdMock1,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsA).toStrictEqual([]);
 
       const { events: eventsB } = await eventStorageAdapterB.getEvents(
         aggregateIdMock2,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsB).toStrictEqual([]);
     });

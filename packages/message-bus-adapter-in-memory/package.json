@@ -1,28 +1,50 @@
 {
   "name": "@hamstore/message-bus-adapter-in-memory",
   "description": "DRY Hamstore MessageBus definition using EventEmitter",
-  "license": "MIT",
-  "homepage": "https://github.com/hamstore/hamstore#readme",
-  "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
     "store",
     "typescript"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "license": "MIT",
+  "maintainers": [
+    "Thomas Aribart",
+    "Charles Géry",
+    "Juliette Fournier",
+    "Valentin Beggi",
+    "Stanislas Hannebelle"
+  ],
+  "repository": "hamstore/hamstore.git",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "sideEffects": false,
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.mjs",
   "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "lint-fix": "pnpm eslint --fix",
+    "lint-fix": "pnpm oxlint --fix",
     "lint-fix-all": "pnpm lint-fix .",
     "package": "rm -rf dist && pnpm package-cjs && pnpm package-esm && pnpm package-types",
     "package-cjs": "NODE_ENV=cjs pnpm transpile --out-dir dist/cjs --source-maps --out-file-extension .cjs",
@@ -31,7 +53,7 @@
     "publish-package": "npm publish --provenance --access public",
     "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
-    "test-linter": "pnpm eslint .",
+    "test-linter": "pnpm oxlint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test-unit": "pnpm vitest run --passWithNoTests",
     "transpile": "babel src --extensions .ts --quiet",
@@ -48,37 +70,15 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.0.1",
-    "eslint": "^9.36.0",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "ts-node": "^10.9.2",
     "ts-toolbelt": "^9.6.0",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
-  },
-  "maintainers": [
-    "Thomas Aribart",
-    "Charles Géry",
-    "Juliette Fournier",
-    "Valentin Beggi",
-    "Stanislas Hannebelle"
-  ],
   "peerDependencies": {
     "@hamstore/core": "*"
-  },
-  "type": "module"
+  }
 }

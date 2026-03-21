@@ -34,9 +34,7 @@ export class ImageParser<EVENT_STORES extends EventStore> {
 
       if (this.eventStoresById[eventStoreId] === undefined) {
         throw new Error(
-          `Unable to detect eventStore from image. Received eventStoreId: ${String(
-            eventStoreId,
-          )}`,
+          `Unable to detect eventStore from image. Received eventStoreId: ${String(eventStoreId)}`,
         );
       }
 

@@ -108,11 +108,14 @@ This adapter will retry failed messages handling. You can specify a different re
 - <code>retryBackoffRate <i>(?number = 2)</i></code>: A factor applied to the `retryDelayInMs` at each subsequent retry.
 
 ```ts
-const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(appMessageQueue, {
-  retryAttempts: 3,
-  retryDelayInMs: 10000,
-  retryBackoffRate: 1.5,
-});
+const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(
+  appMessageQueue,
+  {
+    retryAttempts: 3,
+    retryDelayInMs: 10000,
+    retryBackoffRate: 1.5,
+  },
+);
 
 // 👇 Alternatively
 const messageQueueAdapter = new InMemoryMessageQueueAdapter<

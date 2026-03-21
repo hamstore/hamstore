@@ -9,13 +9,13 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { GroupedEvent } from '@hamstore/core';
 import type {
   Aggregate,
   EventDetail,
   EventStorageAdapter,
   PushEventOptions,
 } from '@hamstore/core';
-import { GroupedEvent } from '@hamstore/core';
 
 import {
   EVENT_TABLE_EVENT_STORE_ID_KEY,
@@ -129,9 +129,7 @@ const parseGroupedEvents = (
   };
 };
 
-export class DynamoDBSingleTableEventStorageAdapter
-  implements EventStorageAdapter
-{
+export class DynamoDBSingleTableEventStorageAdapter implements EventStorageAdapter {
   getEvents: EventStorageAdapter['getEvents'];
   getPushEventInput: (
     eventDetail: EventDetail,

@@ -41,9 +41,8 @@ export class EventStore<
 > {
   static pushEventGroup: EventGroupPusher = async <
     GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]],
-    OPTIONS_OR_GROUPED_EVENTS_HEAD extends
-      | GroupedEvent
-      | { force?: boolean } = GroupedEvent,
+    OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } =
+      GroupedEvent,
   >(
     optionsOrGroupedEvent: OPTIONS_OR_GROUPED_EVENTS_HEAD,
     ..._groupedEvents: GROUPED_EVENTS
@@ -190,7 +189,10 @@ export class EventStore<
     ) => {
       const { event } = (await this.getEventStorageAdapter().pushEvent(
         eventDetail,
-        { eventStoreId: this.eventStoreId, force },
+        {
+          eventStoreId: this.eventStoreId,
+          force,
+        },
       )) as { event: $EVENT_DETAILS };
 
       let nextAggregate: AGGREGATE | undefined = undefined;

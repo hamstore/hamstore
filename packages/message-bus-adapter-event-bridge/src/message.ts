@@ -17,8 +17,8 @@ import type { EventBridgeEvent } from 'aws-lambda';
 
 type EventBridgeStateCarryingMessageBusMessage<
   MESSAGE_BUS extends StateCarryingMessageBus,
-  EVENT_STORE_IDS extends
-    MessageChannelSourceEventStoreIds<MESSAGE_BUS> = MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
+  EVENT_STORE_IDS extends MessageChannelSourceEventStoreIds<MESSAGE_BUS> =
+    MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
   EVENT_TYPES extends MessageChannelSourceEventStoreIdTypes<
     MESSAGE_BUS,
     EVENT_STORE_IDS
@@ -58,8 +58,8 @@ type EventBridgeStateCarryingMessageBusMessage<
 
 type EventBridgeNotificationMessageBusMessage<
   MESSAGE_BUS extends NotificationMessageBus,
-  EVENT_STORE_IDS extends
-    MessageChannelSourceEventStoreIds<MESSAGE_BUS> = MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
+  EVENT_STORE_IDS extends MessageChannelSourceEventStoreIds<MESSAGE_BUS> =
+    MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
   EVENT_TYPES extends MessageChannelSourceEventStoreIdTypes<
     MESSAGE_BUS,
     EVENT_STORE_IDS
@@ -93,14 +93,16 @@ type EventBridgeNotificationMessageBusMessage<
 
 type EventBridgeAggregateExistsMessageBusMessage<
   MESSAGE_BUS extends AggregateExistsMessageBus,
-  EVENT_STORE_IDS extends
-    MessageChannelSourceEventStoreIds<MESSAGE_BUS> = MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
+  EVENT_STORE_IDS extends MessageChannelSourceEventStoreIds<MESSAGE_BUS> =
+    MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
 > = EVENT_STORE_IDS extends infer EVENT_STORE_ID
   ? EVENT_STORE_ID extends string
     ? EventBridgeEvent<
         __AGGREGATE_EXISTS__,
         AggregateExistsMessage<EVENT_STORE_ID>
-      > & { source: EVENT_STORE_ID }
+      > & {
+        source: EVENT_STORE_ID;
+      }
     : never
   : never;
 
@@ -116,8 +118,8 @@ export type EventBridgeMessageBusMessage<
     | AggregateExistsMessageBus
     | NotificationMessageBus
     | StateCarryingMessageBus,
-  EVENT_STORE_IDS extends
-    MessageChannelSourceEventStoreIds<MESSAGE_BUS> = MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
+  EVENT_STORE_IDS extends MessageChannelSourceEventStoreIds<MESSAGE_BUS> =
+    MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
   EVENT_TYPES extends MESSAGE_BUS extends
     | NotificationMessageBus
     | StateCarryingMessageBus

@@ -203,7 +203,9 @@ describe('in-memory message queue adapter', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- for type checking
       const inMemoryMessageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(
         messageQueue,
-        { worker },
+        {
+          worker,
+        },
       );
 
       const assertQueueType: A.Equals<

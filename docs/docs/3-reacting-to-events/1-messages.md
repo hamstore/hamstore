@@ -78,7 +78,7 @@ type PokemonEventStateCarryingMessage = StateCarryingMessage<
 type PokemonEventStateCarryingMessage = {
   eventStoreId: 'POKEMONS';
   event: PokemonEventDetails;
-  aggregate: PokemonAggregate
+  aggregate: PokemonAggregate;
 };
 
 // 👇 Also equivalent to:

@@ -51,7 +51,9 @@ import { InMemoryMessageBusAdapter } from '@hamstore/message-bus-adapter-in-memo
 
 const messageBusAdapter = new InMemoryMessageBusAdapter<
   MessageBusMessage<typeof appMessageBus>
->({ eventEmitter });
+>({
+  eventEmitter,
+});
 
 appMessageBus.messageBusAdapter = messageBusAdapter;
 ```

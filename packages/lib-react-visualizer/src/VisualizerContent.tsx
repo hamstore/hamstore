@@ -6,12 +6,14 @@ import React, { useState, JSX } from 'react';
 
 import { DB as $DB, Commands } from './tabs';
 
+/* eslint-disable no-shadow */
 enum TabName {
   COMMANDS = 'COMMANDS',
   DB = 'DB',
 }
 
 const { COMMANDS, DB } = TabName;
+/* eslint-enable no-shadow */
 
 const defaultTabName = COMMANDS;
 const orderedTabNames = [COMMANDS, DB];

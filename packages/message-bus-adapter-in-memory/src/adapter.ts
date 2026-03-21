@@ -24,9 +24,9 @@ import {
   parseRetryDelayInMs,
 } from './utils';
 
-export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
-  implements MessageChannelAdapter
-{
+export class InMemoryMessageBusAdapter<
+  MESSAGE extends Message = Message,
+> implements MessageChannelAdapter {
   static attachTo<
     MESSAGE_BUS extends
       | AggregateExistsMessageBus

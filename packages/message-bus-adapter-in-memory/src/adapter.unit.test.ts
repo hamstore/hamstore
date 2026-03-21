@@ -212,7 +212,9 @@ describe('in-memory message queue adapter', () => {
     it('correctly instanciates a class and attach it', async () => {
       const inMemoryMessageBusAdapter = InMemoryMessageBusAdapter.attachTo(
         messageBus,
-        { eventEmitter: new EventEmitter() },
+        {
+          eventEmitter: new EventEmitter(),
+        },
       );
 
       expect(messageBus.messageChannelAdapter).toBe(inMemoryMessageBusAdapter);

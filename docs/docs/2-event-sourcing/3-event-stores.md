@@ -179,7 +179,9 @@ const { aggregate: myPikachu } =
 
 // 👇 Retrieve an aggregate below a certain version
 const { aggregate: pikachuBelowVersion5 } =
-  await pokemonsEventStore.getAggregate(myPikachuId, { maxVersion: 5 });
+  await pokemonsEventStore.getAggregate(myPikachuId, {
+    maxVersion: 5,
+  });
 
 // 👇 Returns the events if you need them
 const { aggregate, events } =
@@ -249,7 +251,9 @@ const { event: completeEvent, nextAggregate } =
 const accAggregateIds: string = [];
 
 const { aggregateIds: firstPage, nextPageToken } =
-  await pokemonsEventStore.listAggregateIds({ limit: 20 });
+  await pokemonsEventStore.listAggregateIds({
+    limit: 20,
+  });
 
 accAggregateIds.push(...firstPage);
 

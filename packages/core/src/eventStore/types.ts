@@ -61,9 +61,8 @@ export type EventGroupPusher = <
     GroupedEvent,
     ...GroupedEvent[],
   ],
-  OPTIONS_OR_GROUPED_EVENTS_HEAD extends
-    | GroupedEvent
-    | { force?: boolean } = GroupedEvent,
+  OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } =
+    GroupedEvent,
 >(
   optionsOrGroupedEventsHead: OPTIONS_OR_GROUPED_EVENTS_HEAD,
   ...groupedEvents: GROUPED_EVENTS

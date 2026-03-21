@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-lines */
 import { GroupedEvent } from '@hamstore/core';
 import type {
   EventDetail,
@@ -10,8 +10,8 @@ import type {
   OptionalTimestamp,
   PushEventOptions,
 } from '@hamstore/core';
-import type { SerializableParameter } from 'postgres';
 import postgres from 'postgres';
+import type { SerializableParameter } from 'postgres';
 
 import { PostgresEventAlreadyExistsError } from './error';
 
@@ -114,9 +114,7 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     await sql`
       CREATE TABLE IF NOT EXISTS ${sql.unsafe(tableName)} (
         id              ${sql.unsafe(idType)} PRIMARY KEY,
-        aggregate_name  ${sql.unsafe(
-          `VARCHAR(${aggregateNameLength})`,
-        )} NOT NULL,
+        aggregate_name  ${sql.unsafe(`VARCHAR(${aggregateNameLength})`)} NOT NULL,
         aggregate_id    ${aggregateIdType} NOT NULL,
         version         ${sql.unsafe(versionType)} NOT NULL,
         type            ${sql.unsafe(`VARCHAR(${typeLength})`)} NOT NULL,
@@ -203,11 +201,7 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
         type = EXCLUDED.type,
         data = EXCLUDED.data,
         metadata = EXCLUDED.metadata,
-        timestamp = ${
-          timestamp
-            ? this._sql`EXCLUDED.timestamp`
-            : this._sql`CURRENT_TIMESTAMP(3)`
-        }
+        timestamp = ${timestamp ? this._sql`EXCLUDED.timestamp` : this._sql`CURRENT_TIMESTAMP(3)`}
 		`;
 
     const payloadValue = (payload as SerializableParameter) ?? null;
