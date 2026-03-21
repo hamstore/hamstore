@@ -3,21 +3,15 @@ description: Install dependencies using pnpm
 runs:
   using: composite
   steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v5
+
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version-file: .nvmrc
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-
-    - name: Sync node_modules cache
-      id: sync-node-modules-cache
-      uses: actions/cache@v3
-      with:
-        path: '**/node_modules'
-        key: ${{ runner.os }}-modules-${{ hashFiles('.nvmrc') }}-${{ hashFiles('./pnpm-lock.yaml') }}
+        cache: 'pnpm'
 
     - name: Install node_modules
-      run: if [ '${{ steps.sync-node-modules-cache.outputs.cache-hit }}' != 'true' ]; then pnpm install --frozen-lockfile; fi
+      run: pnpm install --frozen-lockfile
       shell: bash

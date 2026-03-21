@@ -16,7 +16,7 @@ runs:
   using: composite
   steps:
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
-      uses: nrwl/nx-set-shas@v3.0.1
+      uses: nrwl/nx-set-shas@v5
       with:
         main-branch-name: ${{ inputs.base-branch }}
         last-successful-event: ${{ inputs.last-successful-event }}

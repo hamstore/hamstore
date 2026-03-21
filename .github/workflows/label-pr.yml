@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Ensure PR title follows conventional commits
-        uses: beemojs/conventional-pr-action@v2
+        uses: beemojs/conventional-pr-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
