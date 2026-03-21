@@ -66,7 +66,9 @@ packagesNames.forEach(packageName => {
   if (peerDependencies !== undefined) {
     Object.keys(peerDependencies).forEach(dependencyName => {
       if (dependencyName.startsWith('@hamstore/')) {
-        peerDependencies[dependencyName] = `^${NEW_SEM_VER_MAJOR}.0.0`;
+        peerDependencies[dependencyName] = NEW_SEM_VER_PRERELEASE
+          ? `^${NEW_SEM_VER_MAJOR}.0.0-0`
+          : `^${NEW_SEM_VER_MAJOR}.0.0`;
       }
     });
   }
