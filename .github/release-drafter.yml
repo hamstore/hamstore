@@ -17,13 +17,13 @@ exclude-labels:
 autolabeler:
   - label: major
     title:
-      - '/^.+!:/'
+      - '/^[a-z]+(\(.+\))?!:/'
   - label: minor
     title:
-      - '/^feat(\(.+\))?!?:/'
+      - '/^feat(\(.+\))?:/'
   - label: patch
     title:
-      - '/^(fix|perf)(\(.+\))?!?:/'
+      - '/^(fix|perf)(\(.+\))?:/'
   - label: ignore-for-release
     title:
       - '/^(refactor|chore|docs|ci|test)(\(.+\))?:/'
