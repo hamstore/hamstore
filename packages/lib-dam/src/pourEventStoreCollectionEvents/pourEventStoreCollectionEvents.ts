@@ -1,15 +1,15 @@
+import { EventBook } from '~/utils/eventBook';
+import { MessageBatch } from '~/utils/messageBatch';
+import { MessagePourer } from '~/utils/messagePourer';
+import { updateScanInfos } from '~/utils/updateScanInfos';
+
 import type {
   EventStore,
   EventStoreId,
   EventStoreNotificationMessage,
   PublishMessageOptions,
 } from '@hamstore/core';
-
 import type { ScanInfos } from '~/types';
-import { EventBook } from '~/utils/eventBook';
-import { MessageBatch } from '~/utils/messageBatch';
-import { MessagePourer } from '~/utils/messagePourer';
-import { updateScanInfos } from '~/utils/updateScanInfos';
 
 interface Props<EVENT_STORES extends EventStore> {
   eventStores: EVENT_STORES[];
@@ -23,9 +23,7 @@ interface Props<EVENT_STORES extends EventStore> {
   rateLimit?: number;
 }
 
-export const pourEventStoreCollectionEvents = async <
-  EVENT_STORES extends EventStore,
->({
+export const pourEventStoreCollectionEvents = async <EVENT_STORES extends EventStore>({
   eventStores,
   messageChannel,
   filters: { from, to } = {},
@@ -38,10 +36,7 @@ export const pourEventStoreCollectionEvents = async <
 
   const eventBooks = {} as { [key in EVT_STORE_ID]: EventBook<EVENT_STORES> };
 
-  const messagePourer: MessagePourer<EVENT_STORES> = new MessagePourer(
-    messageChannel,
-    rateLimit,
-  );
+  const messagePourer: MessagePourer<EVENT_STORES> = new MessagePourer(messageChannel, rateLimit);
 
   const pageTokens: { [key in EVT_STORE_ID]?: string } = {};
   const fetchedEventsCursors: { [key in EVT_STORE_ID]?: string } = {};
@@ -68,8 +63,7 @@ export const pourEventStoreCollectionEvents = async <
       const fetchedEventsCursor = fetchedEventsCursors[eventStoreId];
 
       return (
-        fetchedEventsCursor !== undefined &&
-        fetchedEventsCursor <= collectionFetchedEventsCursor
+        fetchedEventsCursor !== undefined && fetchedEventsCursor <= collectionFetchedEventsCursor
       );
     });
 
@@ -79,14 +73,12 @@ export const pourEventStoreCollectionEvents = async <
       const eventStorePageToken = pageTokens[eventStoreId];
       const eventStoreFetchedEventsCursor = fetchedEventsCursors[eventStoreId];
 
-      const { aggregateIds, nextPageToken } = await eventStore.listAggregateIds(
-        {
-          pageToken: eventStorePageToken,
-          limit: 20,
-          initialEventAfter: eventStoreFetchedEventsCursor,
-          initialEventBefore: to,
-        },
-      );
+      const { aggregateIds, nextPageToken } = await eventStore.listAggregateIds({
+        pageToken: eventStorePageToken,
+        limit: 20,
+        initialEventAfter: eventStoreFetchedEventsCursor,
+        initialEventBefore: to,
+      });
 
       areAllAggregatesScanned[eventStoreId] = nextPageToken === undefined;
 
@@ -107,17 +99,14 @@ export const pourEventStoreCollectionEvents = async <
 
       pageTokens[eventStoreId] = nextPageToken;
 
-      fetchedEventsCursors[eventStoreId] =
-        lastScannedAggregate.initialEventTimestamp;
+      fetchedEventsCursors[eventStoreId] = lastScannedAggregate.initialEventTimestamp;
     }
 
-    areAllCollectionAggregatesScanned = Object.values(
-      areAllAggregatesScanned,
-    ).every(Boolean);
+    areAllCollectionAggregatesScanned = Object.values(areAllAggregatesScanned).every(Boolean);
 
-    collectionFetchedEventsCursor = Object.values(
-      fetchedEventsCursors,
-    ).sort()[0] as string | undefined;
+    collectionFetchedEventsCursor = Object.values(fetchedEventsCursors).sort()[0] as
+      | string
+      | undefined;
 
     if (collectionFetchedEventsCursor === undefined) {
       // should only happen if no event must be poured at all

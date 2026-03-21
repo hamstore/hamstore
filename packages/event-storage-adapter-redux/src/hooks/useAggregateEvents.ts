@@ -1,8 +1,4 @@
-import {
-  EventsQueryOptions,
-  EventStore,
-  EventStoreEventDetails,
-} from '@hamstore/core';
+import { EventsQueryOptions, EventStore, EventStoreEventDetails } from '@hamstore/core';
 import { useSelector } from 'react-redux';
 
 import { ReduxEventStorageAdapter } from '~/adapter';

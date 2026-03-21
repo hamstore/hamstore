@@ -1,3 +1,7 @@
+import { promise as fastQ, queueAsPromised } from 'fastq';
+
+import { parseBackoffRate, parseRetryAttempts, parseRetryDelayInMs } from './utils';
+
 import type {
   MessageChannelSourceEventStores,
   AggregateExistsMessageQueue,
@@ -9,13 +13,6 @@ import type {
   MessageChannelAdapter,
   Message,
 } from '@hamstore/core';
-import { promise as fastQ, queueAsPromised } from 'fastq';
-
-import {
-  parseBackoffRate,
-  parseRetryAttempts,
-  parseRetryDelayInMs,
-} from './utils';
 
 export type InMemoryQueueMessage<
   MESSAGE_QUEUE extends
@@ -28,17 +25,11 @@ export type InMemoryQueueMessage<
   | NotificationMessageQueue extends MESSAGE_QUEUE
   ? Message
   : MESSAGE_QUEUE extends StateCarryingMessageQueue
-    ? EventStoreStateCarryingMessage<
-        MessageChannelSourceEventStores<MESSAGE_QUEUE>
-      >
+    ? EventStoreStateCarryingMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
     : MESSAGE_QUEUE extends NotificationMessageQueue
-      ? EventStoreNotificationMessage<
-          MessageChannelSourceEventStores<MESSAGE_QUEUE>
-        >
+      ? EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
       : MESSAGE_QUEUE extends AggregateExistsMessageQueue
-        ? EventStoreAggregateExistsMessage<
-            MessageChannelSourceEventStores<MESSAGE_QUEUE>
-          >
+        ? EventStoreAggregateExistsMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
         : never;
 
 export type TaskContext = {
@@ -58,9 +49,9 @@ type ConstructorArgs<MESSAGE extends Message = Message> = {
   retryBackoffRate?: number;
 };
 
-export class InMemoryMessageQueueAdapter<MESSAGE extends Message = Message>
-  implements MessageChannelAdapter
-{
+export class InMemoryMessageQueueAdapter<
+  MESSAGE extends Message = Message,
+> implements MessageChannelAdapter {
   static attachTo<
     MESSAGE_QUEUE extends
       | AggregateExistsMessageQueue
@@ -103,10 +94,7 @@ export class InMemoryMessageQueueAdapter<MESSAGE extends Message = Message>
     this.subscribe = (
       nextHandler: (message: MESSAGE, context: TaskContext) => Promise<void>,
     ): void => {
-      this.queue = fastQ(
-        ({ message, ...context }) => nextHandler(message, context),
-        1,
-      );
+      this.queue = fastQ(({ message, ...context }) => nextHandler(message, context), 1);
       this.queue.error((error, task) => {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (error === null) {
@@ -171,9 +159,7 @@ export class InMemoryMessageQueueAdapter<MESSAGE extends Message = Message>
     };
   }
 
-  set worker(
-    worker: (message: MESSAGE, context: TaskContext) => Promise<void>,
-  ) {
+  set worker(worker: (message: MESSAGE, context: TaskContext) => Promise<void>) {
     this.subscribe(worker);
   }
 }

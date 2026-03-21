@@ -1,9 +1,7 @@
-import type { EventStoreEventDetails } from '@hamstore/core';
-import {
-  pokemonsEventStore,
-  trainersEventStore,
-} from '@hamstore/demo-blueprint';
+import { pokemonsEventStore, trainersEventStore } from '@hamstore/demo-blueprint';
 import { mockEventStore } from '@hamstore/lib-test-tools';
+
+import type { EventStoreEventDetails } from '@hamstore/core';
 
 export const pokemonEvtStoreId = pokemonsEventStore.eventStoreId;
 export const trainerEvtStoreId = trainersEventStore.eventStoreId;
@@ -19,9 +17,7 @@ export const garyOakId = 'garyOak';
 
 // POKEMON EVENTS
 
-export const pikachuEvents: EventStoreEventDetails<
-  typeof pokemonsEventStore
->[] = [
+export const pikachuEvents: EventStoreEventDetails<typeof pokemonsEventStore>[] = [
   {
     aggregateId: pikachuId,
     version: 1,
@@ -45,9 +41,7 @@ export const pikachuEvents: EventStoreEventDetails<
   },
 ];
 
-export const charizardEvents: EventStoreEventDetails<
-  typeof pokemonsEventStore
->[] = [
+export const charizardEvents: EventStoreEventDetails<typeof pokemonsEventStore>[] = [
   {
     aggregateId: charizardId,
     version: 1,
@@ -58,9 +52,7 @@ export const charizardEvents: EventStoreEventDetails<
   },
 ];
 
-export const arcanineEvents: EventStoreEventDetails<
-  typeof pokemonsEventStore
->[] = [
+export const arcanineEvents: EventStoreEventDetails<typeof pokemonsEventStore>[] = [
   {
     aggregateId: arcanineId,
     version: 1,
@@ -80,9 +72,7 @@ export const arcanineEvents: EventStoreEventDetails<
 
 // TRAINER EVENTS
 
-export const ashKetchumEvents: EventStoreEventDetails<
-  typeof trainersEventStore
->[] = [
+export const ashKetchumEvents: EventStoreEventDetails<typeof trainersEventStore>[] = [
   {
     aggregateId: ashKetchumId,
     version: 1,
@@ -99,9 +89,7 @@ export const ashKetchumEvents: EventStoreEventDetails<
   },
 ];
 
-export const garyOakEvents: EventStoreEventDetails<
-  typeof trainersEventStore
->[] = [
+export const garyOakEvents: EventStoreEventDetails<typeof trainersEventStore>[] = [
   {
     aggregateId: garyOakId,
     version: 1,
@@ -120,14 +108,8 @@ export const garyOakEvents: EventStoreEventDetails<
 
 // EVENT STORES
 
-export const trainerEventStore: ReturnType<
-  typeof mockEventStore<typeof trainersEventStore>
-> = mockEventStore(trainersEventStore, [...ashKetchumEvents, ...garyOakEvents]);
+export const trainerEventStore: ReturnType<typeof mockEventStore<typeof trainersEventStore>> =
+  mockEventStore(trainersEventStore, [...ashKetchumEvents, ...garyOakEvents]);
 
-export const pokemonEventStore: ReturnType<
-  typeof mockEventStore<typeof pokemonsEventStore>
-> = mockEventStore(pokemonsEventStore, [
-  ...pikachuEvents,
-  ...charizardEvents,
-  ...arcanineEvents,
-]);
+export const pokemonEventStore: ReturnType<typeof mockEventStore<typeof pokemonsEventStore>> =
+  mockEventStore(pokemonsEventStore, [...pikachuEvents, ...charizardEvents, ...arcanineEvents]);

@@ -1,11 +1,3 @@
-/* eslint-disable max-lines */
-import type { A } from 'ts-toolbelt';
-
-import type { Aggregate } from '~/aggregate';
-import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
-import type { EventTypeDetail } from '~/event/eventType';
-import type { GroupedEvent } from '~/event/groupedEvent';
-import type { EventsQueryOptions } from '~/eventStorageAdapter';
 import {
   EventStore,
   EventStoreAggregate,
@@ -24,6 +16,14 @@ import {
   pikachuCaughtEvent,
 } from './eventStore.fixtures.test';
 
+/* eslint-disable max-lines */
+import type { A } from 'ts-toolbelt';
+import type { Aggregate } from '~/aggregate';
+import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
+import type { EventTypeDetail } from '~/event/eventType';
+import type { GroupedEvent } from '~/event/groupedEvent';
+import type { EventsQueryOptions } from '~/eventStorageAdapter';
+
 // --- EXTENDS ---
 
 const assertExtends: A.Extends<typeof pokemonsEventStore, EventStore> = 1;
@@ -31,10 +31,7 @@ assertExtends;
 
 // --- EVENT STORE ID ---
 
-const assertEventStoreId: A.Equals<
-  (typeof pokemonsEventStore)['eventStoreId'],
-  'POKEMONS'
-> = 1;
+const assertEventStoreId: A.Equals<(typeof pokemonsEventStore)['eventStoreId'], 'POKEMONS'> = 1;
 assertEventStoreId;
 
 // --- EVENTS DETAILS ---
@@ -45,10 +42,7 @@ const assertPokemonEventDetails: A.Equals<
 > = 1;
 assertPokemonEventDetails;
 
-const assertAnyEventsDetails: A.Equals<
-  EventStoreEventDetails<EventStore>,
-  EventDetail
-> = 1;
+const assertAnyEventsDetails: A.Equals<EventStoreEventDetails<EventStore>, EventDetail> = 1;
 assertAnyEventsDetails;
 
 // --- AGGREGATE ---
@@ -59,10 +53,7 @@ const assertCounterAggregate: A.Equals<
 > = 1;
 assertCounterAggregate;
 
-const assertAnyAggregate: A.Equals<
-  EventStoreAggregate<EventStore>,
-  Aggregate
-> = 1;
+const assertAnyAggregate: A.Equals<EventStoreAggregate<EventStore>, Aggregate> = 1;
 assertAnyAggregate;
 
 // --- GET EVENTS ---
@@ -148,11 +139,7 @@ assertGroupEventOutput;
 
 const assertGenericPushEventGroupInput: A.Equals<
   Parameters<typeof EventStore.pushEventGroup>,
-  [
-    GroupedEvent | { force?: boolean | undefined },
-    GroupedEvent,
-    ...GroupedEvent[],
-  ]
+  [GroupedEvent | { force?: boolean | undefined }, GroupedEvent, ...GroupedEvent[]]
 > = 1;
 assertGenericPushEventGroupInput;
 

@@ -144,22 +144,16 @@ const { events: allEvents } = await pokemonsEventStore.getEvents(myPikachuId);
 // => typed as PokemonEventDetail[] 🙌
 
 // 👇 Retrieve a range of events
-const { events: rangedEvents } = await pokemonsEventStore.getEvents(
-  myPikachuId,
-  {
-    minVersion: 2,
-    maxVersion: 5,
-  },
-);
+const { events: rangedEvents } = await pokemonsEventStore.getEvents(myPikachuId, {
+  minVersion: 2,
+  maxVersion: 5,
+});
 
 // 👇 Retrieve the last event of the aggregate
-const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(
-  myPikachuId,
-  {
-    reverse: true,
-    limit: 1,
-  },
-);
+const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(myPikachuId, {
+  reverse: true,
+  limit: 1,
+});
 ```
 
 - <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and build it.
@@ -173,17 +167,16 @@ const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(
   - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
 
 ```ts
-const { aggregate: myPikachu } =
-  await pokemonsEventStore.getAggregate(myPikachuId);
+const { aggregate: myPikachu } = await pokemonsEventStore.getAggregate(myPikachuId);
 // => typed as PokemonAggregate | undefined 🙌
 
 // 👇 Retrieve an aggregate below a certain version
-const { aggregate: pikachuBelowVersion5 } =
-  await pokemonsEventStore.getAggregate(myPikachuId, { maxVersion: 5 });
+const { aggregate: pikachuBelowVersion5 } = await pokemonsEventStore.getAggregate(myPikachuId, {
+  maxVersion: 5,
+});
 
 // 👇 Returns the events if you need them
-const { aggregate, events } =
-  await pokemonsEventStore.getAggregate(myPikachuId);
+const { aggregate, events } = await pokemonsEventStore.getAggregate(myPikachuId);
 ```
 
 - <code>getExistingAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregate</code> method, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
@@ -191,9 +184,7 @@ const { aggregate, events } =
 ```ts
 import { AggregateNotFoundError } from '@hamstore/core';
 
-expect(async () =>
-  pokemonsEventStore.getExistingAggregate(unexistingId),
-).resolves.toThrow(
+expect(async () => pokemonsEventStore.getExistingAggregate(unexistingId)).resolves.toThrow(
   new AggregateNotFoundError({
     eventStoreId: 'POKEMONS',
     aggregateId: unexistingId,
@@ -201,8 +192,7 @@ expect(async () =>
 );
 // true
 
-const { aggregate } =
-  await pokemonsEventStore.getExistingAggregate(aggregateId);
+const { aggregate } = await pokemonsEventStore.getExistingAggregate(aggregateId);
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
@@ -217,19 +207,18 @@ const { aggregate } =
   - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, if the <code>prevAggregate</code> option was provided, or when using a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a> connected to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>
 
 ```ts
-const { event: completeEvent, nextAggregate } =
-  await pokemonsEventStore.pushEvent(
-    {
-      aggregateId: myPikachuId,
-      version: lastVersion + 1,
-      type: 'POKEMON_LEVELED_UP', // <= event type is correctly typed 🙌
-      payload, // <= payload is typed according to the provided event type 🙌
-      metadata, // <= same goes for metadata 🙌
-      // timestamp is optional
-    },
-    // Not required - Can be useful in some cases
-    { prevAggregate },
-  );
+const { event: completeEvent, nextAggregate } = await pokemonsEventStore.pushEvent(
+  {
+    aggregateId: myPikachuId,
+    version: lastVersion + 1,
+    type: 'POKEMON_LEVELED_UP', // <= event type is correctly typed 🙌
+    payload, // <= payload is typed according to the provided event type 🙌
+    metadata, // <= same goes for metadata 🙌
+    // timestamp is optional
+  },
+  // Not required - Can be useful in some cases
+  { prevAggregate },
+);
 ```
 
 - <code>listAggregateIds <i>((opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the list of <code>aggregateId</code> of an event store, ordered by the <code>timestamp</code> of their initial event. Returns an empty array if no aggregate is found.
@@ -248,17 +237,17 @@ const { event: completeEvent, nextAggregate } =
 ```ts
 const accAggregateIds: string = [];
 
-const { aggregateIds: firstPage, nextPageToken } =
-  await pokemonsEventStore.listAggregateIds({ limit: 20 });
+const { aggregateIds: firstPage, nextPageToken } = await pokemonsEventStore.listAggregateIds({
+  limit: 20,
+});
 
 accAggregateIds.push(...firstPage);
 
 if (nextPageToken) {
-  const { aggregateIds: secondPage } =
-    await pokemonsEventStore.listAggregateIds({
-      // 👇 Previous limit of 20 is passed through the page token
-      pageToken: nextPageToken,
-    });
+  const { aggregateIds: secondPage } = await pokemonsEventStore.listAggregateIds({
+    // 👇 Previous limit of 20 is passed through the page token
+    pageToken: nextPageToken,
+  });
   accAggregateIds.push(...secondPage);
 }
 ```

@@ -1,12 +1,3 @@
-import type { A } from 'ts-toolbelt';
-
-import type {
-  Command,
-  CommandId,
-  CommandInput,
-  CommandOutput,
-  CommandContext,
-} from './command';
 import {
   counterEventStore,
   incrementCounter,
@@ -15,12 +6,12 @@ import {
   Context,
 } from './command.fixtures.test';
 
+import type { A } from 'ts-toolbelt';
+import type { Command, CommandId, CommandInput, CommandOutput, CommandContext } from './command';
+
 // --- CLASS ---
 
-const assertIncrementCounterExtendsCommand: A.Extends<
-  typeof incrementCounter,
-  Command
-> = 1;
+const assertIncrementCounterExtendsCommand: A.Extends<typeof incrementCounter, Command> = 1;
 assertIncrementCounterExtendsCommand;
 
 // --- HANDLER ---
@@ -37,23 +28,14 @@ assertIncrementCounterHandler;
 
 // --- HELPERS ---
 
-const assertId: A.Equals<
-  CommandId<typeof incrementCounter>,
-  'INCREMENT_COUNTER'
-> = 1;
+const assertId: A.Equals<CommandId<typeof incrementCounter>, 'INCREMENT_COUNTER'> = 1;
 assertId;
 
 const assertInput: A.Equals<CommandInput<typeof incrementCounter>, Input> = 1;
 assertInput;
 
-const assertOutput: A.Equals<
-  CommandOutput<typeof incrementCounter>,
-  Output
-> = 1;
+const assertOutput: A.Equals<CommandOutput<typeof incrementCounter>, Output> = 1;
 assertOutput;
 
-const assertContext: A.Equals<
-  CommandContext<typeof incrementCounter>,
-  [Context]
-> = 1;
+const assertContext: A.Equals<CommandContext<typeof incrementCounter>, [Context]> = 1;
 assertContext;

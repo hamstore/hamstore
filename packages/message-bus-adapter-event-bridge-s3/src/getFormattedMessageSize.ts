@@ -2,9 +2,7 @@ import type { PutEventsRequestEntry } from '@aws-sdk/client-eventbridge';
 
 export const PUT_EVENTS_ENTRIES_SIZE_LIMIT = 262144;
 
-export const getFormattedMessageSize = (
-  formattedMessage: PutEventsRequestEntry,
-): number => {
+export const getFormattedMessageSize = (formattedMessage: PutEventsRequestEntry): number => {
   let size = 0;
 
   if (formattedMessage.Time) {

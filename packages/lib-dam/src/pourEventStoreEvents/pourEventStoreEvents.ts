@@ -1,13 +1,13 @@
+import { EventBook } from '~/utils/eventBook';
+import { MessagePourer } from '~/utils/messagePourer';
+import { updateScanInfos } from '~/utils/updateScanInfos';
+
 import type {
   EventStore,
   EventStoreNotificationMessage,
   PublishMessageOptions,
 } from '@hamstore/core';
-
 import type { ScanInfos } from '~/types';
-import { EventBook } from '~/utils/eventBook';
-import { MessagePourer } from '~/utils/messagePourer';
-import { updateScanInfos } from '~/utils/updateScanInfos';
 
 interface Props<EVENT_STORE extends EventStore> {
   eventStore: EVENT_STORE;
@@ -28,10 +28,7 @@ export const pourEventStoreEvents = async <EVENT_STORE extends EventStore>({
   rateLimit,
 }: Props<EVENT_STORE>): Promise<{ pouredEventCount: number } & ScanInfos> => {
   const eventBook = new EventBook(eventStore);
-  const messagePourer = new MessagePourer<EVENT_STORE>(
-    messageChannel,
-    rateLimit,
-  );
+  const messagePourer = new MessagePourer<EVENT_STORE>(messageChannel, rateLimit);
 
   let pageToken: string | undefined;
   let fetchedEventsCursor: string | undefined = undefined;

@@ -20,12 +20,11 @@ export interface SQSMessageQueueMessage {
   Records: SQSMessageQueueRecord[];
 }
 
-type Prettify<OBJECTS extends Record<string, unknown>> =
-  OBJECTS extends infer OBJECT
-    ? {
-        [KEY in keyof OBJECT]: OBJECT[KEY];
-      }
-    : never;
+type Prettify<OBJECTS extends Record<string, unknown>> = OBJECTS extends infer OBJECT
+  ? {
+      [KEY in keyof OBJECT]: OBJECT[KEY];
+    }
+  : never;
 
 export type SQSMessageQueueMessageBody<
   MESSAGE_QUEUE extends
@@ -35,17 +34,11 @@ export type SQSMessageQueueMessageBody<
 > = Prettify<
   MESSAGE_QUEUE extends StateCarryingMessageQueue
     ? EventStoreStateCarryingMessage<
-        EventStoreNotificationMessage<
-          MessageChannelSourceEventStores<MESSAGE_QUEUE>
-        >
+        EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
       >
     : MESSAGE_QUEUE extends NotificationMessageQueue
-      ? EventStoreNotificationMessage<
-          MessageChannelSourceEventStores<MESSAGE_QUEUE>
-        >
+      ? EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
       : MESSAGE_QUEUE extends AggregateExistsMessageQueue
-        ? EventStoreAggregateExistsMessage<
-            MessageChannelSourceEventStores<MESSAGE_QUEUE>
-          >
+        ? EventStoreAggregateExistsMessage<MessageChannelSourceEventStores<MESSAGE_QUEUE>>
         : never
 >;

@@ -1,11 +1,5 @@
 /* eslint-disable max-lines */
-import {
-  EventStore,
-  EventType,
-  EventTypeDetail,
-  EventStorageAdapter,
-  tuple,
-} from '@hamstore/core';
+import { EventStore, EventType, EventTypeDetail, EventStorageAdapter, tuple } from '@hamstore/core';
 import { vi } from 'vitest';
 import { z } from 'zod';
 
@@ -47,21 +41,20 @@ export type CounterAggregate = {
 };
 
 export const counterIdMock = 'counterId';
-export const counterEventsMocks: [CounterEventsDetails, CounterEventsDetails] =
-  [
-    {
-      aggregateId: counterIdMock,
-      version: 1,
-      type: 'COUNTER_CREATED',
-      timestamp: '2022',
-    },
-    {
-      aggregateId: counterIdMock,
-      version: 2,
-      type: 'COUNTER_INCREMENTED',
-      timestamp: '2023',
-    },
-  ];
+export const counterEventsMocks: [CounterEventsDetails, CounterEventsDetails] = [
+  {
+    aggregateId: counterIdMock,
+    version: 1,
+    type: 'COUNTER_CREATED',
+    timestamp: '2022',
+  },
+  {
+    aggregateId: counterIdMock,
+    version: 2,
+    type: 'COUNTER_INCREMENTED',
+    timestamp: '2023',
+  },
+];
 
 export const countersReducer = (
   counterAggregate: CounterAggregate,
@@ -87,11 +80,7 @@ export const countersReducer = (
 
 export const counterEventStore = new EventStore({
   eventStoreId: 'Counters',
-  eventTypes: [
-    counterCreatedEvent,
-    counterIncrementedEvent,
-    counterDeletedEvent,
-  ],
+  eventTypes: [counterCreatedEvent, counterIncrementedEvent, counterDeletedEvent],
   reducer: countersReducer,
   eventStorageAdapter: eventStorageAdapterMock,
 });
@@ -110,11 +99,7 @@ export const createCounter = new ZodCommand({
   commandId: 'CREATE_COUNTER',
   requiredEventStores: tuple(counterEventStore),
   outputSchema: inputSchema,
-  handler: async (
-    _,
-    [countersStore],
-    { generateUuid }: { generateUuid: () => string },
-  ) => {
+  handler: async (_, [countersStore], { generateUuid }: { generateUuid: () => string }) => {
     const counterId = generateUuid();
 
     await countersStore.pushEvent({

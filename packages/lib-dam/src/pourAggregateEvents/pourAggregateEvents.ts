@@ -1,3 +1,6 @@
+import { getThrottle } from '~/utils/getThrottle';
+import { getIsBetween } from '~/utils/isBetween';
+
 import type {
   EventDetail,
   EventStore,
@@ -5,9 +8,6 @@ import type {
   EventsQueryOptions,
   PublishMessageOptions,
 } from '@hamstore/core';
-
-import { getThrottle } from '~/utils/getThrottle';
-import { getIsBetween } from '~/utils/isBetween';
 
 interface Props<EVENT_STORE extends EventStore> {
   eventStore: EVENT_STORE;

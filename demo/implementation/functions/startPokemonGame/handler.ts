@@ -1,5 +1,6 @@
-import { startPokemonGameCommand } from '@hamstore/demo-blueprint';
 import { randomUUID } from 'crypto';
+
+import { startPokemonGameCommand } from '@hamstore/demo-blueprint';
 
 import { trainersEventStore } from '~/libs/eventStores/trainers';
 import { applyConsoleMiddleware } from '~/libs/middlewares/console';

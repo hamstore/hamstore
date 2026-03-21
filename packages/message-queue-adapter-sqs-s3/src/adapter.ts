@@ -1,20 +1,13 @@
 /* eslint-disable max-lines */
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
-import {
-  SQSClient,
-  SendMessageRequest,
-  SendMessageCommandInput,
-} from '@aws-sdk/client-sqs';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { SQSClient, SendMessageRequest, SendMessageCommandInput } from '@aws-sdk/client-sqs';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import { isEventCarryingMessage } from '@hamstore/core';
 import { SQSMessageQueueAdapter } from '@hamstore/message-queue-adapter-sqs';
 
 import { getMessageSize, SEND_MESSAGES_SIZE_LIMIT } from './getMessageSize';
+
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import type { OversizedEntryDetail } from './message';
 
 export const SQS_MAX_MESSAGE_BATCH_SIZE = 10;
@@ -30,10 +23,7 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
   s3PreSignatureExpirationInSec: number;
 
   getS3BucketName: () => string;
-  publishFormattedMessage: (
-    messageRequest: SendMessageRequest,
-    message: Message,
-  ) => Promise<void>;
+  publishFormattedMessage: (messageRequest: SendMessageRequest, message: Message) => Promise<void>;
 
   constructor({
     queueUrl,
@@ -60,9 +50,7 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
     this.s3PreSignatureExpirationInSec = s3PreSignatureExpirationInSec;
 
     this.getS3BucketName = () =>
-      typeof this.s3BucketName === 'string'
-        ? this.s3BucketName
-        : this.s3BucketName();
+      typeof this.s3BucketName === 'string' ? this.s3BucketName : this.s3BucketName();
 
     this.publishMessage = (message, options) =>
       this.publishFormattedMessage(
@@ -72,9 +60,7 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
 
     this.publishFormattedMessage = async (formattedMessage, message) => {
       if (getMessageSize(formattedMessage) <= SEND_MESSAGES_SIZE_LIMIT) {
-        return this.sqsMessageQueueAdapter.publishFormattedMessage(
-          formattedMessage,
-        );
+        return this.sqsMessageQueueAdapter.publishFormattedMessage(formattedMessage);
       }
 
       const { eventStoreId } = message;
@@ -82,10 +68,7 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
 
       if (isEventCarryingMessage(message)) {
         const { aggregateId, version } = message.event;
-        filePath.push(
-          aggregateId,
-          [new Date().toISOString(), String(version)].join('#'),
-        );
+        filePath.push(aggregateId, [new Date().toISOString(), String(version)].join('#'));
       } else {
         const { aggregateId } = message;
         filePath.push(aggregateId, new Date().toISOString());
@@ -131,21 +114,20 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
         formattedMessageSize: number;
       };
 
-      const formattedMessagesWithContext: FormattedMessageWithContext[] =
-        formattedMessages.map((formattedMessage, index) => ({
+      const formattedMessagesWithContext: FormattedMessageWithContext[] = formattedMessages.map(
+        (formattedMessage, index) => ({
           formattedMessage,
           formattedMessageSize: getMessageSize(formattedMessage),
           message: messages[index] as Message,
-        }));
+        }),
+      );
 
       formattedMessagesWithContext.sort(
-        ({ formattedMessageSize: sizeA }, { formattedMessageSize: sizeB }) =>
-          sizeA - sizeB,
+        ({ formattedMessageSize: sizeA }, { formattedMessageSize: sizeB }) => sizeA - sizeB,
       );
 
       const formattedMessageBatches: FormattedMessageWithContext[][] = [[]];
-      let currentBatch =
-        formattedMessageBatches[0] as FormattedMessageWithContext[];
+      let currentBatch = formattedMessageBatches[0] as FormattedMessageWithContext[];
       let currentBatchSize = 0;
 
       // NOTE: We could search for the largest fitting entry instead of doing a for loop
@@ -160,9 +142,7 @@ export class SQSS3MessageQueueAdapter implements MessageChannelAdapter {
           currentBatchSize += formattedMessageSize;
         } else {
           formattedMessageBatches.push([formattedMessageWithContext]);
-          currentBatch = formattedMessageBatches.at(
-            -1,
-          ) as FormattedMessageWithContext[];
+          currentBatch = formattedMessageBatches.at(-1) as FormattedMessageWithContext[];
           currentBatchSize = formattedMessageSize;
         }
       }

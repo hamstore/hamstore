@@ -17,11 +17,7 @@ export const useExistingAggregate = <EVENT_STORE extends EventStore>(
   events: EventStoreEventDetails<EVENT_STORE>[];
   lastEvent: EventStoreEventDetails<EVENT_STORE>;
 } => {
-  const { aggregate, events, lastEvent } = useAggregate(
-    eventStore,
-    aggregateId,
-    options,
-  );
+  const { aggregate, events, lastEvent } = useAggregate(eventStore, aggregateId, options);
 
   if (aggregate === undefined || lastEvent === undefined) {
     throw new AggregateNotFoundError({

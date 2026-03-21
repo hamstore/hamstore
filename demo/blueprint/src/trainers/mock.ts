@@ -4,9 +4,7 @@ import { trainersEventStore } from './eventStore';
 
 export const ashId = 'ash-ketchum-id';
 
-export const ashPokemonGameStartedEvent: EventStoreEventDetails<
-  typeof trainersEventStore
-> = {
+export const ashPokemonGameStartedEvent: EventStoreEventDetails<typeof trainersEventStore> = {
   aggregateId: ashId,
   version: 1,
   type: 'GAME_STARTED',
@@ -16,9 +14,7 @@ export const ashPokemonGameStartedEvent: EventStoreEventDetails<
   },
 };
 
-export const ashPokemonCaughtEvent: EventStoreEventDetails<
-  typeof trainersEventStore
-> = {
+export const ashPokemonCaughtEvent: EventStoreEventDetails<typeof trainersEventStore> = {
   aggregateId: ashId,
   version: 2,
   type: 'POKEMON_CAUGHT',

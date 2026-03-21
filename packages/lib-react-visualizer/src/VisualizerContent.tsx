@@ -1,17 +1,20 @@
-import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
-import type { EventStore } from '@hamstore/core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
 import React, { useState, JSX } from 'react';
 
 import { DB as $DB, Commands } from './tabs';
 
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
+
+/* eslint-disable no-shadow */
 enum TabName {
   COMMANDS = 'COMMANDS',
   DB = 'DB',
 }
 
 const { COMMANDS, DB } = TabName;
+/* eslint-enable no-shadow */
 
 const defaultTabName = COMMANDS;
 const orderedTabNames = [COMMANDS, DB];

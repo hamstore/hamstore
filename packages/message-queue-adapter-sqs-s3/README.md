@@ -85,10 +85,7 @@ On the listeners side, you can use the `SQSS3MessageBusMessage` TS type to type 
 On the worker side, you can use the `SQSS3MessageQueueMessage` TS type to type your argument, and the `parseBody` util to fetch the message if it has been uploaded to S3 (it passes it through otherwise):
 
 ```ts
-import {
-  SQSS3MessageQueueMessage,
-  parseBody,
-} from '@hamstore/message-queue-adapter-sqs-s3';
+import { SQSS3MessageQueueMessage, parseBody } from '@hamstore/message-queue-adapter-sqs-s3';
 
 const appMessagesWorker = async ({ Records }: SQSS3MessageQueueMessage) => {
   for (const { body } of Records) {
@@ -103,10 +100,7 @@ Note that `parseBody` uses `fetch` under the hood, so you will have to provide i
 ```ts
 import fetch from 'node-fetch';
 
-import {
-  SQSS3MessageQueueMessage,
-  parseBody,
-} from '@hamstore/message-queue-adapter-sqs-s3';
+import { SQSS3MessageQueueMessage, parseBody } from '@hamstore/message-queue-adapter-sqs-s3';
 
 const appMessagesWorker = async ({ Records }: SQSS3MessageQueueMessage) => {
   for (const { body } of Records) {

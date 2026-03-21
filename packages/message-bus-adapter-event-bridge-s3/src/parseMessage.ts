@@ -1,5 +1,4 @@
 import type { EventBridgeEvent } from 'aws-lambda';
-
 import type { OversizedEntryDetail } from './message';
 
 type ParsedMessage<MESSAGES extends EventBridgeEvent<string, unknown>> =
@@ -13,9 +12,7 @@ type ParsedMessage<MESSAGES extends EventBridgeEvent<string, unknown>> =
       : never
     : never;
 
-export const parseMessage = async <
-  MESSAGES extends EventBridgeEvent<string, unknown>,
->(
+export const parseMessage = async <MESSAGES extends EventBridgeEvent<string, unknown>>(
   _message: MESSAGES,
   { fetch: _fetch = fetch }: { fetch?: typeof fetch } = { fetch },
 ): Promise<ParsedMessage<MESSAGES>> => {

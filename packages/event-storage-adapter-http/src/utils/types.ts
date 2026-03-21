@@ -10,9 +10,7 @@ export type ApiResponse = {
   body: Record<string, unknown>;
 };
 
-export type ApiMethod = (
-  arg: Record<string | number | symbol, unknown>,
-) => Promise<ApiResponse>;
+export type ApiMethod = (arg: Record<string | number | symbol, unknown>) => Promise<ApiResponse>;
 
 export type Api = Record<string, ApiMethod>;
 

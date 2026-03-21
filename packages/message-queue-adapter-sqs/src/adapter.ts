@@ -16,9 +16,7 @@ import chunk from 'lodash.chunk';
 
 export const SQS_MAX_MESSAGE_BATCH_SIZE = 10;
 
-const parseMessage = (
-  message: Message,
-): { aggregateId: string; version?: number } => {
+const parseMessage = (message: Message): { aggregateId: string; version?: number } => {
   if (isAggregateExistsMessage(message)) {
     return { aggregateId: message.aggregateId };
   }
@@ -44,14 +42,9 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
   fifo: boolean;
 
   getQueueUrl: () => string;
-  formatMessage: (
-    message: Message,
-    options?: PublishMessageOptions,
-  ) => SendMessageCommandInput;
+  formatMessage: (message: Message, options?: PublishMessageOptions) => SendMessageCommandInput;
   publishFormattedMessage: (entry: SendMessageCommandInput) => Promise<void>;
-  publishFormattedMessages: (
-    entries: SendMessageCommandInput[],
-  ) => Promise<void>;
+  publishFormattedMessages: (entries: SendMessageCommandInput[]) => Promise<void>;
 
   constructor({
     queueUrl,
@@ -66,8 +59,7 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
     this.sqsClient = sqsClient;
     this.fifo = fifo;
 
-    this.getQueueUrl = () =>
-      typeof this.queueUrl === 'string' ? this.queueUrl : this.queueUrl();
+    this.getQueueUrl = () => (typeof this.queueUrl === 'string' ? this.queueUrl : this.queueUrl());
 
     this.formatMessage = (message, { replay = false } = {}) => {
       const { eventStoreId } = message;
@@ -78,9 +70,7 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
         QueueUrl: this.getQueueUrl(),
       };
 
-      const messageId = [eventStoreId, aggregateId, version]
-        .filter(Boolean)
-        .join('#');
+      const messageId = [eventStoreId, aggregateId, version].filter(Boolean).join('#');
 
       if (this.fifo) {
         formattedMessage.MessageDeduplicationId = messageId;
@@ -109,10 +99,7 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
     };
 
     this.publishFormattedMessages = async formattedMessages => {
-      for (const formattedMessageBatch of chunk(
-        formattedMessages,
-        SQS_MAX_MESSAGE_BATCH_SIZE,
-      )) {
+      for (const formattedMessageBatch of chunk(formattedMessages, SQS_MAX_MESSAGE_BATCH_SIZE)) {
         await this.sqsClient.send(
           new SendMessageBatchCommand({
             Entries: formattedMessageBatch.map(formattedMessage => ({
@@ -130,10 +117,7 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
     };
 
     this.publishMessages = async (messages, { replay = false } = {}) => {
-      const baseEntry: Omit<
-        SendMessageBatchRequestEntry,
-        'Id' | 'MessageBody'
-      > = {};
+      const baseEntry: Omit<SendMessageBatchRequestEntry, 'Id' | 'MessageBody'> = {};
 
       if (replay) {
         baseEntry.MessageAttributes = {
@@ -147,9 +131,7 @@ export class SQSMessageQueueAdapter implements MessageChannelAdapter {
             Entries: chunkMessages.map(message => {
               const { eventStoreId } = message;
               const { aggregateId, version } = parseMessage(message);
-              const messageId = [eventStoreId, aggregateId, version]
-                .filter(Boolean)
-                .join('#');
+              const messageId = [eventStoreId, aggregateId, version].filter(Boolean).join('#');
 
               const entry: SendMessageBatchRequestEntry = {
                 ...baseEntry,

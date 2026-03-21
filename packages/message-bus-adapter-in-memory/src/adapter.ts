@@ -8,15 +8,7 @@ import {
   StateCarryingMessageBus,
   StateCarryingMessage,
 } from '@hamstore/core';
-import type { EventEmitter } from 'node:events';
 
-import type { InMemoryMessageBusMessage, Task } from './message';
-import type {
-  ConstructorArgs,
-  FilterPattern,
-  InMemoryBusMessage,
-  TaskContext,
-} from './types';
 import {
   doesTaskMatchAnyFilterPattern,
   parseBackoffRate,
@@ -24,9 +16,13 @@ import {
   parseRetryDelayInMs,
 } from './utils';
 
-export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
-  implements MessageChannelAdapter
-{
+import type { EventEmitter } from 'node:events';
+import type { InMemoryMessageBusMessage, Task } from './message';
+import type { ConstructorArgs, FilterPattern, InMemoryBusMessage, TaskContext } from './types';
+
+export class InMemoryMessageBusAdapter<
+  MESSAGE extends Message = Message,
+> implements MessageChannelAdapter {
   static attachTo<
     MESSAGE_BUS extends
       | AggregateExistsMessageBus
@@ -36,9 +32,9 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
     messageBus: MESSAGE_BUS,
     constructorArgs: ConstructorArgs,
   ): InMemoryMessageBusAdapter<InMemoryBusMessage<MESSAGE_BUS>> {
-    const messageBusAdapter = new InMemoryMessageBusAdapter<
-      InMemoryBusMessage<MESSAGE_BUS>
-    >(constructorArgs);
+    const messageBusAdapter = new InMemoryMessageBusAdapter<InMemoryBusMessage<MESSAGE_BUS>>(
+      constructorArgs,
+    );
 
     messageBus.messageChannelAdapter = messageBusAdapter;
 
@@ -56,9 +52,7 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
 
   on: <
     EVENT_STORE_ID extends MESSAGE['eventStoreId'] = MESSAGE['eventStoreId'],
-    EVENT_TYPE extends MESSAGE extends
-      | NotificationMessage
-      | StateCarryingMessage
+    EVENT_TYPE extends MESSAGE extends NotificationMessage | StateCarryingMessage
       ? Extract<MESSAGE, { eventStoreId: EVENT_STORE_ID }>['event']['type']
       : never = MESSAGE extends NotificationMessage | StateCarryingMessage
       ? Extract<MESSAGE, { eventStoreId: EVENT_STORE_ID }>['event']['type']
@@ -84,31 +78,28 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
     this.retryAttempts = parseRetryAttempts(retryAttempts);
     this.retryBackoffRate = parseBackoffRate(retryBackoffRate);
 
-    this.eventEmitter.on(
-      'error',
-      (error: Error, task: Task, handlerIndex: number) => {
-        const { message, attempt, retryAttemptsLeft } = task;
+    this.eventEmitter.on('error', (error: Error, task: Task, handlerIndex: number) => {
+      const { message, attempt, retryAttemptsLeft } = task;
 
-        if (retryAttemptsLeft <= 0) {
-          console.error(error);
+      if (retryAttemptsLeft <= 0) {
+        console.error(error);
 
-          return;
-        }
+        return;
+      }
 
-        const waitTimeInMs = Math.round(
-          this.retryDelayInMs * Math.pow(this.retryBackoffRate, attempt - 1),
-        );
+      const waitTimeInMs = Math.round(
+        this.retryDelayInMs * Math.pow(this.retryBackoffRate, attempt - 1),
+      );
 
-        setTimeout(() => {
-          this.eventEmitter.emit('message', {
-            message,
-            attempt: attempt + 1,
-            retryAttemptsLeft: retryAttemptsLeft - 1,
-            retryHandlerIndex: handlerIndex,
-          });
-        }, waitTimeInMs);
-      },
-    );
+      setTimeout(() => {
+        this.eventEmitter.emit('message', {
+          message,
+          attempt: attempt + 1,
+          retryAttemptsLeft: retryAttemptsLeft - 1,
+          retryHandlerIndex: handlerIndex,
+        });
+      }, waitTimeInMs);
+    });
 
     this.publishMessage = async (message, { replay = false } = {}) =>
       new Promise<void>(resolve => {
@@ -135,9 +126,7 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
 
     this.on = <
       EVENT_STORE_ID extends MESSAGE['eventStoreId'] = MESSAGE['eventStoreId'],
-      EVENT_TYPE extends MESSAGE extends
-        | NotificationMessage
-        | StateCarryingMessage
+      EVENT_TYPE extends MESSAGE extends NotificationMessage | StateCarryingMessage
         ? Extract<MESSAGE, { eventStoreId: EVENT_STORE_ID }>['event']['type']
         : never = MESSAGE extends NotificationMessage | StateCarryingMessage
         ? Extract<MESSAGE, { eventStoreId: EVENT_STORE_ID }>['event']['type']
@@ -151,14 +140,11 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
     ) => {
       let handlerIndex = this.handlers.findIndex(
         savedHandler =>
-          savedHandler ===
-          (handler as unknown as (message: MESSAGE) => Promise<void>),
+          savedHandler === (handler as unknown as (message: MESSAGE) => Promise<void>),
       );
 
       if (handlerIndex === -1) {
-        this.handlers.push(
-          handler as unknown as (message: MESSAGE) => Promise<void>,
-        );
+        this.handlers.push(handler as unknown as (message: MESSAGE) => Promise<void>);
         this.filterPatterns.push([filterPattern]);
         handlerIndex = this.handlers.length - 1;
 
@@ -170,18 +156,8 @@ export class InMemoryMessageBusAdapter<MESSAGE extends Message = Message>
 
         this.eventEmitter.on(
           'message',
-          (
-            task: Task<
-              InMemoryMessageBusMessage<MESSAGE, EVENT_STORE_ID, EVENT_TYPE>
-            >,
-          ) => {
-            const {
-              message,
-              retryHandlerIndex,
-              attempt,
-              retryAttemptsLeft,
-              replay = false,
-            } = task;
+          (task: Task<InMemoryMessageBusMessage<MESSAGE, EVENT_STORE_ID, EVENT_TYPE>>) => {
+            const { message, retryHandlerIndex, attempt, retryAttemptsLeft, replay = false } = task;
             const context: TaskContext = { attempt, retryAttemptsLeft, replay };
 
             if (

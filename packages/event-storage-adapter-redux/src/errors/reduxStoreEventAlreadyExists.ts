@@ -1,12 +1,6 @@
-import {
-  eventAlreadyExistsErrorCode,
-  EventAlreadyExistsError,
-} from '@hamstore/core';
+import { eventAlreadyExistsErrorCode, EventAlreadyExistsError } from '@hamstore/core';
 
-export class ReduxStoreEventAlreadyExistsError
-  extends Error
-  implements EventAlreadyExistsError
-{
+export class ReduxStoreEventAlreadyExistsError extends Error implements EventAlreadyExistsError {
   code: typeof eventAlreadyExistsErrorCode;
   eventStoreId?: string;
   aggregateId: string;

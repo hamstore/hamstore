@@ -1,20 +1,15 @@
-import type { EventStore } from '~/eventStore/eventStore';
-import type { $Contravariant } from '~/utils';
-
-import type {
-  EventStoreStateCarryingMessage,
-  EventStoreNotificationMessage,
-} from '../generics';
 import {
   MessageChannelEventStoreNotFoundError,
   UndefinedMessageChannelAdapterError,
 } from './errors';
+
+import type { EventStore } from '~/eventStore/eventStore';
+import type { $Contravariant } from '~/utils';
+import type { EventStoreStateCarryingMessage, EventStoreNotificationMessage } from '../generics';
 import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 
-export class StateCarryingMessageChannel<
-  EVENT_STORE extends EventStore = EventStore,
-> {
+export class StateCarryingMessageChannel<EVENT_STORE extends EventStore = EventStore> {
   // Mainly for type discrimination
   messageType: 'stateCarrying';
   messageChannelType: string;
@@ -102,10 +97,7 @@ export class StateCarryingMessageChannel<
       return eventStore;
     };
 
-    this.publishMessage = async (
-      stateCarryingMessage,
-      { replay = false } = {},
-    ) => {
+    this.publishMessage = async (stateCarryingMessage, { replay = false } = {}) => {
       const { eventStoreId } = stateCarryingMessage;
       this.getEventStore(eventStoreId);
 
@@ -116,10 +108,7 @@ export class StateCarryingMessageChannel<
       });
     };
 
-    this.getAggregateAndPublishMessage = async (
-      notificationMessage,
-      { replay = false } = {},
-    ) => {
+    this.getAggregateAndPublishMessage = async (notificationMessage, { replay = false } = {}) => {
       const { eventStoreId, event } = notificationMessage;
       const { aggregateId, version } = event;
 
@@ -129,16 +118,10 @@ export class StateCarryingMessageChannel<
         maxVersion: version,
       });
 
-      await this.publishMessage(
-        { ...notificationMessage, aggregate },
-        { replay },
-      );
+      await this.publishMessage({ ...notificationMessage, aggregate }, { replay });
     };
 
-    this.publishMessages = async (
-      stateCarryingMessages,
-      { replay = false } = {},
-    ) => {
+    this.publishMessages = async (stateCarryingMessages, { replay = false } = {}) => {
       for (const stateCarryingMessage of stateCarryingMessages) {
         const { eventStoreId } = stateCarryingMessage;
         this.getEventStore(eventStoreId);

@@ -10,27 +10,27 @@ Hamstore is a fork of the [Castore](https://github.com/castore-dev/castore) libr
 
 All packages have been renamed from the `@castore` scope to the `@hamstore` scope. The package names themselves remain the same:
 
-| @castore | @hamstore |
-| --- | --- |
-| `@castore/core` | `@hamstore/core` |
-| `@castore/event-type-json-schema` | `@hamstore/event-type-json-schema` |
-| `@castore/event-type-zod` | `@hamstore/event-type-zod` |
-| `@castore/command-json-schema` | `@hamstore/command-json-schema` |
-| `@castore/command-zod` | `@hamstore/command-zod` |
-| `@castore/event-storage-adapter-dynamodb` | `@hamstore/event-storage-adapter-dynamodb` |
-| `@castore/event-storage-adapter-redux` | `@hamstore/event-storage-adapter-redux` |
-| `@castore/event-storage-adapter-postgres` | `@hamstore/event-storage-adapter-postgres` |
-| `@castore/event-storage-adapter-in-memory` | `@hamstore/event-storage-adapter-in-memory` |
-| `@castore/event-storage-adapter-http` | `@hamstore/event-storage-adapter-http` |
-| `@castore/message-queue-adapter-sqs` | `@hamstore/message-queue-adapter-sqs` |
-| `@castore/message-queue-adapter-sqs-s3` | `@hamstore/message-queue-adapter-sqs-s3` |
-| `@castore/message-queue-adapter-in-memory` | `@hamstore/message-queue-adapter-in-memory` |
-| `@castore/message-bus-adapter-event-bridge` | `@hamstore/message-bus-adapter-event-bridge` |
+| @castore                                       | @hamstore                                       |
+| ---------------------------------------------- | ----------------------------------------------- |
+| `@castore/core`                                | `@hamstore/core`                                |
+| `@castore/event-type-json-schema`              | `@hamstore/event-type-json-schema`              |
+| `@castore/event-type-zod`                      | `@hamstore/event-type-zod`                      |
+| `@castore/command-json-schema`                 | `@hamstore/command-json-schema`                 |
+| `@castore/command-zod`                         | `@hamstore/command-zod`                         |
+| `@castore/event-storage-adapter-dynamodb`      | `@hamstore/event-storage-adapter-dynamodb`      |
+| `@castore/event-storage-adapter-redux`         | `@hamstore/event-storage-adapter-redux`         |
+| `@castore/event-storage-adapter-postgres`      | `@hamstore/event-storage-adapter-postgres`      |
+| `@castore/event-storage-adapter-in-memory`     | `@hamstore/event-storage-adapter-in-memory`     |
+| `@castore/event-storage-adapter-http`          | `@hamstore/event-storage-adapter-http`          |
+| `@castore/message-queue-adapter-sqs`           | `@hamstore/message-queue-adapter-sqs`           |
+| `@castore/message-queue-adapter-sqs-s3`        | `@hamstore/message-queue-adapter-sqs-s3`        |
+| `@castore/message-queue-adapter-in-memory`     | `@hamstore/message-queue-adapter-in-memory`     |
+| `@castore/message-bus-adapter-event-bridge`    | `@hamstore/message-bus-adapter-event-bridge`    |
 | `@castore/message-bus-adapter-event-bridge-s3` | `@hamstore/message-bus-adapter-event-bridge-s3` |
-| `@castore/message-bus-adapter-in-memory` | `@hamstore/message-bus-adapter-in-memory` |
-| `@castore/lib-test-tools` | `@hamstore/lib-test-tools` |
-| `@castore/lib-dam` | `@hamstore/lib-dam` |
-| `@castore/lib-react-visualizer` | `@hamstore/lib-react-visualizer` |
+| `@castore/message-bus-adapter-in-memory`       | `@hamstore/message-bus-adapter-in-memory`       |
+| `@castore/lib-test-tools`                      | `@hamstore/lib-test-tools`                      |
+| `@castore/lib-dam`                             | `@hamstore/lib-dam`                             |
+| `@castore/lib-react-visualizer`                | `@hamstore/lib-react-visualizer`                |
 
 ## Step-by-step Migration
 
@@ -66,10 +66,10 @@ find src -name '*.ts' -o -name '*.tsx' | xargs sed -i 's/@castore\//@hamstore\//
 
 The following exported identifiers from `@hamstore/event-storage-adapter-redux` (formerly `@castore/event-storage-adapter-redux`) have been renamed:
 
-| Before | After |
-| --- | --- |
+| Before               | After                 |
+| -------------------- | --------------------- |
 | `getCastoreReducers` | `getHamstoreReducers` |
-| `configureCastore` | `configureHamstore` |
+| `configureCastore`   | `configureHamstore`   |
 
 Update any usage accordingly:
 

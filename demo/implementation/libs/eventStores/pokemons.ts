@@ -3,11 +3,9 @@ import { DynamoDBSingleTableEventStorageAdapter } from '@hamstore/event-storage-
 
 import { dynamoDBClient } from './client';
 
-export const pokemonsEventStore: typeof $pokemonsEventStore =
-  $pokemonsEventStore;
+export const pokemonsEventStore: typeof $pokemonsEventStore = $pokemonsEventStore;
 
-pokemonsEventStore.eventStorageAdapter =
-  new DynamoDBSingleTableEventStorageAdapter({
-    tableName: process.env.POKEMON_EVENTS_TABLE_NAME as string,
-    dynamoDBClient,
-  });
+pokemonsEventStore.eventStorageAdapter = new DynamoDBSingleTableEventStorageAdapter({
+  tableName: process.env.POKEMON_EVENTS_TABLE_NAME as string,
+  dynamoDBClient,
+});

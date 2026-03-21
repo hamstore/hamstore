@@ -1,14 +1,11 @@
 /* eslint-disable max-lines */
-import {
-  SQSClient,
-  SendMessageCommand,
-  SendMessageBatchCommand,
-} from '@aws-sdk/client-sqs';
-import type { Message, PublishMessageOptions } from '@hamstore/core';
+import { SQSClient, SendMessageCommand, SendMessageBatchCommand } from '@aws-sdk/client-sqs';
 import { mockClient } from 'aws-sdk-client-mock';
-import type { A } from 'ts-toolbelt';
 
 import { SQSMessageQueueAdapter, SQS_MAX_MESSAGE_BATCH_SIZE } from './adapter';
+
+import type { Message, PublishMessageOptions } from '@hamstore/core';
+import type { A } from 'ts-toolbelt';
 
 const sqsClientMock = mockClient(SQSClient);
 
@@ -157,17 +154,11 @@ describe('SQSMessageQueueAdapter', () => {
     expect(sqsClientMock.call(0).args[0].input).toMatchObject({
       Entries: [
         {
-          MessageDeduplicationId: [eventStoreId, aggregateId, version].join(
-            '#',
-          ),
+          MessageDeduplicationId: [eventStoreId, aggregateId, version].join('#'),
           MessageGroupId: [eventStoreId, aggregateId].join('#'),
         },
         {
-          MessageDeduplicationId: [
-            eventStoreId,
-            aggregateId,
-            otherVersion,
-          ].join('#'),
+          MessageDeduplicationId: [eventStoreId, aggregateId, otherVersion].join('#'),
           MessageGroupId: [eventStoreId, aggregateId].join('#'),
         },
       ],

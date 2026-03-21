@@ -1,7 +1,7 @@
-import type { AWS } from '@serverless/typescript';
-
 import { functions } from './functions';
 import { resources } from './resources';
+
+import type { AWS } from '@serverless/typescript';
 
 const serverlessConfiguration: AWS = {
   service: 'hamstore-demo',
@@ -35,16 +35,10 @@ const serverlessConfiguration: AWS = {
               { 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] },
               { 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] },
               {
-                'Fn::Join': [
-                  '/',
-                  [{ 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] }, 'index/*'],
-                ],
+                'Fn::Join': ['/', [{ 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] }, 'index/*']],
               },
               {
-                'Fn::Join': [
-                  '/',
-                  [{ 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] }, 'index/*'],
-                ],
+                'Fn::Join': ['/', [{ 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] }, 'index/*']],
               },
             ],
             Action: [

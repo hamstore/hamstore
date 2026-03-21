@@ -9,10 +9,11 @@ import {
   trainersEventStore,
   pikachuAppearedEvent,
 } from '@hamstore/demo-blueprint';
-import type { queueAsPromised } from 'fastq';
-import type { A } from 'ts-toolbelt';
 
 import { Task, InMemoryMessageQueueAdapter, TaskContext } from './adapter';
+
+import type { queueAsPromised } from 'fastq';
+import type { A } from 'ts-toolbelt';
 
 const messageQueue = new NotificationMessageQueue({
   messageQueueId: 'messageQueueId',
@@ -21,9 +22,7 @@ const messageQueue = new NotificationMessageQueue({
 
 type ExpectedMessage = MessageChannelMessage<typeof messageQueue>;
 
-const pikachuAppearedMessage: EventStoreNotificationMessage<
-  typeof pokemonsEventStore
-> = {
+const pikachuAppearedMessage: EventStoreNotificationMessage<typeof pokemonsEventStore> = {
   eventStoreId: 'POKEMONS',
   event: pikachuAppearedEvent,
 };
@@ -34,8 +33,7 @@ const context: TaskContext = {
   replay: false,
 };
 
-const sleep = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('in-memory message queue adapter', () => {
   describe('with constructor (typed)', () => {
@@ -125,10 +123,7 @@ describe('in-memory message queue adapter', () => {
 
       const assertQueueType: A.Equals<
         NonNullable<typeof inMemoryMessageQueueAdapter2.queue>,
-        queueAsPromised<
-          Task<EventStoreNotificationMessage<typeof pokemonsEventStore>>,
-          void
-        >
+        queueAsPromised<Task<EventStoreNotificationMessage<typeof pokemonsEventStore>>, void>
       > = 1;
       assertQueueType;
     });
@@ -137,10 +132,7 @@ describe('in-memory message queue adapter', () => {
       messageQueue.messageChannelAdapter = inMemoryMessageQueueAdapter;
       const mockNumberOfEventToPublish = 3;
       await messageQueue.publishMessages(
-        Array.from(
-          { length: mockNumberOfEventToPublish },
-          () => pikachuAppearedMessage,
-        ),
+        Array.from({ length: mockNumberOfEventToPublish }, () => pikachuAppearedMessage),
       );
 
       expect(worker2).toHaveBeenCalledTimes(mockNumberOfEventToPublish);
@@ -173,8 +165,7 @@ describe('in-memory message queue adapter', () => {
     });
 
     it('correctly instanciates a class and attach it', async () => {
-      const inMemoryMessageQueueAdapter =
-        InMemoryMessageQueueAdapter.attachTo(messageQueue);
+      const inMemoryMessageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(messageQueue);
 
       const assertQueueType: A.Equals<
         typeof inMemoryMessageQueueAdapter,
@@ -201,10 +192,9 @@ describe('in-memory message queue adapter', () => {
       });
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- for type checking
-      const inMemoryMessageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(
-        messageQueue,
-        { worker },
-      );
+      const inMemoryMessageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(messageQueue, {
+        worker,
+      });
 
       const assertQueueType: A.Equals<
         typeof inMemoryMessageQueueAdapter,
@@ -268,13 +258,10 @@ describe('in-memory message queue adapter', () => {
           const receivedDelay =
             (workerExecutionsDates[attempt] as Date).getTime() -
             (workerExecutionsDates[attempt - 1] as Date).getTime();
-          const expectedDelay =
-            retryDelayInMs * Math.pow(retryBackoffRate, attempt - 1);
+          const expectedDelay = retryDelayInMs * Math.pow(retryBackoffRate, attempt - 1);
 
           // Expect delay imprecision to be less than 5%
-          expect(
-            Math.abs((receivedDelay - expectedDelay) / expectedDelay),
-          ).toBeLessThan(0.05);
+          expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
         }
       },
       { timeout: testWaitTime + 1000 },

@@ -49,9 +49,9 @@ You can also instanciate one on its own, but notice the code duplication:
 import type { MessageBusMessage } from '@hamstore/core';
 import { InMemoryMessageBusAdapter } from '@hamstore/message-bus-adapter-in-memory';
 
-const messageBusAdapter = new InMemoryMessageBusAdapter<
-  MessageBusMessage<typeof appMessageBus>
->({ eventEmitter });
+const messageBusAdapter = new InMemoryMessageBusAdapter<MessageBusMessage<typeof appMessageBus>>({
+  eventEmitter,
+});
 
 appMessageBus.messageBusAdapter = messageBusAdapter;
 ```
@@ -77,13 +77,10 @@ messageBusAdapter.on({ eventStoreId: 'POKEMONS' }, async message => {
 });
 
 // 👇 Listen only to POKEMON_APPEARED created messages
-messageBusAdapter.on(
-  { eventStoreId: 'POKEMONS', eventType: 'POKEMON_APPEARED' },
-  async message => {
-    // 🙌 Correctly typed!
-    const { eventStoreId, event } = message;
-  },
-);
+messageBusAdapter.on({ eventStoreId: 'POKEMONS', eventType: 'POKEMON_APPEARED' }, async message => {
+  // 🙌 Correctly typed!
+  const { eventStoreId, event } = message;
+});
 
 // 👇 Include replayed events
 messageBusAdapter.on(
@@ -121,10 +118,7 @@ const logSomething = async () => {
 };
 
 messageBusAdapter.on({ eventStoreId: 'POKEMONS' }, logSomething);
-messageBusAdapter.on(
-  { eventStoreId: 'POKEMONS', eventType: 'POKEMON_APPEARED' },
-  logSomething,
-);
+messageBusAdapter.on({ eventStoreId: 'POKEMONS', eventType: 'POKEMON_APPEARED' }, logSomething);
 
 await appMessageBus.publishMessage(pokemonAppearedEvent);
 
@@ -151,9 +145,7 @@ const messageBusAdapter = InMemoryMessageBusAdapter.attachTo(appMessageBus, {
 });
 
 // 👇 Alternatively
-const messageBusAdapter = new InMemoryMessageBusAdapter<
-  MessageBusMessage<typeof appMessageBus>
->({
+const messageBusAdapter = new InMemoryMessageBusAdapter<MessageBusMessage<typeof appMessageBus>>({
   eventEmitter,
   retryAttempts: 3,
   retryDelayInMs: 10000,

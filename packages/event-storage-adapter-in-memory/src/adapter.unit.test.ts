@@ -1,6 +1,7 @@
+import { randomUUID } from 'crypto';
+
 /* eslint-disable max-lines */
 import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
-import { randomUUID } from 'crypto';
 import omit from 'lodash.omit';
 import MockDate from 'mockdate';
 
@@ -79,12 +80,9 @@ describe('in-memory storage adapter', () => {
         });
         MockDate.reset();
 
-        const allEvents = await eventStorageAdapter.getEvents(
-          aggregateIdMock1,
-          {
-            eventStoreId,
-          },
-        );
+        const allEvents = await eventStorageAdapter.getEvents(aggregateIdMock1, {
+          eventStoreId,
+        });
         // Check that the timestamp is added
         expect(allEvents).toStrictEqual({ events: [eventMock1, eventMock2] });
 
@@ -182,11 +180,10 @@ describe('in-memory storage adapter', () => {
           { eventStoreId },
         );
 
-        const { aggregateIds, nextPageToken } =
-          await eventStorageAdapter.listAggregateIds(
-            { eventStoreId },
-            { limit: 2 },
-          );
+        const { aggregateIds, nextPageToken } = await eventStorageAdapter.listAggregateIds(
+          { eventStoreId },
+          { limit: 2 },
+        );
 
         expect(aggregateIds).toStrictEqual([
           {
@@ -227,16 +224,15 @@ describe('in-memory storage adapter', () => {
       });
 
       it('applies lisAggregateIds options', async () => {
-        const { aggregateIds, nextPageToken } =
-          await eventStorageAdapter.listAggregateIds(
-            { eventStoreId },
-            {
-              limit: 1,
-              initialEventAfter: '2021-02-01T00:00:00.000Z',
-              initialEventBefore: '2023-02-01T00:00:00.000Z',
-              reverse: true,
-            },
-          );
+        const { aggregateIds, nextPageToken } = await eventStorageAdapter.listAggregateIds(
+          { eventStoreId },
+          {
+            limit: 1,
+            initialEventAfter: '2021-02-01T00:00:00.000Z',
+            initialEventBefore: '2023-02-01T00:00:00.000Z',
+            reverse: true,
+          },
+        );
 
         expect(aggregateIds).toStrictEqual([
           {
@@ -275,9 +271,7 @@ describe('in-memory storage adapter', () => {
       const eventStorageAdapter = new InMemoryEventStorageAdapter();
 
       it('groups events correctly', () => {
-        const groupedEvent = eventStorageAdapter.groupEvent(
-          omit(eventMock1, 'timestamp'),
-        );
+        const groupedEvent = eventStorageAdapter.groupEvent(omit(eventMock1, 'timestamp'));
 
         expect(groupedEvent).toBeInstanceOf(GroupedEvent);
         expect(groupedEvent).toMatchObject({
@@ -329,16 +323,14 @@ describe('in-memory storage adapter', () => {
         eventGroup: [{ event: eventMock1 }, { event: aggregate2EventMock }],
       });
 
-      const { events: eventsA } = await eventStorageAdapterA.getEvents(
-        aggregateIdMock1,
-        { eventStoreId },
-      );
+      const { events: eventsA } = await eventStorageAdapterA.getEvents(aggregateIdMock1, {
+        eventStoreId,
+      });
       expect(eventsA).toStrictEqual([eventMock1]);
 
-      const { events: eventsB } = await eventStorageAdapterB.getEvents(
-        aggregateIdMock2,
-        { eventStoreId },
-      );
+      const { events: eventsB } = await eventStorageAdapterB.getEvents(aggregateIdMock2, {
+        eventStoreId,
+      });
       expect(eventsB).toStrictEqual([aggregate2EventMock]);
     });
 
@@ -428,16 +420,14 @@ describe('in-memory storage adapter', () => {
       expect(pushEventSyncASpy).toHaveBeenCalledOnce();
       expect(pushEventSyncBSpy).toHaveBeenCalledOnce();
 
-      const { events: eventsA } = await eventStorageAdapterA.getEvents(
-        aggregateIdMock1,
-        { eventStoreId },
-      );
+      const { events: eventsA } = await eventStorageAdapterA.getEvents(aggregateIdMock1, {
+        eventStoreId,
+      });
       expect(eventsA).toStrictEqual([]);
 
-      const { events: eventsB } = await eventStorageAdapterB.getEvents(
-        aggregateIdMock2,
-        { eventStoreId },
-      );
+      const { events: eventsB } = await eventStorageAdapterB.getEvents(aggregateIdMock2, {
+        eventStoreId,
+      });
       expect(eventsB).toStrictEqual([]);
     });
   });

@@ -4,9 +4,7 @@ import { pokemonsEventStore } from './eventStore';
 
 export const pikachuId = 'pikachu-id';
 
-export const pikachuAppearedEvent: EventStoreEventDetails<
-  typeof pokemonsEventStore
-> = {
+export const pikachuAppearedEvent: EventStoreEventDetails<typeof pokemonsEventStore> = {
   aggregateId: pikachuId,
   version: 1,
   type: 'APPEARED',
@@ -20,9 +18,7 @@ export const pikachuAppearedEvent: EventStoreEventDetails<
   },
 };
 
-export const pikachuCaughtEvent: EventStoreEventDetails<
-  typeof pokemonsEventStore
-> = {
+export const pikachuCaughtEvent: EventStoreEventDetails<typeof pokemonsEventStore> = {
   aggregateId: pikachuId,
   version: 2,
   type: 'CAUGHT_BY_TRAINER',
@@ -32,17 +28,11 @@ export const pikachuCaughtEvent: EventStoreEventDetails<
   },
 };
 
-export const pikachuLevelledUpEvent: EventStoreEventDetails<
-  typeof pokemonsEventStore
-> = {
+export const pikachuLevelledUpEvent: EventStoreEventDetails<typeof pokemonsEventStore> = {
   aggregateId: pikachuId,
   version: 3,
   type: 'LEVELLED_UP',
   timestamp: '2024-01-01T00:00:00.000Z',
 };
 
-export const pikachuEvents = [
-  pikachuAppearedEvent,
-  pikachuCaughtEvent,
-  pikachuLevelledUpEvent,
-];
+export const pikachuEvents = [pikachuAppearedEvent, pikachuCaughtEvent, pikachuLevelledUpEvent];

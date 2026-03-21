@@ -1,11 +1,11 @@
+import { MessageBatch } from './messageBatch';
+
 import type {
   EventDetail,
   EventStore,
   EventStoreEventDetails,
   EventStoreNotificationMessage,
 } from '@hamstore/core';
-
-import { MessageBatch } from './messageBatch';
 
 export class EventBook<EVENT_STORE extends EventStore> {
   eventStore: EVENT_STORE;
@@ -16,9 +16,7 @@ export class EventBook<EVENT_STORE extends EventStore> {
     this.eventsByAggregateId = {};
   }
 
-  bookAggregateEvents = async (
-    aggregateIds: { aggregateId: string }[],
-  ): Promise<void> => {
+  bookAggregateEvents = async (aggregateIds: { aggregateId: string }[]): Promise<void> => {
     for (const { aggregateId } of aggregateIds) {
       const { events } = await this.eventStore.getEvents(aggregateId);
       this.eventsByAggregateId[aggregateId] = events;
@@ -39,8 +37,7 @@ export class EventBook<EVENT_STORE extends EventStore> {
 
       while (
         aggregateEvents[0] &&
-        (areAllAggregatesScanned ||
-          aggregateEvents[0].timestamp <= fetchedEventsCursor)
+        (areAllAggregatesScanned || aggregateEvents[0].timestamp <= fetchedEventsCursor)
       ) {
         eventsToPour.push(aggregateEvents.shift() as EventDetail);
       }

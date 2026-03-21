@@ -73,8 +73,7 @@ const pokemonsReducer: Reducer<PokemonAggregate, PokemonEventDetails> = (
   }
 };
 
-const myPikachuAggregate: PokemonAggregate =
-  myPikachuEvents.reduce(pokemonsReducer);
+const myPikachuAggregate: PokemonAggregate = myPikachuEvents.reduce(pokemonsReducer);
 ```
 
 :::info

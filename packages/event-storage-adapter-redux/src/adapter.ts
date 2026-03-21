@@ -6,19 +6,17 @@ import {
   PushEventOptions,
   Aggregate,
 } from '@hamstore/core';
-import type { EnhancedStore } from '@reduxjs/toolkit';
 
-import {
-  ReduxStoreEventAlreadyExistsError,
-  ReduxStateNotFoundError,
-} from '~/errors';
+import { ReduxStoreEventAlreadyExistsError, ReduxStateNotFoundError } from '~/errors';
 
-import type { EventStoreReduxState, EventStoresReduxState } from './types';
 import { getEventStoreSliceName } from './utils/getEventStoreSliceName';
 import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
+
+import type { EnhancedStore } from '@reduxjs/toolkit';
+import type { EventStoreReduxState, EventStoresReduxState } from './types';
 
 type ReduxGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,
@@ -46,9 +44,7 @@ const parseGroupedEvents = (
   })[];
   timestamp?: string;
 } => {
-  let timestampInfos:
-    | { timestamp: string; groupedEventIndex: number }
-    | undefined;
+  let timestampInfos: { timestamp: string; groupedEventIndex: number } | undefined;
   const groupedEvents: (ReduxGroupedEvent & {
     context: NonNullable<GroupedEvent['context']>;
   })[] = [];
@@ -64,10 +60,7 @@ const parseGroupedEvents = (
       throw new Error(`Event group event #${groupedEventIndex} misses context`);
     }
 
-    if (
-      groupedEvent.event.timestamp !== undefined &&
-      timestampInfos !== undefined
-    ) {
+    if (groupedEvent.event.timestamp !== undefined && timestampInfos !== undefined) {
       timestampInfos = {
         timestamp: groupedEvent.event.timestamp,
         groupedEventIndex,
@@ -95,9 +88,7 @@ const parseGroupedEvents = (
 
   return {
     groupedEvents,
-    ...(timestampInfos !== undefined
-      ? { timestamp: timestampInfos.timestamp }
-      : {}),
+    ...(timestampInfos !== undefined ? { timestamp: timestampInfos.timestamp } : {}),
   };
 };
 
@@ -130,9 +121,7 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
     this.eventStoreId = eventStoreId;
     this.eventStoreSliceName = getEventStoreSliceName({ eventStoreId, prefix });
 
-    this.getEventStoreState = (
-      eventStoreSliceName: string = this.eventStoreSliceName,
-    ) => {
+    this.getEventStoreState = (eventStoreSliceName: string = this.eventStoreSliceName) => {
       const eventStoreState = this.store.getState()[eventStoreSliceName];
 
       if (eventStoreState === undefined) {
@@ -174,8 +163,9 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
 
     this.pushEventGroup = async (options, ...groupedEventsInput) =>
       new Promise(resolve => {
-        const { groupedEvents, timestamp = new Date().toISOString() } =
-          parseGroupedEvents(...groupedEventsInput);
+        const { groupedEvents, timestamp = new Date().toISOString() } = parseGroupedEvents(
+          ...groupedEventsInput,
+        );
 
         const responses: { event: EventDetail }[] = [];
 
@@ -213,14 +203,9 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
         resolve({ eventGroup: responses });
       });
 
-    this.groupEvent = event =>
-      new GroupedEvent({ event, eventStorageAdapter: this });
+    this.groupEvent = event => new GroupedEvent({ event, eventStorageAdapter: this });
 
-    this.getEvents = (
-      aggregateId,
-      _,
-      { minVersion, maxVersion, reverse, limit } = {},
-    ) =>
+    this.getEvents = (aggregateId, _, { minVersion, maxVersion, reverse, limit } = {}) =>
       new Promise(resolve => {
         const eventStoreState = this.getEventStoreState();
 
@@ -245,42 +230,29 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
         resolve({ events });
       });
 
-    this.listAggregateIds = (
-      _,
-      { pageToken: inputPageToken, ...inputOptions } = {},
-    ) =>
+    this.listAggregateIds = (_, { pageToken: inputPageToken, ...inputOptions } = {}) =>
       new Promise(resolve => {
         const eventStoreState = this.getEventStoreState();
 
-        const {
-          limit,
-          initialEventAfter,
-          initialEventBefore,
-          reverse,
-          exclusiveStartKey,
-        } = parseAppliedListAggregateIdsOptions({
-          inputPageToken,
-          inputOptions,
-        });
+        const { limit, initialEventAfter, initialEventBefore, reverse, exclusiveStartKey } =
+          parseAppliedListAggregateIdsOptions({
+            inputPageToken,
+            inputOptions,
+          });
 
-        let aggregateIds = [...eventStoreState.aggregateIds].sort(
-          (aggregateA, aggregateB) =>
-            aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp
-              ? 1
-              : -1,
+        let aggregateIds = [...eventStoreState.aggregateIds].sort((aggregateA, aggregateB) =>
+          aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp ? 1 : -1,
         );
 
         if (initialEventAfter !== undefined) {
           aggregateIds = aggregateIds.filter(
-            ({ initialEventTimestamp }) =>
-              initialEventAfter <= initialEventTimestamp,
+            ({ initialEventTimestamp }) => initialEventAfter <= initialEventTimestamp,
           );
         }
 
         if (initialEventBefore !== undefined) {
           aggregateIds = aggregateIds.filter(
-            ({ initialEventTimestamp }) =>
-              initialEventTimestamp <= initialEventBefore,
+            ({ initialEventTimestamp }) => initialEventTimestamp <= initialEventBefore,
           );
         }
 
@@ -301,8 +273,7 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
           aggregateIds = aggregateIds.slice(0, limit);
         }
 
-        const hasNextPage =
-          limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
+        const hasNextPage = limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
 
         const parsedNextPageToken: ParsedPageToken = {
           limit,
@@ -314,9 +285,7 @@ export class ReduxEventStorageAdapter implements EventStorageAdapter {
 
         resolve({
           aggregateIds,
-          ...(hasNextPage
-            ? { nextPageToken: JSON.stringify(parsedNextPageToken) }
-            : {}),
+          ...(hasNextPage ? { nextPageToken: JSON.stringify(parsedNextPageToken) } : {}),
         });
       });
   }

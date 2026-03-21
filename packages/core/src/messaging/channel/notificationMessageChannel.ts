@@ -1,17 +1,15 @@
-import type { EventStore } from '~/eventStore/eventStore';
-import type { $Contravariant } from '~/utils';
-
-import type { EventStoreNotificationMessage } from '../generics';
 import {
   MessageChannelEventStoreNotFoundError,
   UndefinedMessageChannelAdapterError,
 } from './errors';
+
+import type { EventStore } from '~/eventStore/eventStore';
+import type { $Contravariant } from '~/utils';
+import type { EventStoreNotificationMessage } from '../generics';
 import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 
-export class NotificationMessageChannel<
-  EVENT_STORE extends EventStore = EventStore,
-> {
+export class NotificationMessageChannel<EVENT_STORE extends EventStore = EventStore> {
   // Mainly for type discrimination
   messageType: 'notification';
   messageChannelType: string;
@@ -90,10 +88,7 @@ export class NotificationMessageChannel<
       return eventStore;
     };
 
-    this.publishMessage = async (
-      notificationMessage,
-      { replay = false } = {},
-    ) => {
+    this.publishMessage = async (notificationMessage, { replay = false } = {}) => {
       const { eventStoreId } = notificationMessage;
       this.getEventStore(eventStoreId);
 
@@ -104,10 +99,7 @@ export class NotificationMessageChannel<
       });
     };
 
-    this.publishMessages = async (
-      notificationMessages,
-      { replay = false } = {},
-    ) => {
+    this.publishMessages = async (notificationMessages, { replay = false } = {}) => {
       for (const notificationMessage of notificationMessages) {
         const { eventStoreId } = notificationMessage;
         this.getEventStore(eventStoreId);

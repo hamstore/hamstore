@@ -1,10 +1,3 @@
-/* eslint-disable max-lines */
-import type {
-  Aggregate,
-  EventDetail,
-  PushEventOptions,
-  EventStorageAdapter,
-} from '@hamstore/core';
 import { GroupedEvent } from '@hamstore/core';
 
 import { InMemoryEventAlreadyExistsError } from './error';
@@ -12,6 +5,9 @@ import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
+
+/* eslint-disable max-lines */
+import type { Aggregate, EventDetail, PushEventOptions, EventStorageAdapter } from '@hamstore/core';
 
 type InMemoryGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,
@@ -39,9 +35,7 @@ const parseGroupedEvents = (
   })[];
   timestamp?: string;
 } => {
-  let timestampInfos:
-    | { timestamp: string; groupedEventIndex: number }
-    | undefined;
+  let timestampInfos: { timestamp: string; groupedEventIndex: number } | undefined;
   const groupedEvents: (InMemoryGroupedEvent & {
     context: NonNullable<InMemoryGroupedEvent['context']>;
   })[] = [];
@@ -57,10 +51,7 @@ const parseGroupedEvents = (
       throw new Error(`Event group event #${groupedEventIndex} misses context`);
     }
 
-    if (
-      groupedEvent.event.timestamp !== undefined &&
-      timestampInfos !== undefined
-    ) {
+    if (groupedEvent.event.timestamp !== undefined && timestampInfos !== undefined) {
       timestampInfos = {
         timestamp: groupedEvent.event.timestamp,
         groupedEventIndex,
@@ -88,22 +79,15 @@ const parseGroupedEvents = (
 
   return {
     groupedEvents,
-    ...(timestampInfos !== undefined
-      ? { timestamp: timestampInfos.timestamp }
-      : {}),
+    ...(timestampInfos !== undefined ? { timestamp: timestampInfos.timestamp } : {}),
   };
 };
 
-const getInitialEventTimestamp = (
-  aggregateId: string,
-  events: EventDetail[],
-) => {
+const getInitialEventTimestamp = (aggregateId: string, events: EventDetail[]) => {
   const initialEventTimestamp = events[0]?.timestamp;
 
   if (initialEventTimestamp === undefined) {
-    throw new Error(
-      `Unable to find initial timestamp for aggregate ${aggregateId}`,
-    );
+    throw new Error(`Unable to find initial timestamp for aggregate ${aggregateId}`);
   }
 
   return initialEventTimestamp;
@@ -177,8 +161,9 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
 
     this.pushEventGroup = async (options, ...groupedEventsInput) =>
       new Promise(resolve => {
-        const { groupedEvents, timestamp = new Date().toISOString() } =
-          parseGroupedEvents(...groupedEventsInput);
+        const { groupedEvents, timestamp = new Date().toISOString() } = parseGroupedEvents(
+          ...groupedEventsInput,
+        );
 
         const responses: { event: EventDetail }[] = [];
 
@@ -204,16 +189,12 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
                 const { aggregateId, version } = eventToRevert;
 
                 const revertedEvent =
-                  eventToRevertEventStorageAdapter.eventStore[
-                    aggregateId
-                  ]?.pop();
+                  eventToRevertEventStorageAdapter.eventStore[aggregateId]?.pop();
 
                 // Check that version is indeed last pushed event
                 if (revertedEvent?.version !== version) {
                   if (revertedEvent !== undefined) {
-                    eventToRevertEventStorageAdapter.eventStore[
-                      aggregateId
-                    ]?.push(revertedEvent);
+                    eventToRevertEventStorageAdapter.eventStore[aggregateId]?.push(revertedEvent);
                   }
 
                   throw new Error(
@@ -231,14 +212,9 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
         resolve({ eventGroup: responses });
       });
 
-    this.groupEvent = event =>
-      new GroupedEvent({ event, eventStorageAdapter: this });
+    this.groupEvent = event => new GroupedEvent({ event, eventStorageAdapter: this });
 
-    this.getEvents = (
-      aggregateId,
-      _,
-      { minVersion, maxVersion, reverse, limit } = {},
-    ) =>
+    this.getEvents = (aggregateId, _, { minVersion, maxVersion, reverse, limit } = {}) =>
       new Promise(resolve => {
         let events = [...(this.eventStore[aggregateId] ?? [])];
 
@@ -261,47 +237,32 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
         resolve({ events });
       });
 
-    this.listAggregateIds = (
-      _,
-      { pageToken: inputPageToken, ...inputOptions } = {},
-    ) =>
+    this.listAggregateIds = (_, { pageToken: inputPageToken, ...inputOptions } = {}) =>
       new Promise(resolve => {
-        const {
-          limit,
-          initialEventAfter,
-          initialEventBefore,
-          reverse,
-          exclusiveStartKey,
-        } = parseAppliedListAggregateIdsOptions({
-          inputPageToken,
-          inputOptions,
-        });
+        const { limit, initialEventAfter, initialEventBefore, reverse, exclusiveStartKey } =
+          parseAppliedListAggregateIdsOptions({
+            inputPageToken,
+            inputOptions,
+          });
 
         let aggregateIds = Object.entries(this.eventStore)
           .map(([aggregateId, aggregateEvents]) => ({
             aggregateId,
-            initialEventTimestamp: getInitialEventTimestamp(
-              aggregateId,
-              aggregateEvents,
-            ),
+            initialEventTimestamp: getInitialEventTimestamp(aggregateId, aggregateEvents),
           }))
           .sort((aggregateA, aggregateB) =>
-            aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp
-              ? 1
-              : -1,
+            aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp ? 1 : -1,
           );
 
         if (initialEventAfter !== undefined) {
           aggregateIds = aggregateIds.filter(
-            ({ initialEventTimestamp }) =>
-              initialEventTimestamp >= initialEventAfter,
+            ({ initialEventTimestamp }) => initialEventTimestamp >= initialEventAfter,
           );
         }
 
         if (initialEventBefore !== undefined) {
           aggregateIds = aggregateIds.filter(
-            ({ initialEventTimestamp }) =>
-              initialEventTimestamp <= initialEventBefore,
+            ({ initialEventTimestamp }) => initialEventTimestamp <= initialEventBefore,
           );
         }
 
@@ -322,8 +283,7 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
           aggregateIds = aggregateIds.slice(0, limit);
         }
 
-        const hasNextPage =
-          limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
+        const hasNextPage = limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
 
         const parsedNextPageToken: ParsedPageToken = {
           limit,
@@ -335,9 +295,7 @@ export class InMemoryEventStorageAdapter implements EventStorageAdapter {
 
         resolve({
           aggregateIds,
-          ...(hasNextPage
-            ? { nextPageToken: JSON.stringify(parsedNextPageToken) }
-            : {}),
+          ...(hasNextPage ? { nextPageToken: JSON.stringify(parsedNextPageToken) } : {}),
         });
       });
   }

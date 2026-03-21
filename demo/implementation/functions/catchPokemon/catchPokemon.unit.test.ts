@@ -7,15 +7,14 @@ import { pokemonsEventStore } from '~/libs/eventStores/pokemons';
 import { trainersEventStore } from '~/libs/eventStores/trainers';
 
 const pikachuId = 'pikachu1';
-const pikachuAppearedEvent: EventStoreEventDetails<typeof pokemonsEventStore> =
-  {
-    aggregateId: pikachuId,
-    version: 1,
-    type: 'APPEARED',
-    timestamp: '2021-01-01T00:00:00.000Z',
-    payload: { name: 'Pikachu', level: 42 },
-    metadata: { trigger: 'random' },
-  };
+const pikachuAppearedEvent: EventStoreEventDetails<typeof pokemonsEventStore> = {
+  aggregateId: pikachuId,
+  version: 1,
+  type: 'APPEARED',
+  timestamp: '2021-01-01T00:00:00.000Z',
+  payload: { name: 'Pikachu', level: 42 },
+  metadata: { trigger: 'random' },
+};
 
 const ashId = 'ash';
 const ashGameStartedEvent: EventStoreEventDetails<typeof trainersEventStore> = {
@@ -27,12 +26,8 @@ const ashGameStartedEvent: EventStoreEventDetails<typeof trainersEventStore> = {
 };
 
 describe('Commands - catchPokemon', () => {
-  const pokemonsEventStoreMock = mockEventStore(pokemonsEventStore, [
-    pikachuAppearedEvent,
-  ]);
-  const trainersEventStoreMock = mockEventStore(trainersEventStore, [
-    ashGameStartedEvent,
-  ]);
+  const pokemonsEventStoreMock = mockEventStore(pokemonsEventStore, [pikachuAppearedEvent]);
+  const trainersEventStoreMock = mockEventStore(trainersEventStore, [ashGameStartedEvent]);
 
   it('should catch a pokemon', async () => {
     const timestamp = '2022-01-01T00:00:00.000Z';
@@ -46,8 +41,7 @@ describe('Commands - catchPokemon', () => {
       [pokemonsEventStoreMock, trainersEventStoreMock],
     );
 
-    const { events: pikachuEvents } =
-      await pokemonsEventStoreMock.getEvents(pikachuId);
+    const { events: pikachuEvents } = await pokemonsEventStoreMock.getEvents(pikachuId);
     expect(pikachuEvents).toStrictEqual([
       pikachuAppearedEvent,
       {

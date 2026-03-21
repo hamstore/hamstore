@@ -22,11 +22,7 @@ export const startPokemonGameCommand = new JSONSchemaCommand({
     required: ['trainerId'],
     additionalProperties: false,
   } as const,
-  handler: async (
-    input,
-    eventStores,
-    { generateUuid }: { generateUuid: () => string },
-  ) => {
+  handler: async (input, eventStores, { generateUuid }: { generateUuid: () => string }) => {
     const { trainerName } = input;
     const [eventStore] = eventStores;
 

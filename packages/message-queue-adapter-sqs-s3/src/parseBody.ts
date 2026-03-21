@@ -4,7 +4,6 @@ import type {
   StateCarryingMessageQueue,
 } from '@hamstore/core';
 import type { SQSMessageQueueMessageBody } from '@hamstore/message-queue-adapter-sqs';
-
 import type { OversizedEntryDetail } from './message';
 
 export const parseBody = async <
@@ -23,16 +22,13 @@ export const parseBody = async <
     jsonParsedBody !== null &&
     'messageUrl' in jsonParsedBody
   ) {
-    const response = await _fetch(
-      (jsonParsedBody as OversizedEntryDetail).messageUrl,
-    );
+    const response = await _fetch((jsonParsedBody as OversizedEntryDetail).messageUrl);
 
     if (!response.ok) {
       throw new Error(response.statusText);
     }
 
-    const parsedBody =
-      (await response.json()) as SQSMessageQueueMessageBody<MESSAGE_QUEUE>;
+    const parsedBody = (await response.json()) as SQSMessageQueueMessageBody<MESSAGE_QUEUE>;
 
     return parsedBody;
   }

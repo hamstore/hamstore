@@ -17,13 +17,7 @@ import type {
 } from 'undici';
 
 declare global {
-  export const {
-    fetch,
-    FormData,
-    Headers,
-    Request,
-    Response,
-  }: typeof import('undici');
+  export const { fetch, FormData, Headers, Request, Response }: typeof import('undici');
 
   type FormData = _FormData;
   type Headers = _Headers;

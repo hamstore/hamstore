@@ -4,12 +4,7 @@ import type {
   EventStoreEventDetails,
   EventStoreAggregate,
 } from '~/eventStore';
-
-import type {
-  AggregateExistsMessage,
-  NotificationMessage,
-  StateCarryingMessage,
-} from './message';
+import type { AggregateExistsMessage, NotificationMessage, StateCarryingMessage } from './message';
 
 export type EventStoreAggregateExistsMessage<EVENT_STORES extends EventStore> =
   EVENT_STORES extends infer EVENT_STORE
@@ -21,10 +16,7 @@ export type EventStoreAggregateExistsMessage<EVENT_STORES extends EventStore> =
 export type EventStoreNotificationMessage<EVENT_STORES extends EventStore> =
   EVENT_STORES extends infer EVENT_STORE
     ? EVENT_STORE extends EventStore
-      ? NotificationMessage<
-          EventStoreId<EVENT_STORE>,
-          EventStoreEventDetails<EVENT_STORE>
-        >
+      ? NotificationMessage<EventStoreId<EVENT_STORE>, EventStoreEventDetails<EVENT_STORE>>
       : never
     : never;
 

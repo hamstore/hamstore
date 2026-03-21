@@ -1,7 +1,5 @@
 import { randomUUID } from 'crypto';
 
-import type { EventDetail } from '~/event/eventDetail';
-
 import {
   counterEventsMocks,
   counterEventStore,
@@ -12,6 +10,8 @@ import {
   pushEventMock,
   requiredEventStores,
 } from './command.fixtures.test';
+
+import type { EventDetail } from '~/event/eventDetail';
 
 getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
@@ -25,17 +25,11 @@ describe('command implementation', () => {
   ]);
 
   it('has correct properties', () => {
-    expect(new Set(Object.keys(incrementCounter))).toStrictEqual(
-      expectedProperties,
-    );
+    expect(new Set(Object.keys(incrementCounter))).toStrictEqual(expectedProperties);
 
     expect(
-      incrementCounter.requiredEventStores.map(
-        ({ eventStoreId }) => eventStoreId,
-      ),
-    ).toStrictEqual(
-      requiredEventStores.map(({ eventStoreId }) => eventStoreId),
-    );
+      incrementCounter.requiredEventStores.map(({ eventStoreId }) => eventStoreId),
+    ).toStrictEqual(requiredEventStores.map(({ eventStoreId }) => eventStoreId));
   });
 
   describe('onEventAlreadyExists retry behavior', () => {
@@ -69,11 +63,9 @@ describe('command implementation', () => {
         .mockImplementationOnce(throwEventAlreadyExistsError)
         .mockResolvedValue({ event: { counterId: '123' } });
 
-      await incrementCounter.handler(
-        { counterId: '123' },
-        [counterEventStore],
-        { generateUuid: randomUUID },
-      );
+      await incrementCounter.handler({ counterId: '123' }, [counterEventStore], {
+        generateUuid: randomUUID,
+      });
 
       expect(pushEventMock).toHaveBeenCalledTimes(3);
 

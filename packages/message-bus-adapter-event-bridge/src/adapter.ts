@@ -3,11 +3,6 @@ import {
   PutEventsCommand,
   PutEventsRequestEntry,
 } from '@aws-sdk/client-eventbridge';
-import type {
-  Message,
-  MessageChannelAdapter,
-  PublishMessageOptions,
-} from '@hamstore/core';
 import {
   __REPLAYED__,
   __AGGREGATE_EXISTS__,
@@ -15,6 +10,8 @@ import {
   isEventCarryingMessage,
 } from '@hamstore/core';
 import chunk from 'lodash.chunk';
+
+import type { Message, MessageChannelAdapter, PublishMessageOptions } from '@hamstore/core';
 
 export const EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE = 10;
 
@@ -41,10 +38,7 @@ export class EventBridgeMessageBusAdapter implements MessageChannelAdapter {
   eventBridgeClient: EventBridgeClient;
 
   getEventBusName: () => string;
-  formatMessage: (
-    message: Message,
-    options?: PublishMessageOptions,
-  ) => PutEventsRequestEntry;
+  formatMessage: (message: Message, options?: PublishMessageOptions) => PutEventsRequestEntry;
   publishFormattedMessage: (entry: PutEventsRequestEntry) => Promise<void>;
   publishFormattedMessages: (entries: PutEventsRequestEntry[]) => Promise<void>;
 
@@ -59,9 +53,7 @@ export class EventBridgeMessageBusAdapter implements MessageChannelAdapter {
     this.eventBridgeClient = eventBridgeClient;
 
     this.getEventBusName = () =>
-      typeof this.eventBusName === 'string'
-        ? this.eventBusName
-        : this.eventBusName();
+      typeof this.eventBusName === 'string' ? this.eventBusName : this.eventBusName();
 
     this.formatMessage = (message, options) => ({
       EventBusName: this.getEventBusName(),
@@ -74,24 +66,15 @@ export class EventBridgeMessageBusAdapter implements MessageChannelAdapter {
       this.publishFormattedMessage(this.formatMessage(message, options));
 
     this.publishFormattedMessage = async formattedMessage => {
-      await this.eventBridgeClient.send(
-        new PutEventsCommand({ Entries: [formattedMessage] }),
-      );
+      await this.eventBridgeClient.send(new PutEventsCommand({ Entries: [formattedMessage] }));
     };
 
     this.publishMessages = async (messages, options) =>
-      this.publishFormattedMessages(
-        messages.map(message => this.formatMessage(message, options)),
-      );
+      this.publishFormattedMessages(messages.map(message => this.formatMessage(message, options)));
 
     this.publishFormattedMessages = async entries => {
-      for (const entriesBatch of chunk(
-        entries,
-        EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE,
-      )) {
-        await this.eventBridgeClient.send(
-          new PutEventsCommand({ Entries: entriesBatch }),
-        );
+      for (const entriesBatch of chunk(entries, EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE)) {
+        await this.eventBridgeClient.send(new PutEventsCommand({ Entries: entriesBatch }));
       }
     };
   }

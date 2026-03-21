@@ -32,12 +32,7 @@ export type {
 } from './eventStore';
 export { ConnectedEventStore } from './connectedEventStore';
 export { Command, tuple } from './command/command';
-export type {
-  CommandId,
-  CommandInput,
-  CommandOutput,
-  CommandContext,
-} from './command/command';
+export type { CommandId, CommandInput, CommandOutput, CommandContext } from './command/command';
 export type { OnEventAlreadyExistsCallback } from './command/command';
 export type { $Contravariant } from './utils';
 export {

@@ -1,7 +1,7 @@
-import type { EventStore } from '~/eventStore/eventStore';
-
-import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 import { NotificationMessageChannel } from '../channel/notificationMessageChannel';
+
+import type { EventStore } from '~/eventStore/eventStore';
+import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 
 export class NotificationMessageQueue<
   EVENT_STORE extends EventStore = EventStore,

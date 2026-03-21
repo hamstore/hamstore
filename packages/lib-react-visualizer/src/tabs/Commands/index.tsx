@@ -1,9 +1,10 @@
-import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
-import type { EventStore } from '@hamstore/core';
 import { Stack } from '@mui/material';
 import React, { JSX } from 'react';
 
 import { CommandCard } from './CommandCard';
+
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 
 export const Commands = ({
   commands,

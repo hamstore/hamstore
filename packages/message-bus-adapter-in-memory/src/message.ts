@@ -4,18 +4,14 @@ import type {
   StateCarryingMessage,
 } from '@hamstore/core';
 
-type Prettify<OBJECTS extends Record<string, unknown>> =
-  OBJECTS extends infer OBJECT
-    ? {
-        [KEY in keyof OBJECT]: OBJECT[KEY];
-      }
-    : never;
+type Prettify<OBJECTS extends Record<string, unknown>> = OBJECTS extends infer OBJECT
+  ? {
+      [KEY in keyof OBJECT]: OBJECT[KEY];
+    }
+  : never;
 
 export type InMemoryMessageBusMessage<
-  MESSAGE extends
-    | AggregateExistsMessage
-    | NotificationMessage
-    | StateCarryingMessage =
+  MESSAGE extends AggregateExistsMessage | NotificationMessage | StateCarryingMessage =
     | AggregateExistsMessage
     | NotificationMessage
     | StateCarryingMessage,
@@ -36,9 +32,7 @@ export type InMemoryMessageBusMessage<
     : never
 >;
 
-export type Task<
-  MESSAGE extends InMemoryMessageBusMessage = InMemoryMessageBusMessage,
-> = {
+export type Task<MESSAGE extends InMemoryMessageBusMessage = InMemoryMessageBusMessage> = {
   message: MESSAGE;
   retryHandlerIndex?: number;
   attempt: number;

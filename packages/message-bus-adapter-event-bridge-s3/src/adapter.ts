@@ -1,22 +1,13 @@
-/* eslint-disable max-lines */
-import type {
-  EventBridgeClient,
-  PutEventsRequestEntry,
-} from '@aws-sdk/client-eventbridge';
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import { isEventCarryingMessage } from '@hamstore/core';
 import { EventBridgeMessageBusAdapter } from '@hamstore/message-bus-adapter-event-bridge';
 
-import {
-  getFormattedMessageSize,
-  PUT_EVENTS_ENTRIES_SIZE_LIMIT,
-} from './getFormattedMessageSize';
+import { getFormattedMessageSize, PUT_EVENTS_ENTRIES_SIZE_LIMIT } from './getFormattedMessageSize';
+
+/* eslint-disable max-lines */
+import type { EventBridgeClient, PutEventsRequestEntry } from '@aws-sdk/client-eventbridge';
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import type { OversizedEntryDetail } from './message';
 
 const EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE = 10;
@@ -62,9 +53,7 @@ export class EventBridgeS3MessageBusAdapter implements MessageChannelAdapter {
     this.s3PreSignatureExpirationInSec = s3PreSignatureExpirationInSec;
 
     this.getS3BucketName = () =>
-      typeof this.s3BucketName === 'string'
-        ? this.s3BucketName
-        : this.s3BucketName();
+      typeof this.s3BucketName === 'string' ? this.s3BucketName : this.s3BucketName();
 
     this.publishMessage = (message, options) =>
       this.publishFormattedMessage(
@@ -73,13 +62,8 @@ export class EventBridgeS3MessageBusAdapter implements MessageChannelAdapter {
       );
 
     this.publishFormattedMessage = async (formattedMessage, message) => {
-      if (
-        getFormattedMessageSize(formattedMessage) <=
-        PUT_EVENTS_ENTRIES_SIZE_LIMIT
-      ) {
-        return this.eventBridgeMessageBusAdapter.publishFormattedMessage(
-          formattedMessage,
-        );
+      if (getFormattedMessageSize(formattedMessage) <= PUT_EVENTS_ENTRIES_SIZE_LIMIT) {
+        return this.eventBridgeMessageBusAdapter.publishFormattedMessage(formattedMessage);
       }
 
       const { eventStoreId } = message;
@@ -87,10 +71,7 @@ export class EventBridgeS3MessageBusAdapter implements MessageChannelAdapter {
 
       if (isEventCarryingMessage(message)) {
         const { aggregateId, version } = message.event;
-        filePath.push(
-          aggregateId,
-          [new Date().toISOString(), String(version)].join('#'),
-        );
+        filePath.push(aggregateId, [new Date().toISOString(), String(version)].join('#'));
       } else {
         const { aggregateId } = message;
         filePath.push(aggregateId, new Date().toISOString());
@@ -136,21 +117,20 @@ export class EventBridgeS3MessageBusAdapter implements MessageChannelAdapter {
         formattedMessageSize: number;
       };
 
-      const formattedMessagesWithContext: FormattedMessageWithContext[] =
-        formattedMessages.map((formattedMessage, index) => ({
+      const formattedMessagesWithContext: FormattedMessageWithContext[] = formattedMessages.map(
+        (formattedMessage, index) => ({
           formattedMessage,
           formattedMessageSize: getFormattedMessageSize(formattedMessage),
           message: messages[index] as Message,
-        }));
+        }),
+      );
 
       formattedMessagesWithContext.sort(
-        ({ formattedMessageSize: sizeA }, { formattedMessageSize: sizeB }) =>
-          sizeA - sizeB,
+        ({ formattedMessageSize: sizeA }, { formattedMessageSize: sizeB }) => sizeA - sizeB,
       );
 
       const formattedMessageBatches: FormattedMessageWithContext[][] = [[]];
-      let currentBatch =
-        formattedMessageBatches[0] as FormattedMessageWithContext[];
+      let currentBatch = formattedMessageBatches[0] as FormattedMessageWithContext[];
       let currentBatchSize = 0;
 
       // NOTE: We could search for the largest fitting formattedMessage instead of doing a for loop
@@ -159,16 +139,13 @@ export class EventBridgeS3MessageBusAdapter implements MessageChannelAdapter {
 
         if (
           currentBatch.length < EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE &&
-          currentBatchSize + formattedMessageSize <=
-            PUT_EVENTS_ENTRIES_SIZE_LIMIT
+          currentBatchSize + formattedMessageSize <= PUT_EVENTS_ENTRIES_SIZE_LIMIT
         ) {
           currentBatch.push(formattedMessageWithContext);
           currentBatchSize += formattedMessageSize;
         } else {
           formattedMessageBatches.push([formattedMessageWithContext]);
-          currentBatch = formattedMessageBatches.at(
-            -1,
-          ) as FormattedMessageWithContext[];
+          currentBatch = formattedMessageBatches.at(-1) as FormattedMessageWithContext[];
           currentBatchSize = formattedMessageSize;
         }
       }

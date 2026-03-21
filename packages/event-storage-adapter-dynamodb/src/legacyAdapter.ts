@@ -9,12 +9,6 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import type {
-  Aggregate,
-  EventDetail,
-  PushEventOptions,
-  EventStorageAdapter,
-} from '@hamstore/core';
 import { GroupedEvent } from '@hamstore/core';
 
 import {
@@ -32,6 +26,8 @@ import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
+
+import type { Aggregate, EventDetail, PushEventOptions, EventStorageAdapter } from '@hamstore/core';
 
 type LegacyDynamoDBGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,
@@ -61,9 +57,7 @@ const parseGroupedEvents = (
   groupedEvents: [ParsedGroupedEvent, ...ParsedGroupedEvent[]];
   timestamp?: string;
 } => {
-  let timestampInfos:
-    | { timestamp: string; groupedEventIndex: number }
-    | undefined;
+  let timestampInfos: { timestamp: string; groupedEventIndex: number } | undefined;
   const groupedEvents: ParsedGroupedEvent[] = [];
 
   groupedEventsInput.forEach((groupedEvent, groupedEventIndex) => {
@@ -77,10 +71,7 @@ const parseGroupedEvents = (
       throw new Error(`Event group event #${groupedEventIndex} misses context`);
     }
 
-    if (
-      groupedEvent.event.timestamp !== undefined &&
-      timestampInfos !== undefined
-    ) {
+    if (groupedEvent.event.timestamp !== undefined && timestampInfos !== undefined) {
       timestampInfos = {
         timestamp: groupedEvent.event.timestamp,
         groupedEventIndex,
@@ -107,13 +98,8 @@ const parseGroupedEvents = (
   }
 
   return {
-    groupedEvents: groupedEvents as [
-      ParsedGroupedEvent,
-      ...ParsedGroupedEvent[],
-    ],
-    ...(timestampInfos !== undefined
-      ? { timestamp: timestampInfos.timestamp }
-      : {}),
+    groupedEvents: groupedEvents as [ParsedGroupedEvent, ...ParsedGroupedEvent[]],
+    ...(timestampInfos !== undefined ? { timestamp: timestampInfos.timestamp } : {}),
   };
 };
 
@@ -122,10 +108,7 @@ const parseGroupedEvents = (
  */
 export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
   getEvents: EventStorageAdapter['getEvents'];
-  getPushEventInput: (
-    eventDetail: EventDetail,
-    options: PushEventOptions,
-  ) => PutItemCommandInput;
+  getPushEventInput: (eventDetail: EventDetail, options: PushEventOptions) => PutItemCommandInput;
   pushEvent: EventStorageAdapter['pushEvent'];
   pushEventGroup: EventStorageAdapter['pushEventGroup'];
   groupEvent: EventStorageAdapter['groupEvent'];
@@ -149,11 +132,7 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
       typeof this.tableName === 'string' ? this.tableName : this.tableName();
 
     // eslint-disable-next-line complexity
-    this.getEvents = async (
-      aggregateId,
-      _,
-      { minVersion, maxVersion, reverse, limit } = {},
-    ) => {
+    this.getEvents = async (aggregateId, _, { minVersion, maxVersion, reverse, limit } = {}) => {
       const marshalledEvents: Record<string, AttributeValue>[] = [];
 
       const eventsQueryCommand = new QueryCommand({
@@ -185,13 +164,11 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
         ...(limit !== undefined ? { Limit: limit } : {}),
       });
 
-      let eventsQueryResult =
-        await this.dynamoDBClient.send(eventsQueryCommand);
+      let eventsQueryResult = await this.dynamoDBClient.send(eventsQueryCommand);
       marshalledEvents.push(...(eventsQueryResult.Items ?? []));
 
       while (eventsQueryResult.LastEvaluatedKey !== undefined) {
-        eventsQueryCommand.input.ExclusiveStartKey =
-          eventsQueryResult.LastEvaluatedKey;
+        eventsQueryCommand.input.ExclusiveStartKey = eventsQueryResult.LastEvaluatedKey;
         eventsQueryResult = await this.dynamoDBClient.send(eventsQueryCommand);
 
         marshalledEvents.push(...(eventsQueryResult.Items ?? []));
@@ -223,8 +200,7 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
     };
 
     this.getPushEventInput = (event, options) => {
-      const { aggregateId, version, type, timestamp, payload, metadata } =
-        event;
+      const { aggregateId, version, type, timestamp, payload, metadata } = event;
       const force = options.force ?? false;
 
       return {
@@ -255,19 +231,14 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
         timestamp: new Date().toISOString(),
         ...eventWithOptTimestamp,
       };
-      const putEventCommand = new PutItemCommand(
-        this.getPushEventInput(event, options),
-      );
+      const putEventCommand = new PutItemCommand(this.getPushEventInput(event, options));
 
       const { aggregateId, version } = event;
 
       try {
         await this.dynamoDBClient.send(putEventCommand);
       } catch (error) {
-        if (
-          error instanceof Error &&
-          isConditionalCheckFailedException(error)
-        ) {
+        if (error instanceof Error && isConditionalCheckFailedException(error)) {
           const { eventStoreId } = options;
 
           throw new DynamoDBEventAlreadyExistsError({
@@ -287,12 +258,12 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
      * @debt test "Add  unit test for pushEventGroup"
      */
     this.pushEventGroup = async (options, ...groupedEventsInput) => {
-      const { groupedEvents, timestamp = new Date().toISOString() } =
-        parseGroupedEvents(...groupedEventsInput);
+      const { groupedEvents, timestamp = new Date().toISOString() } = parseGroupedEvents(
+        ...groupedEventsInput,
+      );
 
       const [firstGroupedEvent] = groupedEvents;
-      const dynamodbClient =
-        firstGroupedEvent.eventStorageAdapter.dynamoDBClient;
+      const dynamodbClient = firstGroupedEvent.eventStorageAdapter.dynamoDBClient;
 
       try {
         await dynamodbClient.send(
@@ -327,14 +298,10 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
       };
     };
 
-    this.groupEvent = event =>
-      new GroupedEvent({ event, eventStorageAdapter: this });
+    this.groupEvent = event => new GroupedEvent({ event, eventStorageAdapter: this });
 
     // eslint-disable-next-line complexity
-    this.listAggregateIds = async (
-      _,
-      { pageToken: inputPageToken, ...inputOptions } = {},
-    ) => {
+    this.listAggregateIds = async (_, { pageToken: inputPageToken, ...inputOptions } = {}) => {
       const aggregateIdsQueryCommandInput: QueryCommandInput = {
         TableName: this.getTableName(),
         KeyConditionExpression: '#isInitialEvent = :true',
@@ -345,13 +312,8 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
         IndexName: EVENT_TABLE_INITIAL_EVENT_INDEX_NAME,
       };
 
-      const {
-        limit,
-        initialEventAfter,
-        initialEventBefore,
-        reverse,
-        exclusiveStartKey,
-      } = parseAppliedListAggregateIdsOptions({ inputPageToken, inputOptions });
+      const { limit, initialEventAfter, initialEventBefore, reverse, exclusiveStartKey } =
+        parseAppliedListAggregateIdsOptions({ inputPageToken, inputOptions });
 
       if (limit !== undefined) {
         aggregateIdsQueryCommandInput.Limit = limit;
@@ -396,12 +358,8 @@ export class LegacyDynamoDBEventStorageAdapter implements EventStorageAdapter {
         aggregateIdsQueryCommandInput.ExclusiveStartKey = exclusiveStartKey;
       }
 
-      const {
-        Items: marshalledInitialEvents = [],
-        LastEvaluatedKey: lastEvaluatedKey,
-      } = await this.dynamoDBClient.send(
-        new QueryCommand(aggregateIdsQueryCommandInput),
-      );
+      const { Items: marshalledInitialEvents = [], LastEvaluatedKey: lastEvaluatedKey } =
+        await this.dynamoDBClient.send(new QueryCommand(aggregateIdsQueryCommandInput));
 
       const parsedNextPageToken: ParsedPageToken = {
         limit,

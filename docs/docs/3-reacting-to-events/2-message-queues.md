@@ -68,8 +68,7 @@ import type {
 const appMessagesWorker = async ({ Records }: SQSMessageQueueMessage) => {
   for (const { body } of Records) {
     // 👇 Correctly typed!
-    const recordBody: SQSMessageQueueMessageBody<typeof appMessageQueue> =
-      JSON.parse(body);
+    const recordBody: SQSMessageQueueMessageBody<typeof appMessageQueue> = JSON.parse(body);
   }
 };
 ```

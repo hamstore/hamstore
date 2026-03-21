@@ -1,8 +1,4 @@
-import {
-  EventStore,
-  EventStoreNotificationMessage,
-  PublishMessageOptions,
-} from '@hamstore/core';
+import { EventStore, EventStoreNotificationMessage, PublishMessageOptions } from '@hamstore/core';
 
 import { getThrottle } from '~/utils/getThrottle';
 
@@ -16,9 +12,7 @@ export class MessagePourer<EVENT_STORE extends EventStore> {
     ) => Promise<void>;
   };
   pouredEventCount: number;
-  throttle: <RESPONSE>(
-    throttledFn: () => Promise<RESPONSE>,
-  ) => Promise<RESPONSE>;
+  throttle: <RESPONSE>(throttledFn: () => Promise<RESPONSE>) => Promise<RESPONSE>;
 
   constructor(
     messageChannel: {
@@ -39,9 +33,7 @@ export class MessagePourer<EVENT_STORE extends EventStore> {
     options: PublishMessageOptions = {},
   ): Promise<void> => {
     for (const message of messages) {
-      await this.throttle(() =>
-        this.messageChannel.publishMessage(message, options),
-      );
+      await this.throttle(() => this.messageChannel.publishMessage(message, options));
 
       this.pouredEventCount += 1;
     }

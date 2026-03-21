@@ -14,14 +14,7 @@ export default {
   options: {
     doNotFollow: {
       path: 'node_modules',
-      dependencyTypes: [
-        'npm',
-        'npm-dev',
-        'npm-optional',
-        'npm-peer',
-        'npm-bundled',
-        'npm-no-pkg',
-      ],
+      dependencyTypes: ['npm', 'npm-dev', 'npm-optional', 'npm-peer', 'npm-bundled', 'npm-no-pkg'],
     },
     moduleSystems: ['amd', 'cjs', 'es6', 'tsd'],
     tsPreCompilationDeps: true,
@@ -37,8 +30,7 @@ export default {
         collapsePattern: 'node_modules/[^/]+',
       },
       archi: {
-        collapsePattern:
-          '^(packages|src|lib|app|bin|test(s?)|spec(s?))/[^/]+|node_modules/[^/]+',
+        collapsePattern: '^(packages|src|lib|app|bin|test(s?)|spec(s?))/[^/]+|node_modules/[^/]+',
       },
     },
   },

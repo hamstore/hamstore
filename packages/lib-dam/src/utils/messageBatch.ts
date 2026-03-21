@@ -1,6 +1,6 @@
-import type { EventStore, EventStoreNotificationMessage } from '@hamstore/core';
-
 import { isBetween } from './isBetween';
+
+import type { EventStore, EventStoreNotificationMessage } from '@hamstore/core';
 
 export class MessageBatch<EVENT_STORE extends EventStore> {
   messages: EventStoreNotificationMessage<EVENT_STORE>[];
@@ -14,9 +14,7 @@ export class MessageBatch<EVENT_STORE extends EventStore> {
   };
 
   filterByTimestamp = ({ from, to }: { from?: string; to?: string }): void => {
-    this.messages = this.messages.filter(({ event }) =>
-      isBetween(event, { from, to }),
-    );
+    this.messages = this.messages.filter(({ event }) => isBetween(event, { from, to }));
   };
 
   sortByTimestamp = (): void => {

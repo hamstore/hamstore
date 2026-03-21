@@ -1,6 +1,5 @@
 import { vi } from 'vitest';
 
-import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import { EventStore } from '~/eventStore/eventStore';
 import {
   eventStorageAdapterMock,
@@ -17,6 +16,8 @@ import {
   pokemonsEventStoreWithStateCarryingMessageBus,
 } from './connectedEventStore.fixtures.test';
 import * as publishPushedEventModule from './publishPushedEvent';
+
+import type { EventStorageAdapter } from '~/eventStorageAdapter';
 
 const publishPushedEventMock = vi
   .spyOn(publishPushedEventModule, 'publishPushedEvent')
@@ -50,9 +51,7 @@ describe('ConnectedEventStore', () => {
     it('pushes the event and publishes the message in the message queue', async () => {
       pushEvent.mockResolvedValue({ event });
 
-      await pokemonsEventStoreWithNotificationMessageQueue.pushEvent(
-        eventInput,
-      );
+      await pokemonsEventStoreWithNotificationMessageQueue.pushEvent(eventInput);
 
       expect(pushEvent).toHaveBeenCalledOnce();
       expect(pushEvent).toHaveBeenCalledWith(eventInput, {});
@@ -79,10 +78,9 @@ describe('ConnectedEventStore', () => {
 
       pushEvent.mockResolvedValue({ event, nextAggregate: v2Aggregate });
 
-      await pokemonsEventStoreWithNotificationMessageQueue.pushEvent(
-        eventInput,
-        { prevAggregate: v1Aggregate },
-      );
+      await pokemonsEventStoreWithNotificationMessageQueue.pushEvent(eventInput, {
+        prevAggregate: v1Aggregate,
+      });
 
       expect(pushEvent).toHaveBeenCalledOnce();
       expect(pushEvent).toHaveBeenCalledWith(eventInput, {
@@ -106,29 +104,21 @@ describe('ConnectedEventStore', () => {
     };
 
     it('pushes new event group correctly to their respective bus/queues', async () => {
-      const prevPikachuAggregate = pokemonsEventStore.buildAggregate([
-        pikachuAppearedEvent,
-      ]);
+      const prevPikachuAggregate = pokemonsEventStore.buildAggregate([pikachuAppearedEvent]);
       const nextPikachuAggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
         pikachuCaughtEvent,
       ]);
 
       const eventGroup = [
-        pokemonsEventStoreWithStateCarryingMessageBus.groupEvent(
-          pikachuCaughtEvent,
-          { prevAggregate: prevPikachuAggregate },
-        ),
-        pokemonsEventStoreWithNotificationMessageQueue.groupEvent(
-          charizardLeveledUpEvent,
-        ),
+        pokemonsEventStoreWithStateCarryingMessageBus.groupEvent(pikachuCaughtEvent, {
+          prevAggregate: prevPikachuAggregate,
+        }),
+        pokemonsEventStoreWithNotificationMessageQueue.groupEvent(charizardLeveledUpEvent),
       ] as const;
 
       pushEventGroupMock.mockResolvedValue({
-        eventGroup: [
-          { event: pikachuCaughtEvent },
-          { event: charizardLeveledUpEvent },
-        ],
+        eventGroup: [{ event: pikachuCaughtEvent }, { event: charizardLeveledUpEvent }],
       });
 
       await EventStore.pushEventGroup(...eventGroup);
@@ -149,20 +139,16 @@ describe('ConnectedEventStore', () => {
     it('sets & gets the original event storage adapter', () => {
       pokemonsEventStoreWithNotificationMessageQueue.eventStorageAdapter =
         anotherEventStorageAdapterMock;
-      expect(
-        pokemonsEventStoreWithNotificationMessageQueue.eventStorageAdapter,
-      ).toBe(anotherEventStorageAdapterMock);
-      expect(pokemonsEventStore.eventStorageAdapter).toBe(
+      expect(pokemonsEventStoreWithNotificationMessageQueue.eventStorageAdapter).toBe(
         anotherEventStorageAdapterMock,
       );
+      expect(pokemonsEventStore.eventStorageAdapter).toBe(anotherEventStorageAdapterMock);
 
       pokemonsEventStore.eventStorageAdapter = eventStorageAdapterMock;
-      expect(
-        pokemonsEventStoreWithNotificationMessageQueue.eventStorageAdapter,
-      ).toBe(eventStorageAdapterMock);
-      expect(pokemonsEventStore.eventStorageAdapter).toBe(
+      expect(pokemonsEventStoreWithNotificationMessageQueue.eventStorageAdapter).toBe(
         eventStorageAdapterMock,
       );
+      expect(pokemonsEventStore.eventStorageAdapter).toBe(eventStorageAdapterMock);
     });
   });
 });

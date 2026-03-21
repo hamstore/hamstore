@@ -1,9 +1,5 @@
 /* eslint-disable max-lines */
-import {
-  NotificationMessage,
-  NotificationMessageQueue,
-  EventStoreId,
-} from '@hamstore/core';
+import { NotificationMessage, NotificationMessageQueue, EventStoreId } from '@hamstore/core';
 import {
   InMemoryMessageQueueAdapter,
   TaskContext,
@@ -25,6 +21,7 @@ import {
   arcanineId,
   arcanineEvents,
 } from '../fixtures.test';
+
 import { pourEventStoreCollectionEvents } from './pourEventStoreCollectionEvents';
 
 const messageQueue = new NotificationMessageQueue({
@@ -34,9 +31,7 @@ const messageQueue = new NotificationMessageQueue({
 
 let receivedMessages: {
   date: Date;
-  message: NotificationMessage<
-    EventStoreId<typeof pokemonEventStore | typeof trainerEventStore>
-  >;
+  message: NotificationMessage<EventStoreId<typeof pokemonEventStore | typeof trainerEventStore>>;
   context: TaskContext;
 }[] = [];
 
@@ -212,9 +207,7 @@ describe('pourEventStoreEvents', () => {
         (receivedMessages[index]?.date as Date).getTime();
 
       // Expect delay imprecision to be less than 5%
-      expect(
-        Math.abs((receivedDelay - expectedDelay) / expectedDelay),
-      ).toBeLessThan(0.05);
+      expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
     });
   });
 });

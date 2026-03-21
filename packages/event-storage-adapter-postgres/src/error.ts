@@ -1,10 +1,8 @@
-import type { EventAlreadyExistsError } from '@hamstore/core';
 import { eventAlreadyExistsErrorCode } from '@hamstore/core';
 
-export class PostgresEventAlreadyExistsError
-  extends Error
-  implements EventAlreadyExistsError
-{
+import type { EventAlreadyExistsError } from '@hamstore/core';
+
+export class PostgresEventAlreadyExistsError extends Error implements EventAlreadyExistsError {
   code: typeof eventAlreadyExistsErrorCode;
   eventStoreId?: string;
   aggregateId: string;

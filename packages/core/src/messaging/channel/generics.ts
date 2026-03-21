@@ -1,9 +1,4 @@
-import type {
-  EventStore,
-  EventStoreEventTypes,
-  EventStoreId,
-} from '~/eventStore';
-
+import type { EventStore, EventStoreEventTypes, EventStoreId } from '~/eventStore';
 import type {
   EventStoreAggregateExistsMessage,
   EventStoreNotificationMessage,
@@ -31,17 +26,11 @@ export type MessageChannelMessage<
     | StateCarryingMessageChannel
     | NotificationMessageChannel,
 > = MESSAGE_CHANNEL extends StateCarryingMessageChannel
-  ? EventStoreStateCarryingMessage<
-      MessageChannelSourceEventStores<MESSAGE_CHANNEL>
-    >
+  ? EventStoreStateCarryingMessage<MessageChannelSourceEventStores<MESSAGE_CHANNEL>>
   : MESSAGE_CHANNEL extends NotificationMessageChannel
-    ? EventStoreNotificationMessage<
-        MessageChannelSourceEventStores<MESSAGE_CHANNEL>
-      >
+    ? EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_CHANNEL>>
     : MESSAGE_CHANNEL extends AggregateExistsMessageChannel
-      ? EventStoreAggregateExistsMessage<
-          MessageChannelSourceEventStores<MESSAGE_CHANNEL>
-        >
+      ? EventStoreAggregateExistsMessage<MessageChannelSourceEventStores<MESSAGE_CHANNEL>>
       : never;
 
 export type MessageChannelSourceEventStoreIds<
@@ -56,11 +45,8 @@ export type MessageChannelSourceEventStoreIdTypes<
     | AggregateExistsMessageChannel
     | StateCarryingMessageChannel
     | NotificationMessageChannel,
-  EVENT_STORE_ID extends
-    MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL> = MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL>,
+  EVENT_STORE_ID extends MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL> =
+    MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL>,
 > = EventStoreEventTypes<
-  Extract<
-    MessageChannelSourceEventStores<MESSAGE_CHANNEL>,
-    { eventStoreId: EVENT_STORE_ID }
-  >
+  Extract<MessageChannelSourceEventStores<MESSAGE_CHANNEL>, { eventStoreId: EVENT_STORE_ID }>
 >[number]['type'];

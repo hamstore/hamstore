@@ -1,17 +1,15 @@
-import type { EventStore } from '~/eventStore/eventStore';
-import type { $Contravariant } from '~/utils';
-
-import type { EventStoreAggregateExistsMessage } from '../generics';
 import {
   MessageChannelEventStoreNotFoundError,
   UndefinedMessageChannelAdapterError,
 } from './errors';
+
+import type { EventStore } from '~/eventStore/eventStore';
+import type { $Contravariant } from '~/utils';
+import type { EventStoreAggregateExistsMessage } from '../generics';
 import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 
-export class AggregateExistsMessageChannel<
-  EVENT_STORE extends EventStore = EventStore,
-> {
+export class AggregateExistsMessageChannel<EVENT_STORE extends EventStore = EventStore> {
   // Mainly for type discrimination
   messageType: 'aggregateExists';
   messageChannelType: string;
@@ -90,10 +88,7 @@ export class AggregateExistsMessageChannel<
       return eventStore;
     };
 
-    this.publishMessage = async (
-      aggregateExistsMessage,
-      { replay = false } = {},
-    ) => {
+    this.publishMessage = async (aggregateExistsMessage, { replay = false } = {}) => {
       const { eventStoreId } = aggregateExistsMessage;
       this.getEventStore(eventStoreId);
 
@@ -104,10 +99,7 @@ export class AggregateExistsMessageChannel<
       });
     };
 
-    this.publishMessages = async (
-      aggregateExistsMessages,
-      { replay = false } = {},
-    ) => {
+    this.publishMessages = async (aggregateExistsMessages, { replay = false } = {}) => {
       for (const aggregateExistsMessage of aggregateExistsMessages) {
         const { eventStoreId } = aggregateExistsMessage;
         this.getEventStore(eventStoreId);

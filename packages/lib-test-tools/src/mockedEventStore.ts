@@ -14,19 +14,9 @@ export class MockedEventStore<
   EVENT_TYPES extends EventType[] = EventType[],
   EVENT_DETAIL extends EventDetail = EventTypeDetails<EVENT_TYPES>,
   $EVENT_DETAIL extends EventDetail = $Contravariant<EVENT_DETAIL, EventDetail>,
-  REDUCER extends Reducer<Aggregate, $EVENT_DETAIL> = Reducer<
-    Aggregate,
-    $EVENT_DETAIL
-  >,
+  REDUCER extends Reducer<Aggregate, $EVENT_DETAIL> = Reducer<Aggregate, $EVENT_DETAIL>,
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
-> extends EventStore<
-  EVENT_STORE_ID,
-  EVENT_TYPES,
-  EVENT_DETAIL,
-  $EVENT_DETAIL,
-  REDUCER,
-  AGGREGATE
-> {
+> extends EventStore<EVENT_STORE_ID, EVENT_TYPES, EVENT_DETAIL, $EVENT_DETAIL, REDUCER, AGGREGATE> {
   initialEvents: EVENT_DETAIL[];
   reset: () => void;
 

@@ -9,12 +9,8 @@ import {
   TaskContext,
 } from '@hamstore/message-queue-adapter-in-memory';
 
-import {
-  pokemonEventStore,
-  pokemonEvtStoreId,
-  pikachuId,
-  pikachuEvents,
-} from '../fixtures.test';
+import { pokemonEventStore, pokemonEvtStoreId, pikachuId, pikachuEvents } from '../fixtures.test';
+
 import { pourAggregateEvents } from './pourAggregateEvents';
 
 const messageQueue = new NotificationMessageQueue({
@@ -42,18 +38,15 @@ describe('pourAggregateEvents', () => {
   });
 
   it('pours event store aggregate ids in correct order', async () => {
-    const { pouredEventCount, firstPouredEvent, lastPouredEvent } =
-      await pourAggregateEvents({
-        eventStore: pokemonEventStore,
-        messageChannel: messageQueue,
-        aggregateId: pikachuId,
-      });
+    const { pouredEventCount, firstPouredEvent, lastPouredEvent } = await pourAggregateEvents({
+      eventStore: pokemonEventStore,
+      messageChannel: messageQueue,
+      aggregateId: pikachuId,
+    });
 
     expect(pouredEventCount).toStrictEqual(3);
     expect(firstPouredEvent).toStrictEqual(pikachuEvents[0]);
-    expect(lastPouredEvent).toStrictEqual(
-      pikachuEvents[pikachuEvents.length - 1],
-    );
+    expect(lastPouredEvent).toStrictEqual(pikachuEvents[pikachuEvents.length - 1]);
 
     expect(receivedMessages).toHaveLength(3);
     expect(receivedMessages[0]?.message).toStrictEqual({
@@ -72,16 +65,15 @@ describe('pourAggregateEvents', () => {
   });
 
   it('correctly applies from & to filters', async () => {
-    const { pouredEventCount, firstPouredEvent, lastPouredEvent } =
-      await pourAggregateEvents({
-        eventStore: pokemonEventStore,
-        messageChannel: messageQueue,
-        aggregateId: pikachuId,
-        filters: {
-          from: '2021-02-01T00:00:00.000Z',
-          to: '2023-06-01T00:00:00.000Z',
-        },
-      });
+    const { pouredEventCount, firstPouredEvent, lastPouredEvent } = await pourAggregateEvents({
+      eventStore: pokemonEventStore,
+      messageChannel: messageQueue,
+      aggregateId: pikachuId,
+      filters: {
+        from: '2021-02-01T00:00:00.000Z',
+        to: '2023-06-01T00:00:00.000Z',
+      },
+    });
 
     expect(pouredEventCount).toStrictEqual(1);
     expect(firstPouredEvent).toStrictEqual(pikachuEvents[1]);
@@ -135,9 +127,7 @@ describe('pourAggregateEvents', () => {
         (receivedMessages[index]?.date as Date).getTime();
 
       // Expect delay imprecision to be less than 5%
-      expect(
-        Math.abs((receivedDelay - expectedDelay) / expectedDelay),
-      ).toBeLessThan(0.05);
+      expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
     });
   });
 });

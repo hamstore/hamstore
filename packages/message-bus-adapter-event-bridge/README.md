@@ -43,9 +43,8 @@ const messageBusAdapter = new EventBridgeMessageBusAdapter({
 });
 
 const appMessageBus = new NotificationMessageBus({
-  ...
-  messageBusAdapter
-})
+  ...messageBusAdapter,
+});
 ```
 
 This will directly plug your MessageBus to EventBridge 🙌
@@ -127,9 +126,7 @@ On the listeners side, you can use the `EventBridgeMessageBusMessage` TS type to
 ```ts
 import type { EventBridgeMessageBusMessage } from '@hamstore/message-bus-adapter-event-bridge';
 
-const listener = async (
-  message: EventBridgeMessageBusMessage<typeof appMessageBus>,
-) => {
+const listener = async (message: EventBridgeMessageBusMessage<typeof appMessageBus>) => {
   // 🙌 Correctly typed!
   const { eventStoreId, event } = message.detail;
 };

@@ -1,3 +1,5 @@
+import { publishPushedEvent } from './publishPushedEvent';
+
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
@@ -17,17 +19,12 @@ import type {
 import type { EventStoreMessageChannel } from '~/messaging';
 import type { $Contravariant } from '~/utils';
 
-import { publishPushedEvent } from './publishPushedEvent';
-
 export class ConnectedEventStore<
   EVENT_STORE_ID extends string = string,
   EVENT_TYPES extends EventType[] = EventType[],
   EVENT_DETAIL extends EventDetail = EventTypeDetails<EVENT_TYPES>,
   $EVENT_DETAIL extends EventDetail = $Contravariant<EVENT_DETAIL, EventDetail>,
-  REDUCER extends Reducer<Aggregate, $EVENT_DETAIL> = Reducer<
-    Aggregate,
-    $EVENT_DETAIL
-  >,
+  REDUCER extends Reducer<Aggregate, $EVENT_DETAIL> = Reducer<Aggregate, $EVENT_DETAIL>,
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
   MESSAGE_CHANNEL extends Pick<
@@ -57,17 +54,15 @@ export class ConnectedEventStore<
     >,
     'publishMessage'
   >,
-> implements
-    EventStore<
-      EVENT_STORE_ID,
-      EVENT_TYPES,
-      EVENT_DETAIL,
-      $EVENT_DETAIL,
-      REDUCER,
-      AGGREGATE,
-      $AGGREGATE
-    >
-{
+> implements EventStore<
+  EVENT_STORE_ID,
+  EVENT_TYPES,
+  EVENT_DETAIL,
+  $EVENT_DETAIL,
+  REDUCER,
+  AGGREGATE,
+  $AGGREGATE
+> {
   _types?: {
     details: EVENT_DETAIL;
     aggregate: AGGREGATE;
@@ -80,10 +75,7 @@ export class ConnectedEventStore<
   pushEvent: EventPusher<EVENT_DETAIL, $EVENT_DETAIL, AGGREGATE, $AGGREGATE>;
   groupEvent: EventGrouper<EVENT_DETAIL, $EVENT_DETAIL, AGGREGATE, $AGGREGATE>;
   listAggregateIds: AggregateIdsLister;
-  buildAggregate: (
-    events: $EVENT_DETAIL[],
-    aggregate?: $AGGREGATE,
-  ) => AGGREGATE | undefined;
+  buildAggregate: (events: $EVENT_DETAIL[], aggregate?: $AGGREGATE) => AGGREGATE | undefined;
   getAggregate: AggregateGetter<EVENT_DETAIL, AGGREGATE>;
   getExistingAggregate: AggregateGetter<EVENT_DETAIL, AGGREGATE, true>;
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
@@ -143,9 +135,7 @@ export class ConnectedEventStore<
     this.messageChannel = messageChannel;
   }
 
-  set eventStorageAdapter(
-    eventStorageAdapter: EventStorageAdapter | undefined,
-  ) {
+  set eventStorageAdapter(eventStorageAdapter: EventStorageAdapter | undefined) {
     this.eventStore.eventStorageAdapter = eventStorageAdapter;
   }
 
@@ -153,9 +143,7 @@ export class ConnectedEventStore<
     return this.eventStore.eventStorageAdapter;
   }
 
-  set onEventPushed(
-    onEventPushed: OnEventPushed<$EVENT_DETAIL, $AGGREGATE> | undefined,
-  ) {
+  set onEventPushed(onEventPushed: OnEventPushed<$EVENT_DETAIL, $AGGREGATE> | undefined) {
     this.eventStore.onEventPushed = onEventPushed;
   }
 
