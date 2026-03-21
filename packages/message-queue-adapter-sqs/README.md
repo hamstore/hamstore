@@ -43,7 +43,7 @@ const messageQueueAdapter = new SQSMessageQueueAdapter({
 });
 
 const appMessageQueue = new NotificationMessageQueue({
-  ...
+  // ...
   messageQueueAdapter
 })
 ```
@@ -71,7 +71,7 @@ const message = {
     \"eventStoreId\": \"POKEMONS\",
     \"aggregateId\": \"123\",
   }',
-  ... // <= Other technical SQS properties
+  // ... // <= Other technical SQS properties
 }
 ```
 
@@ -85,10 +85,10 @@ const message = {
       \"version\": 1,
       \"type\": \"POKEMON_APPEARED\",
       \"timestamp\": ...
-      ...
+      // ...
     },
   }',
-  ...
+  // ...
 }
 ```
 
@@ -99,11 +99,11 @@ const message = {
     \"eventStoreId\": \"POKEMONS\",
     \"event\": {
       \"aggregateId\": \"123\",
-      ...
+      // ...
     },
     \"aggregate\": ...,
   }',
-  ...
+  // ...
 };
 ```
 
@@ -112,10 +112,10 @@ If your queue is of type FIFO, the `messageGroupId` and `messageDeduplicationId`
 ```ts
 // 👇 Fifo message
 const message = {
-  messageBody: ...,
+  messageBody: // ...,
   messageGroupId: "POKEMONS#123",
   messageDeduplicationId: "POKEMONS#123#1", // <= Or "POKEMONS#123" for AggregateExistsMessageQueues
-  ... // <= Other technical SQS properties
+  // ... // <= Other technical SQS properties
 };
 ```
 
@@ -128,7 +128,7 @@ const message = {
     \"eventStoreId\": \"POKEMONS\",
     \"event\": {
       \"aggregateId\": \"123\",
-      ...
+      // ...
     },
   }',
   messageAttributes: {
@@ -139,7 +139,7 @@ const message = {
       stringValue: '1',
     },
   },
-  ...
+  // ...
 };
 ```
 

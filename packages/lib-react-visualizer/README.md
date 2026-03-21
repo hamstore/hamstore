@@ -36,19 +36,19 @@ const MyPage = () =>
     eventStores={[
       eventStoreA,
       eventStoreB
-      ...
+      // ...
     ]}
     // 👇 `tuple` is only used for type inference
     commands={tuple(
       commandA,
       commandB
-      ...
+      // ...
     )}
     // 👇 Provide additional context arguments
     // (see https://github.com/hamstore/hamstore#--command)
     contextsByCommandId={{
       COMMAND_A_ID: [{ generateUuid: uuid }],
-      ...
+      // ...
     }}
   />
 ```
@@ -75,7 +75,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { UnthemedVisualizer } from '@hamstore/lib-react-visualizer';
 
 const customTheme = createTheme({
-  ...
+  // ...
 })
 
 const MyPage = () =>

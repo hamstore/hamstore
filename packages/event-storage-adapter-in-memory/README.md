@@ -34,13 +34,13 @@ const pokemonsEventStorageAdapter = new InMemoryEventStorageAdapter({
   initialEvents: [
     {
       aggregateId: '123',
-      ...
+      // ...
     },
   ],
 });
 
 const pokemonsEventStore = new EventStore({
-  ...
+  // ...
   eventStorageAdapter: pokemonsEventStorageAdapter,
 });
 ```

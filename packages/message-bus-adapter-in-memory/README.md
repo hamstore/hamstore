@@ -96,7 +96,7 @@ For more control, the callback has access to more context through its second arg
 
 ```ts
 messageBusAdapter.on(
-  ...,
+  // ...,
   async (message, context) => {
     const { eventStoreId, event } = message;
     const {

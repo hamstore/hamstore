@@ -52,11 +52,11 @@ const messageQueueAdapter = new SQSS3MessageQueueAdapter({
 const messageQueueAdapter = new SQSS3MessageQueueAdapter({
   queueUrl: () => process.env.MY_QUEUE_URL,
   s3BucketName: () => process.env.MY_BUCKET_NAME
-  ...
+  // ...
 });
 
 const appMessageQueue = new NotificationMessageQueue({
-  ...
+  // ...
   messageQueueAdapter
 })
 ```

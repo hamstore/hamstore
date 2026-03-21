@@ -91,7 +91,7 @@ messageQueueAdapter.worker = async (message, context) => {
     replay,
   } = context;
 
-  ...
+  // ...
 };
 ```
 

@@ -23,7 +23,7 @@ await appMessageQueue.publishMessage({
   eventStoreId: 'POKEMONS',
   event: {
     type: 'POKEMON_LEVELED_UP',
-    ...
+    // ...
   },
 });
 
@@ -39,7 +39,7 @@ await messageQueue.publishMessage(...);
 // ❌ Will throw an `UndefinedMessageChannelAdapterError`
 
 const messageQueue = new NotificationMessageQueue({
-  ...
+  // ...
   // 👇 Provide it in the constructor
   messageQueueAdapter: mySuperMessageQueueAdapter,
 });

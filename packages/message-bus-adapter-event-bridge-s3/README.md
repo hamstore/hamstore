@@ -52,11 +52,11 @@ const messageBusAdapter = new EventBridgeS3MessageBusAdapter({
 const messageBusAdapter = new EventBridgeS3MessageBusAdapter({
   eventBusName: () => process.env.MY_EVENT_BUS_NAME,
   s3BucketName: () => process.env.MY_BUCKET_NAME
-  ...
+  // ...
 });
 
 const appMessageBus = new NotificationMessageBus({
-  ...
+  // ...
   messageBusAdapter
 })
 ```

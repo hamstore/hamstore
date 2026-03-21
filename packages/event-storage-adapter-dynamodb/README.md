@@ -71,7 +71,7 @@ const pokemonsEventStorageAdapter =
   });
 
 const pokemonsEventStore = new EventStore({
-  ...
+  // ...
   eventStorageAdapter: pokemonsEventStorageAdapter,
 });
 ```
@@ -242,7 +242,7 @@ await EventStore.pushEventGroup(
   eventStoreA.groupEvent(eventA1),
   eventStoreA.groupEvent(eventA2),
   eventStoreB.groupEvent(eventB),
-  ...
+  // ...
 );
 ```
 
@@ -307,7 +307,7 @@ const pokemonsEventStorageAdapter = new DynamoDBEventStorageAdapter({
 });
 
 const pokemonsEventStore = new EventStore({
-  ...
+  // ...
   eventStorageAdapter: pokemonsEventStorageAdapter
 })
 ```
@@ -478,7 +478,7 @@ await EventStore.pushEventGroup(
   eventStoreA.groupEvent(eventA1),
   eventStoreA.groupEvent(eventA2),
   eventStoreB.groupEvent(eventB),
-  ...
+  // ...
 );
 ```
 

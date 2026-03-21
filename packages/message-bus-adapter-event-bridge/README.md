@@ -43,7 +43,7 @@ const messageBusAdapter = new EventBridgeMessageBusAdapter({
 });
 
 const appMessageBus = new NotificationMessageBus({
-  ...
+  // ...
   messageBusAdapter
 })
 ```
@@ -63,7 +63,7 @@ When publishing a message, its `eventStoreId` is used as the message `source` an
     "eventStoreId": "POKEMONS",
     "aggregateId": "123",
   },
-  ... // <= Other technical EventBridge properties
+  // ... // <= Other technical EventBridge properties
 }
 ```
 
@@ -78,11 +78,11 @@ When publishing a message, its `eventStoreId` is used as the message `source` an
       "aggregateId": "123",
       "version": 1,
       "type": "POKEMON_APPEARED",
-      "timestamp": ...
-      ...
+      "timestamp": // ...
+      // ...
     },
   },
-  ...
+  // ...
 }
 ```
 
@@ -95,11 +95,11 @@ When publishing a message, its `eventStoreId` is used as the message `source` an
     "eventStoreId": "POKEMONS",
     "event": {
       "aggregateId": "123",
-      ...
+      // ...
     },
     "aggregate": { ... } // <= aggregate
   },
-  ...
+  // ...
 }
 ```
 
@@ -115,10 +115,10 @@ If the `replay` option is set to `true` when publishing a notification or state-
     "event": {
       "aggregateId": "123",
       "type": "POKEMON_APPEARED", // <= event type still available
-      ...
+      // ...
     },
   },
-  ...
+  // ...
 }
 ```
 

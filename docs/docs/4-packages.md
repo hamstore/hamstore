@@ -18,7 +18,7 @@ describe('My awesome test', () => {
       aggregateId: 'pikachu1',
       version: 1,
       type: 'POKEMON_APPEARED',
-      ...
+      // ...
     },
   ]);
 
@@ -38,7 +38,7 @@ import { pourEventStoreEvents } from '@hamstore/lib-dam';
 
 const maintenanceMessageQueue = new NotificationMessageQueue({
   sourceEventStores: [pokemonEventStore],
-  ...
+  // ...
 });
 
 await pourEventStoreEvents({
