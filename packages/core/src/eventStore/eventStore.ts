@@ -29,14 +29,21 @@ export class EventStore<
   EVENT_DETAILS extends EventDetail = EventTypeDetails<EVENT_TYPES>,
   // cf https://devblogs.microsoft.com/typescript/announcing-typescript-4-7-rc/#optional-variance-annotations-for-type-parameters
   // EventStore is contravariant on its fns args: We have to type them as "any" so that EventStore implementations still extends the EventStore type
-  $EVENT_DETAILS extends EventDetail = $Contravariant<EVENT_DETAILS, EventDetail>,
-  REDUCER extends Reducer<Aggregate, $EVENT_DETAILS> = Reducer<Aggregate, $EVENT_DETAILS>,
+  $EVENT_DETAILS extends EventDetail = $Contravariant<
+    EVENT_DETAILS,
+    EventDetail
+  >,
+  REDUCER extends Reducer<Aggregate, $EVENT_DETAILS> = Reducer<
+    Aggregate,
+    $EVENT_DETAILS
+  >,
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
 > {
   static pushEventGroup: EventGroupPusher = async <
     GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]],
-    OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } = GroupedEvent,
+    OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } =
+      GroupedEvent,
   >(
     optionsOrGroupedEvent: OPTIONS_OR_GROUPED_EVENTS_HEAD,
     ..._groupedEvents: GROUPED_EVENTS
@@ -54,33 +61,39 @@ export class EventStore<
     const [groupedEventsHead] = groupedEvents;
 
     const { eventGroup: eventGroupWithoutAggregates } =
-      await groupedEventsHead.eventStorageAdapter.pushEventGroup(options, ...groupedEvents);
+      await groupedEventsHead.eventStorageAdapter.pushEventGroup(
+        options,
+        ...groupedEvents,
+      );
 
-    const eventGroupWithAggregates = eventGroupWithoutAggregates.map(({ event }, eventIndex) => {
-      const groupedEvent = groupedEvents[eventIndex];
+    const eventGroupWithAggregates = eventGroupWithoutAggregates.map(
+      ({ event }, eventIndex) => {
+        const groupedEvent = groupedEvents[eventIndex];
 
-      let nextAggregate: Aggregate | undefined = undefined;
-      const prevAggregate = groupedEvent?.prevAggregate;
+        let nextAggregate: Aggregate | undefined = undefined;
+        const prevAggregate = groupedEvent?.prevAggregate;
 
-      if (
-        (prevAggregate !== undefined || event.version === 1) &&
-        groupedEvent?.eventStore !== undefined
-      ) {
-        nextAggregate = groupedEvent.eventStore.reducer(prevAggregate, event);
-      }
+        if (
+          (prevAggregate !== undefined || event.version === 1) &&
+          groupedEvent?.eventStore !== undefined
+        ) {
+          nextAggregate = groupedEvent.eventStore.reducer(prevAggregate, event);
+        }
 
-      return {
-        event,
-        ...(nextAggregate !== undefined ? { nextAggregate } : {}),
-      };
-    });
+        return {
+          event,
+          ...(nextAggregate !== undefined ? { nextAggregate } : {}),
+        };
+      },
+    );
 
     await Promise.all(
       groupedEvents.map((groupedEvent, eventIndex) => {
         const eventStore = groupedEvent.eventStore;
         const pushEventResponse = eventGroupWithAggregates[eventIndex];
 
-        return pushEventResponse !== undefined && eventStore?.onEventPushed !== undefined
+        return pushEventResponse !== undefined &&
+          eventStore?.onEventPushed !== undefined
           ? eventStore.onEventPushed(pushEventResponse)
           : null;
       }),
@@ -88,7 +101,9 @@ export class EventStore<
 
     return { eventGroup: eventGroupWithAggregates } as {
       eventGroup: OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent
-        ? EventGroupPusherResponse<[OPTIONS_OR_GROUPED_EVENTS_HEAD, ...GROUPED_EVENTS]>
+        ? EventGroupPusherResponse<
+            [OPTIONS_OR_GROUPED_EVENTS_HEAD, ...GROUPED_EVENTS]
+          >
         : EventGroupPusherResponse<GROUPED_EVENTS>;
     };
   };
@@ -105,10 +120,18 @@ export class EventStore<
   getEvents: EventsGetter<EVENT_DETAILS>;
   pushEvent: EventPusher<EVENT_DETAILS, $EVENT_DETAILS, AGGREGATE, $AGGREGATE>;
   onEventPushed?: OnEventPushed<$EVENT_DETAILS, $AGGREGATE>;
-  groupEvent: EventGrouper<EVENT_DETAILS, $EVENT_DETAILS, AGGREGATE, $AGGREGATE>;
+  groupEvent: EventGrouper<
+    EVENT_DETAILS,
+    $EVENT_DETAILS,
+    AGGREGATE,
+    $AGGREGATE
+  >;
   listAggregateIds: AggregateIdsLister;
 
-  buildAggregate: (events: $EVENT_DETAILS[], aggregate?: $AGGREGATE) => AGGREGATE | undefined;
+  buildAggregate: (
+    events: $EVENT_DETAILS[],
+    aggregate?: $AGGREGATE,
+  ) => AGGREGATE | undefined;
 
   getAggregate: AggregateGetter<EVENT_DETAILS, AGGREGATE>;
   getExistingAggregate: AggregateGetter<EVENT_DETAILS, AGGREGATE, true>;
@@ -161,11 +184,17 @@ export class EventStore<
          */
       ) as Promise<{ events: EVENT_DETAILS[] }>;
 
-    this.pushEvent = async (eventDetail, { prevAggregate, force = false } = {}) => {
-      const { event } = (await this.getEventStorageAdapter().pushEvent(eventDetail, {
-        eventStoreId: this.eventStoreId,
-        force,
-      })) as { event: $EVENT_DETAILS };
+    this.pushEvent = async (
+      eventDetail,
+      { prevAggregate, force = false } = {},
+    ) => {
+      const { event } = (await this.getEventStorageAdapter().pushEvent(
+        eventDetail,
+        {
+          eventStoreId: this.eventStoreId,
+          force,
+        },
+      )) as { event: $EVENT_DETAILS };
 
       let nextAggregate: AGGREGATE | undefined = undefined;
       if (prevAggregate !== undefined || event.version === 1) {
@@ -190,10 +219,9 @@ export class EventStore<
     };
 
     this.groupEvent = (eventDetail, { prevAggregate } = {}) => {
-      const groupedEvent = this.getEventStorageAdapter().groupEvent(eventDetail) as GroupedEvent<
-        EVENT_DETAILS,
-        AGGREGATE
-      >;
+      const groupedEvent = this.getEventStorageAdapter().groupEvent(
+        eventDetail,
+      ) as GroupedEvent<EVENT_DETAILS, AGGREGATE>;
 
       groupedEvent.eventStore = this;
       groupedEvent.context = { eventStoreId: this.eventStoreId };
@@ -206,7 +234,10 @@ export class EventStore<
     };
 
     this.listAggregateIds = options =>
-      this.getEventStorageAdapter().listAggregateIds({ eventStoreId: this.eventStoreId }, options);
+      this.getEventStorageAdapter().listAggregateIds(
+        { eventStoreId: this.eventStoreId },
+        options,
+      );
 
     this.buildAggregate = (eventDetails, aggregate) =>
       eventDetails.reduce(this.reducer, aggregate) as AGGREGATE | undefined;
@@ -214,7 +245,10 @@ export class EventStore<
     this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
       const { events } = await this.getEvents(aggregateId, { maxVersion });
 
-      const aggregate = this.buildAggregate(events as unknown as $EVENT_DETAILS[], undefined);
+      const aggregate = this.buildAggregate(
+        events as unknown as $EVENT_DETAILS[],
+        undefined,
+      );
 
       const lastEvent = events[events.length - 1];
 
@@ -222,10 +256,8 @@ export class EventStore<
     };
 
     this.getExistingAggregate = async (aggregateId, options) => {
-      const { aggregate, lastEvent, ...restAggregate } = await this.getAggregate(
-        aggregateId,
-        options,
-      );
+      const { aggregate, lastEvent, ...restAggregate } =
+        await this.getAggregate(aggregateId, options);
 
       if (aggregate === undefined || lastEvent === undefined) {
         throw new AggregateNotFoundError({

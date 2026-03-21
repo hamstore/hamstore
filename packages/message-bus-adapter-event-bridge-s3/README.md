@@ -88,7 +88,9 @@ import {
   parseMessage,
 } from '@hamstore/message-bus-adapter-event-bridge-s3';
 
-const listener = async (message: EventBridgeS3MessageBusMessage<typeof appMessageBus>) => {
+const listener = async (
+  message: EventBridgeS3MessageBusMessage<typeof appMessageBus>,
+) => {
   // 🙌 Correctly typed!
   const { eventStoreId, event } = await parseMessage(message);
 };
@@ -104,7 +106,9 @@ import {
   parseMessage,
 } from '@hamstore/message-bus-adapter-event-bridge-s3';
 
-const listener = async (message: EventBridgeS3MessageBusMessage<typeof appMessageBus>) => {
+const listener = async (
+  message: EventBridgeS3MessageBusMessage<typeof appMessageBus>,
+) => {
   const { eventStoreId, event } = await parseMessage(message, { fetch });
 };
 ```

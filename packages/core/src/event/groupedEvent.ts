@@ -1,5 +1,8 @@
 import type { Aggregate } from '~/aggregate';
-import type { EventStorageAdapter, EventStoreContext } from '~/eventStorageAdapter';
+import type {
+  EventStorageAdapter,
+  EventStoreContext,
+} from '~/eventStorageAdapter';
 import type { EventStore } from '~/eventStore/eventStore';
 import type { EventDetail, OptionalTimestamp } from './eventDetail';
 

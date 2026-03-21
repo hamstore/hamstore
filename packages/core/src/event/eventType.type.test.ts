@@ -5,7 +5,10 @@ import type { A } from 'ts-toolbelt';
 // Payload, no metadata
 
 type CounterCreatedEventPayload = { startCount: number };
-const counterCreatedEvent = new EventType<'COUNTER_CREATED', CounterCreatedEventPayload>({
+const counterCreatedEvent = new EventType<
+  'COUNTER_CREATED',
+  CounterCreatedEventPayload
+>({
   type: 'COUNTER_CREATED',
 });
 
@@ -39,7 +42,11 @@ assertCounterIncrementedEventDetail;
 // No payload, metadata
 
 type CounterRemovedEventMetadata = { removedBy: string };
-const counterRemovedEvent = new EventType<'COUNTER_REMOVED', never, CounterRemovedEventMetadata>({
+const counterRemovedEvent = new EventType<
+  'COUNTER_REMOVED',
+  never,
+  CounterRemovedEventMetadata
+>({
   type: 'COUNTER_REMOVED',
 });
 
@@ -57,7 +64,11 @@ assertCounterRemovedEventDetail;
 
 // Event Details
 
-const eventTypes = [counterCreatedEvent, counterIncrementedEvent, counterRemovedEvent];
+const eventTypes = [
+  counterCreatedEvent,
+  counterIncrementedEvent,
+  counterRemovedEvent,
+];
 
 type CounterEventDetail = EventTypeDetails<typeof eventTypes>;
 const assertDetails: A.Equals<

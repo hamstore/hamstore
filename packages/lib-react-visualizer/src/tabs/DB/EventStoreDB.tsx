@@ -6,13 +6,21 @@ import { AggregateCard } from './AggregateCard';
 
 import type { EventStore } from '@hamstore/core';
 
-export const EventStoreDB = ({ eventStore }: { eventStore: EventStore }): JSX.Element => {
+export const EventStoreDB = ({
+  eventStore,
+}: {
+  eventStore: EventStore;
+}): JSX.Element => {
   const { aggregateIds } = useAggregateIds(eventStore);
 
   return (
     <Stack spacing={2}>
       {aggregateIds.map(({ aggregateId }) => (
-        <AggregateCard key={aggregateId} aggregateId={aggregateId} eventStore={eventStore} />
+        <AggregateCard
+          key={aggregateId}
+          aggregateId={aggregateId}
+          eventStore={eventStore}
+        />
       ))}
     </Stack>
   );

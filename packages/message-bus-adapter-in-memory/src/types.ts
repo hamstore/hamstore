@@ -26,15 +26,27 @@ export type TaskContext = {
 };
 
 export type InMemoryBusMessage<
-  MESSAGE_BUS extends AggregateExistsMessageBus | NotificationMessageBus | StateCarryingMessageBus,
-> = AggregateExistsMessageBus | NotificationMessageBus | StateCarryingMessageBus extends MESSAGE_BUS
+  MESSAGE_BUS extends
+    | AggregateExistsMessageBus
+    | NotificationMessageBus
+    | StateCarryingMessageBus,
+> =
+  | AggregateExistsMessageBus
+  | NotificationMessageBus
+  | StateCarryingMessageBus extends MESSAGE_BUS
   ? AggregateExistsMessage | StateCarryingMessage | NotificationMessage
   : MESSAGE_BUS extends StateCarryingMessageBus
-    ? EventStoreStateCarryingMessage<MessageChannelSourceEventStores<MESSAGE_BUS>>
+    ? EventStoreStateCarryingMessage<
+        MessageChannelSourceEventStores<MESSAGE_BUS>
+      >
     : MESSAGE_BUS extends NotificationMessageBus
-      ? EventStoreNotificationMessage<MessageChannelSourceEventStores<MESSAGE_BUS>>
+      ? EventStoreNotificationMessage<
+          MessageChannelSourceEventStores<MESSAGE_BUS>
+        >
       : MESSAGE_BUS extends AggregateExistsMessageBus
-        ? EventStoreAggregateExistsMessage<MessageChannelSourceEventStores<MESSAGE_BUS>>
+        ? EventStoreAggregateExistsMessage<
+            MessageChannelSourceEventStores<MESSAGE_BUS>
+          >
         : never;
 
 export type FilterPattern<

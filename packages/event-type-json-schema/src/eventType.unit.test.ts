@@ -41,7 +41,10 @@ describe('jsonSchemaEvent implementation', () => {
   it('has correct properties (no payload, no metadata)', () => {
     const simpleEventType = new JSONSchemaEventType({ type });
 
-    const assertExtends: A.Extends<typeof simpleEventType, JSONSchemaEventType> = 1;
+    const assertExtends: A.Extends<
+      typeof simpleEventType,
+      JSONSchemaEventType
+    > = 1;
     assertExtends;
 
     type SimpleEventTypeDetail = EventTypeDetail<typeof simpleEventType>;
@@ -56,7 +59,9 @@ describe('jsonSchemaEvent implementation', () => {
     > = 1;
     assertSimpleEventTypeDetail;
 
-    expect(new Set(Object.keys(simpleEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(simpleEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(simpleEventType.type).toStrictEqual(type);
     expect(simpleEventType.payloadSchema).toStrictEqual(undefined);
     expect(simpleEventType.metadataSchema).toStrictEqual(undefined);
@@ -68,7 +73,10 @@ describe('jsonSchemaEvent implementation', () => {
       payloadSchema,
     });
 
-    const assertExtends: A.Extends<typeof payloadEventType, JSONSchemaEventType> = 1;
+    const assertExtends: A.Extends<
+      typeof payloadEventType,
+      JSONSchemaEventType
+    > = 1;
     assertExtends;
 
     type PayloadEventTypeDetail = EventTypeDetail<typeof payloadEventType>;
@@ -84,7 +92,9 @@ describe('jsonSchemaEvent implementation', () => {
     > = 1;
     assertPayloadEventTypeDetail;
 
-    expect(new Set(Object.keys(payloadEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(payloadEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(payloadEventType.type).toStrictEqual(type);
     expect(payloadEventType.payloadSchema).toStrictEqual(payloadSchema);
     expect(payloadEventType.metadataSchema).toStrictEqual(undefined);
@@ -96,7 +106,10 @@ describe('jsonSchemaEvent implementation', () => {
       metadataSchema,
     });
 
-    const assertExtends: A.Extends<typeof metadataEventType, JSONSchemaEventType> = 1;
+    const assertExtends: A.Extends<
+      typeof metadataEventType,
+      JSONSchemaEventType
+    > = 1;
     assertExtends;
 
     type MetadataEventTypeDetail = EventTypeDetail<typeof metadataEventType>;
@@ -112,7 +125,9 @@ describe('jsonSchemaEvent implementation', () => {
     > = 1;
     assertMetadataEventTypeDetail;
 
-    expect(new Set(Object.keys(metadataEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(metadataEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(metadataEventType.type).toStrictEqual(type);
     expect(metadataEventType.payloadSchema).toStrictEqual(undefined);
     expect(metadataEventType.metadataSchema).toStrictEqual(metadataSchema);
@@ -125,7 +140,8 @@ describe('jsonSchemaEvent implementation', () => {
       metadataSchema,
     });
 
-    const assertExtends: A.Extends<typeof fullEventType, JSONSchemaEventType> = 1;
+    const assertExtends: A.Extends<typeof fullEventType, JSONSchemaEventType> =
+      1;
     assertExtends;
 
     type FullEventTypeDetail = EventTypeDetail<typeof fullEventType>;
@@ -142,7 +158,9 @@ describe('jsonSchemaEvent implementation', () => {
     > = 1;
     assertFullEventTypeDetail;
 
-    expect(new Set(Object.keys(fullEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(fullEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(fullEventType.type).toStrictEqual(type);
     expect(fullEventType.payloadSchema).toStrictEqual(payloadSchema);
     expect(fullEventType.metadataSchema).toStrictEqual(metadataSchema);

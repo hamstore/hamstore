@@ -22,16 +22,28 @@ type Output = z.infer<typeof outputSchema>;
 const assertZodCommandExtendsCommand: A.Extends<ZodCommand, Command> = 1;
 assertZodCommandExtendsCommand;
 
-const assertCreateCounterExtendsZodCommand: A.Extends<typeof createCounter, ZodCommand> = 1;
+const assertCreateCounterExtendsZodCommand: A.Extends<
+  typeof createCounter,
+  ZodCommand
+> = 1;
 assertCreateCounterExtendsZodCommand;
 
-const assertCreateCounterExtendsCommand: A.Extends<typeof createCounter, Command> = 1;
+const assertCreateCounterExtendsCommand: A.Extends<
+  typeof createCounter,
+  Command
+> = 1;
 assertCreateCounterExtendsCommand;
 
-const assertIncrementCounterExtendsZodCommand: A.Extends<typeof incrementCounter, ZodCommand> = 1;
+const assertIncrementCounterExtendsZodCommand: A.Extends<
+  typeof incrementCounter,
+  ZodCommand
+> = 1;
 assertIncrementCounterExtendsZodCommand;
 
-const assertIncrementCounterExtendsCommand: A.Extends<typeof incrementCounter, Command> = 1;
+const assertIncrementCounterExtendsCommand: A.Extends<
+  typeof incrementCounter,
+  Command
+> = 1;
 assertIncrementCounterExtendsCommand;
 
 const assertIncrementCounterNoOutputExtendsZodCommand: A.Extends<
@@ -46,10 +58,16 @@ const assertIncrementCounterNoOutputExtendsCommand: A.Extends<
 > = 1;
 assertIncrementCounterNoOutputExtendsCommand;
 
-const assertIncrementCounterAExtendsZodCommand: A.Extends<typeof incrementCounterA, ZodCommand> = 1;
+const assertIncrementCounterAExtendsZodCommand: A.Extends<
+  typeof incrementCounterA,
+  ZodCommand
+> = 1;
 assertIncrementCounterAExtendsZodCommand;
 
-const assertIncrementCounterAExtendsCommand: A.Extends<typeof incrementCounterA, Command> = 1;
+const assertIncrementCounterAExtendsCommand: A.Extends<
+  typeof incrementCounterA,
+  Command
+> = 1;
 assertIncrementCounterAExtendsCommand;
 
 const assertIncrementCounterANoOutputExtendsZodCommand: A.Extends<
@@ -117,13 +135,19 @@ assertCreateCounterHandler;
 
 const assertIncrementCounterHandler: A.Equals<
   typeof incrementCounter.handler,
-  (input: Input, requiredEventStores: [typeof counterEventStore]) => Promise<Output>
+  (
+    input: Input,
+    requiredEventStores: [typeof counterEventStore],
+  ) => Promise<Output>
 > = 1;
 assertIncrementCounterHandler;
 
 const assertIncrementCounterNoOutputHandler: A.Equals<
   typeof incrementCounterNoOutput.handler,
-  (input: Input, requiredEventStores: [typeof counterEventStore]) => Promise<void>
+  (
+    input: Input,
+    requiredEventStores: [typeof counterEventStore],
+  ) => Promise<void>
 > = 1;
 assertIncrementCounterNoOutputHandler;
 

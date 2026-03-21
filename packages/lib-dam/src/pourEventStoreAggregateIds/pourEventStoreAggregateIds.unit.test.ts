@@ -47,11 +47,14 @@ describe('pourEventStoreAggregateIds', () => {
   });
 
   it('pours event store aggregate ids in correct order', async () => {
-    const { pouredAggregateIdCount, firstScannedAggregate, lastScannedAggregate } =
-      await pourEventStoreAggregateIds({
-        eventStore: pokemonEventStore,
-        messageChannel: messageQueue,
-      });
+    const {
+      pouredAggregateIdCount,
+      firstScannedAggregate,
+      lastScannedAggregate,
+    } = await pourEventStoreAggregateIds({
+      eventStore: pokemonEventStore,
+      messageChannel: messageQueue,
+    });
 
     expect(pouredAggregateIdCount).toStrictEqual(3);
     expect(firstScannedAggregate).toStrictEqual({
@@ -93,7 +96,10 @@ describe('pourEventStoreAggregateIds', () => {
       reverse: true,
     };
 
-    const listAggregateIdsMock = vi.spyOn(pokemonEventStore, 'listAggregateIds');
+    const listAggregateIdsMock = vi.spyOn(
+      pokemonEventStore,
+      'listAggregateIds',
+    );
 
     await pourEventStoreAggregateIds({
       eventStore: pokemonEventStore,
@@ -124,7 +130,9 @@ describe('pourEventStoreAggregateIds', () => {
         (receivedMessages[index]?.date as Date).getTime();
 
       // Expect delay imprecision to be less than 5%
-      expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
+      expect(
+        Math.abs((receivedDelay - expectedDelay) / expectedDelay),
+      ).toBeLessThan(0.05);
     });
   });
 });

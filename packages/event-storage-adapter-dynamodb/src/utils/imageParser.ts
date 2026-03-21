@@ -1,7 +1,14 @@
-import { unmarshall, unmarshallOptions as UnmarshallOptions } from '@aws-sdk/util-dynamodb';
+import {
+  unmarshall,
+  unmarshallOptions as UnmarshallOptions,
+} from '@aws-sdk/util-dynamodb';
 
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
-import type { EventDetail, EventStore, EventStoreNotificationMessage } from '@hamstore/core';
+import type {
+  EventDetail,
+  EventStore,
+  EventStoreNotificationMessage,
+} from '@hamstore/core';
 
 export class ImageParser<EVENT_STORES extends EventStore> {
   public sourceEventStores: EVENT_STORES[];
@@ -22,10 +29,9 @@ export class ImageParser<EVENT_STORES extends EventStore> {
     this.parseImage = (image, unmarshallOptions = {}) => {
       const event = unmarshall(image, unmarshallOptions) as EventDetail;
       const prefixedAggregateId = event.aggregateId;
-      const [eventStoreId, ...splitAggregateId] = prefixedAggregateId.split('#') as [
-        string,
-        ...string[],
-      ];
+      const [eventStoreId, ...splitAggregateId] = prefixedAggregateId.split(
+        '#',
+      ) as [string, ...string[]];
 
       if (this.eventStoresById[eventStoreId] === undefined) {
         throw new Error(

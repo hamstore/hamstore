@@ -25,12 +25,16 @@ const messageBus = new NotificationMessageBus({
 
 type ExpectedMessage = MessageChannelMessage<typeof messageBus>;
 
-const pikachuAppearedMessage: EventStoreNotificationMessage<typeof pokemonsEventStore> = {
+const pikachuAppearedMessage: EventStoreNotificationMessage<
+  typeof pokemonsEventStore
+> = {
   eventStoreId: 'POKEMONS',
   event: pikachuAppearedEvent,
 };
 
-const pikachuCaughtMessage: EventStoreNotificationMessage<typeof pokemonsEventStore> = {
+const pikachuCaughtMessage: EventStoreNotificationMessage<
+  typeof pokemonsEventStore
+> = {
   eventStoreId: 'POKEMONS',
   event: pikachuCaughtEvent,
 };
@@ -41,7 +45,8 @@ const context: TaskContext = {
   replay: false,
 };
 
-const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, ms));
 
 describe('in-memory message queue adapter', () => {
   describe('with constructor (typed)', () => {
@@ -86,7 +91,10 @@ describe('in-memory message queue adapter', () => {
     });
 
     it('calls handler only if it has been set', async () => {
-      inMemoryMessageBusAdapter.on({ eventStoreId: 'POKEMONS', eventType: 'APPEARED' }, handler1);
+      inMemoryMessageBusAdapter.on(
+        { eventStoreId: 'POKEMONS', eventType: 'APPEARED' },
+        handler1,
+      );
 
       await inMemoryMessageBusAdapter.publishMessage(pikachuAppearedMessage);
       await inMemoryMessageBusAdapter.publishMessage(pikachuCaughtMessage);
@@ -121,7 +129,10 @@ describe('in-memory message queue adapter', () => {
       expect(handler1).not.toHaveBeenCalled();
       expect(handler2).not.toHaveBeenCalled();
 
-      inMemoryMessageBusAdapter.on({ eventStoreId: 'POKEMONS', onReplay: true }, handler1);
+      inMemoryMessageBusAdapter.on(
+        { eventStoreId: 'POKEMONS', onReplay: true },
+        handler1,
+      );
       inMemoryMessageBusAdapter.on(
         {
           eventStoreId: 'POKEMONS',
@@ -176,7 +187,10 @@ describe('in-memory message queue adapter', () => {
     it('calls the handlers as many times as the number of messages to publish', async () => {
       const mockNumberOfEventToPublish = 3;
       await inMemoryMessageBusAdapter.publishMessages(
-        Array.from({ length: mockNumberOfEventToPublish }, () => pikachuAppearedMessage),
+        Array.from(
+          { length: mockNumberOfEventToPublish },
+          () => pikachuAppearedMessage,
+        ),
       );
 
       expect(handler1).toHaveBeenCalledTimes(mockNumberOfEventToPublish);
@@ -198,9 +212,12 @@ describe('in-memory message queue adapter', () => {
     });
 
     it('correctly instanciates a class and attach it', async () => {
-      const inMemoryMessageBusAdapter = InMemoryMessageBusAdapter.attachTo(messageBus, {
-        eventEmitter: new EventEmitter(),
-      });
+      const inMemoryMessageBusAdapter = InMemoryMessageBusAdapter.attachTo(
+        messageBus,
+        {
+          eventEmitter: new EventEmitter(),
+        },
+      );
 
       expect(messageBus.messageChannelAdapter).toBe(inMemoryMessageBusAdapter);
 
@@ -256,12 +273,15 @@ describe('in-memory message queue adapter', () => {
     it(
       'successfully retries',
       async () => {
-        const inMemoryMessageBusAdapter = InMemoryMessageBusAdapter.attachTo(messageBus, {
-          eventEmitter: new EventEmitter(),
-          retryAttempts,
-          retryDelayInMs,
-          retryBackoffRate,
-        });
+        const inMemoryMessageBusAdapter = InMemoryMessageBusAdapter.attachTo(
+          messageBus,
+          {
+            eventEmitter: new EventEmitter(),
+            retryAttempts,
+            retryDelayInMs,
+            retryBackoffRate,
+          },
+        );
 
         inMemoryMessageBusAdapter.on({}, failingHandler);
         inMemoryMessageBusAdapter.on({}, succeedingHandler);
@@ -279,10 +299,13 @@ describe('in-memory message queue adapter', () => {
           const receivedDelay =
             (failingHandlerExecutionsDates[attempt] as Date).getTime() -
             (failingHandlerExecutionsDates[attempt - 1] as Date).getTime();
-          const expectedDelay = retryDelayInMs * Math.pow(retryBackoffRate, attempt - 1);
+          const expectedDelay =
+            retryDelayInMs * Math.pow(retryBackoffRate, attempt - 1);
 
           // Expect delay imprecision to be less than 5%
-          expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
+          expect(
+            Math.abs((receivedDelay - expectedDelay) / expectedDelay),
+          ).toBeLessThan(0.05);
         }
       },
       { timeout: testWaitTime + 1000 },

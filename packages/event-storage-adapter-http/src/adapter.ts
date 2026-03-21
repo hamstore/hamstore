@@ -77,8 +77,11 @@ export class HttpEventStorageAdapter implements EventStorageAdapter {
     };
 
     // We do not implement event groups in this adapter
-    this.groupEvent = event => new GroupedEvent({ event, eventStorageAdapter: this });
-    this.pushEvent = () => new Promise((_, reject) => reject('Not implemented yet'));
-    this.pushEventGroup = () => new Promise((_, reject) => reject('Not implemented yet'));
+    this.groupEvent = event =>
+      new GroupedEvent({ event, eventStorageAdapter: this });
+    this.pushEvent = () =>
+      new Promise((_, reject) => reject('Not implemented yet'));
+    this.pushEventGroup = () =>
+      new Promise((_, reject) => reject('Not implemented yet'));
   }
 }

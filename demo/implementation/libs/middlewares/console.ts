@@ -9,13 +9,21 @@ interface ApplyMiddlewaresOptions {
   inputSchema?: JSONSchema;
 }
 
-export type Handler<EVENT = unknown, RESPONSE = unknown, CONTEXT extends Context = Context> = (
+export type Handler<
+  EVENT = unknown,
+  RESPONSE = unknown,
+  CONTEXT extends Context = Context,
+> = (
   event: EVENT,
   context: CONTEXT,
   callback: Callback<RESPONSE>,
 ) => Promise<RESPONSE>;
 
-export const applyConsoleMiddleware = <EVENT, RESPONSE, CONTEXT extends Context>(
+export const applyConsoleMiddleware = <
+  EVENT,
+  RESPONSE,
+  CONTEXT extends Context,
+>(
   handler?: Handler<EVENT, RESPONSE, CONTEXT>,
   options: ApplyMiddlewaresOptions = {},
 ): MiddyfiedHandler<EVENT, RESPONSE, Error, CONTEXT> => {

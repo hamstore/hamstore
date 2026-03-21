@@ -187,7 +187,8 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     eventDetail: OptionalTimestamp<EventDetail>,
     options: PushEventOptions,
   ): Promise<{ event: EventDetail }> {
-    const { aggregateId, version, type, payload, metadata, timestamp } = eventDetail;
+    const { aggregateId, version, type, payload, metadata, timestamp } =
+      eventDetail;
     if (payload) {
       assertIsSerializableParameter(payload);
     }
@@ -237,7 +238,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     const res = await query.catch(err => {
       if (
         err.code === '23505' &&
-        err.message.includes(`${this._tableName}_aggregate_name_aggregate_id_version_key`)
+        err.message.includes(
+          `${this._tableName}_aggregate_name_aggregate_id_version_key`,
+        )
       ) {
         throw new PostgresEventAlreadyExistsError({
           eventStoreId: options.eventStoreId,
@@ -267,7 +270,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     const order = options?.reverse
       ? this._sql`ORDER BY version DESC`
       : this._sql`ORDER BY version ASC`;
-    const limit = options?.limit ? this._sql`LIMIT ${options.limit}` : this._sql``;
+    const limit = options?.limit
+      ? this._sql`LIMIT ${options.limit}`
+      : this._sql``;
     const minVersion = options?.minVersion
       ? this._sql`AND version >= ${options.minVersion}`
       : this._sql``;
@@ -315,7 +320,12 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     const results: { event: EventDetail }[] = [];
 
     const hasABadAdapter = allEvents.some(groupedEvent => {
-      if (!(groupedEvent.eventStorageAdapter instanceof PostgresEventStorageAdapter)) {
+      if (
+        !(
+          groupedEvent.eventStorageAdapter instanceof
+          PostgresEventStorageAdapter
+        )
+      ) {
         return true;
       }
 
@@ -323,16 +333,20 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     });
 
     if (hasABadAdapter) {
-      throw new Error('All events must be connected to a PostgresEventStorageAdapter');
+      throw new Error(
+        'All events must be connected to a PostgresEventStorageAdapter',
+      );
     }
 
     await this._sql.begin(async transaction => {
       for (const groupedEvent of allEvents) {
         const eventDetail = groupedEvent.event;
-        const { aggregateId, version, type, payload, metadata, timestamp } = eventDetail;
+        const { aggregateId, version, type, payload, metadata, timestamp } =
+          eventDetail;
 
         const aggregateName =
-          groupedEvent.eventStore?.eventStoreId ?? groupedEvent.context?.eventStoreId;
+          groupedEvent.eventStore?.eventStoreId ??
+          groupedEvent.context?.eventStoreId;
 
         if (!aggregateName) {
           throw new Error('Event store ID (Aggregate name) is required');
@@ -355,7 +369,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
             data = EXCLUDED.data,
             metadata = EXCLUDED.metadata,
             timestamp = ${
-              timestamp ? transaction`EXCLUDED.timestamp` : transaction`CURRENT_TIMESTAMP(3)`
+              timestamp
+                ? transaction`EXCLUDED.timestamp`
+                : transaction`CURRENT_TIMESTAMP(3)`
             }
         `;
 
@@ -389,7 +405,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
         const res = await query.catch(err => {
           if (
             err.code === '23505' &&
-            err.message.includes('event_aggregate_name_aggregate_id_version_key')
+            err.message.includes(
+              'event_aggregate_name_aggregate_id_version_key',
+            )
           ) {
             throw new PostgresEventAlreadyExistsError({
               eventStoreId: aggregateName,
@@ -417,7 +435,11 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     return new GroupedEvent({ event: eventDetail, eventStorageAdapter: this });
   }
 
-  private parseInputs({ inputOptions }: { inputOptions: ListAggregateIdsOptions | undefined }) {
+  private parseInputs({
+    inputOptions,
+  }: {
+    inputOptions: ListAggregateIdsOptions | undefined;
+  }) {
     let pageTokenParsed: ParsedPageToken = {};
 
     if (typeof inputOptions?.pageToken === 'string') {
@@ -431,8 +453,10 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
 
     return {
       limit: pageTokenParsed.limit ?? inputOptions?.limit,
-      initialEventAfter: pageTokenParsed.initialEventAfter ?? inputOptions?.initialEventAfter,
-      initialEventBefore: pageTokenParsed.initialEventBefore ?? inputOptions?.initialEventBefore,
+      initialEventAfter:
+        pageTokenParsed.initialEventAfter ?? inputOptions?.initialEventAfter,
+      initialEventBefore:
+        pageTokenParsed.initialEventBefore ?? inputOptions?.initialEventBefore,
       reverse: pageTokenParsed.reverse ?? inputOptions?.reverse,
       lastEvaluatedKey: pageTokenParsed.lastEvaluatedKey,
     };
@@ -442,10 +466,15 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     context: EventStoreContext,
     options?: ListAggregateIdsOptions,
   ): Promise<ListAggregateIdsOutput> {
-    const { limit, initialEventAfter, initialEventBefore, reverse, lastEvaluatedKey } =
-      this.parseInputs({
-        inputOptions: options,
-      });
+    const {
+      limit,
+      initialEventAfter,
+      initialEventBefore,
+      reverse,
+      lastEvaluatedKey,
+    } = this.parseInputs({
+      inputOptions: options,
+    });
 
     const limitFilter = limit ? this._sql`LIMIT ${limit}` : this._sql``;
     const orderFilter = reverse
@@ -462,7 +491,8 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
       if (lastEvaluatedKey?.initialEventTimestamp) {
         return reverse
           ? this._sql`AND timestamp < ${lastEvaluatedKey.initialEventTimestamp}`
-          : this._sql`AND timestamp > ${lastEvaluatedKey.initialEventTimestamp}`;
+          : this
+              ._sql`AND timestamp > ${lastEvaluatedKey.initialEventTimestamp}`;
       }
 
       return this._sql``;
@@ -472,7 +502,8 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
       if (lastEvaluatedKey?.initialEventTimestamp) {
         return reverse
           ? this._sql`AND timestamp < ${lastEvaluatedKey.initialEventTimestamp}`
-          : this._sql`AND timestamp > ${lastEvaluatedKey.initialEventTimestamp}`;
+          : this
+              ._sql`AND timestamp > ${lastEvaluatedKey.initialEventTimestamp}`;
       }
 
       return this._sql``;
@@ -500,7 +531,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
     `;
 
     const results = await query;
-    const remainingCount = results[0]?.remaining_count ? Number(results[0].remaining_count) : 0;
+    const remainingCount = results[0]?.remaining_count
+      ? Number(results[0].remaining_count)
+      : 0;
     const aggregateIds = results.map(({ aggregate_id, timestamp }) => ({
       aggregateId: aggregate_id as string,
       initialEventTimestamp: timestamp.toISOString(),
@@ -518,7 +551,9 @@ export class PostgresEventStorageAdapter implements EventStorageAdapter {
 
     return {
       aggregateIds,
-      ...(hasNextPage ? { nextPageToken: JSON.stringify(parsedNextPageToken) } : {}),
+      ...(hasNextPage
+        ? { nextPageToken: JSON.stringify(parsedNextPageToken) }
+        : {}),
     };
   }
 }

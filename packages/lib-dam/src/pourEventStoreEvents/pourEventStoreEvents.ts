@@ -28,7 +28,10 @@ export const pourEventStoreEvents = async <EVENT_STORE extends EventStore>({
   rateLimit,
 }: Props<EVENT_STORE>): Promise<{ pouredEventCount: number } & ScanInfos> => {
   const eventBook = new EventBook(eventStore);
-  const messagePourer = new MessagePourer<EVENT_STORE>(messageChannel, rateLimit);
+  const messagePourer = new MessagePourer<EVENT_STORE>(
+    messageChannel,
+    rateLimit,
+  );
 
   let pageToken: string | undefined;
   let fetchedEventsCursor: string | undefined = undefined;

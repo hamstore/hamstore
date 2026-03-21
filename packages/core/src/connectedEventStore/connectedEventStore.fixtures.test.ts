@@ -8,17 +8,13 @@ export const notificationMessageQueue = new NotificationMessageQueue({
   sourceEventStores: [pokemonsEventStore],
 });
 
-export const pokemonsEventStoreWithNotificationMessageQueue = new ConnectedEventStore(
-  pokemonsEventStore,
-  notificationMessageQueue,
-);
+export const pokemonsEventStoreWithNotificationMessageQueue =
+  new ConnectedEventStore(pokemonsEventStore, notificationMessageQueue);
 
 export const stateCarryingMessageBus = new StateCarryingMessageBus({
   messageBusId: 'stateCarryingMessageBus',
   sourceEventStores: [pokemonsEventStore],
 });
 
-export const pokemonsEventStoreWithStateCarryingMessageBus = new ConnectedEventStore(
-  pokemonsEventStore,
-  stateCarryingMessageBus,
-);
+export const pokemonsEventStoreWithStateCarryingMessageBus =
+  new ConnectedEventStore(pokemonsEventStore, stateCarryingMessageBus);

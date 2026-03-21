@@ -8,7 +8,9 @@ import {
 import { mockEventStore } from './mockEventStore';
 
 describe('mockEventStore', () => {
-  const mockedCounterEventStore = mockEventStore(pokemonsEventStore, [pikachuAppearedEvent]);
+  const mockedCounterEventStore = mockEventStore(pokemonsEventStore, [
+    pikachuAppearedEvent,
+  ]);
 
   it('does not mutate the original event store', () => {
     expect(pokemonsEventStore.eventStorageAdapter).toBeUndefined();

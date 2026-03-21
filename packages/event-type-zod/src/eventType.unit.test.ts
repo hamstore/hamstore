@@ -43,7 +43,9 @@ describe('zodEvent implementation', () => {
     > = 1;
     assertSimpleEventTypeDetail;
 
-    expect(new Set(Object.keys(simpleEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(simpleEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(simpleEventType.type).toStrictEqual(type);
     expect(simpleEventType.payloadSchema).toStrictEqual(undefined);
     expect(simpleEventType.metadataSchema).toStrictEqual(undefined);
@@ -68,7 +70,9 @@ describe('zodEvent implementation', () => {
     > = 1;
     assertPayloadEventTypeDetail;
 
-    expect(new Set(Object.keys(payloadEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(payloadEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(payloadEventType.type).toStrictEqual(type);
     expect(payloadEventType.payloadSchema).toStrictEqual(payloadSchema);
     expect(payloadEventType.metadataSchema).toStrictEqual(undefined);
@@ -93,7 +97,9 @@ describe('zodEvent implementation', () => {
     > = 1;
     assertMetadataEventTypeDetail;
 
-    expect(new Set(Object.keys(metadataEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(metadataEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(metadataEventType.type).toStrictEqual(type);
     expect(metadataEventType.payloadSchema).toStrictEqual(undefined);
     expect(metadataEventType.metadataSchema).toStrictEqual(metadataSchema);
@@ -123,7 +129,9 @@ describe('zodEvent implementation', () => {
     > = 1;
     assertFullEventTypeDetail;
 
-    expect(new Set(Object.keys(fullEventType))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(fullEventType))).toStrictEqual(
+      expectedProperties,
+    );
     expect(fullEventType.type).toStrictEqual(type);
     expect(fullEventType.payloadSchema).toStrictEqual(payloadSchema);
     expect(fullEventType.metadataSchema).toStrictEqual(metadataSchema);

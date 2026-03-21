@@ -2,7 +2,11 @@ import { vi } from 'vitest';
 
 import { EventType, EventTypeDetail } from '~/event/eventType';
 import { EventStorageAdapter } from '~/eventStorageAdapter';
-import { eventAlreadyExistsErrorCode, EventAlreadyExistsError, EventStore } from '~/eventStore';
+import {
+  eventAlreadyExistsErrorCode,
+  EventAlreadyExistsError,
+  EventStore,
+} from '~/eventStore';
 
 import { tuple, Command } from './command';
 
@@ -47,20 +51,21 @@ export type CounterAggregate = {
 };
 
 export const counterIdMock = 'counterId';
-export const counterEventsMocks: [CounterEventsDetails, CounterEventsDetails] = [
-  {
-    aggregateId: counterIdMock,
-    version: 1,
-    type: 'COUNTER_CREATED',
-    timestamp: '2022',
-  },
-  {
-    aggregateId: counterIdMock,
-    version: 2,
-    type: 'COUNTER_INCREMENTED',
-    timestamp: '2023',
-  },
-];
+export const counterEventsMocks: [CounterEventsDetails, CounterEventsDetails] =
+  [
+    {
+      aggregateId: counterIdMock,
+      version: 1,
+      type: 'COUNTER_CREATED',
+      timestamp: '2022',
+    },
+    {
+      aggregateId: counterIdMock,
+      version: 2,
+      type: 'COUNTER_INCREMENTED',
+      timestamp: '2023',
+    },
+  ];
 
 export const countersReducer = (
   counterAggregate: CounterAggregate,
@@ -99,7 +104,11 @@ export const countersReducer = (
 
 export const counterEventStore = new EventStore({
   eventStoreId: 'Counters',
-  eventTypes: [counterCreatedEvent, counterIncrementedEvent, counterDeletedEvent],
+  eventTypes: [
+    counterCreatedEvent,
+    counterIncrementedEvent,
+    counterDeletedEvent,
+  ],
   reducer: countersReducer,
   eventStorageAdapter: eventStorageAdapterMock,
 });
@@ -145,7 +154,10 @@ export const incrementCounter = new Command({
   onEventAlreadyExists: onEventAlreadyExistsMock,
 });
 
-export class MockedEventAlreadyExistsError extends Error implements EventAlreadyExistsError {
+export class MockedEventAlreadyExistsError
+  extends Error
+  implements EventAlreadyExistsError
+{
   code: typeof eventAlreadyExistsErrorCode;
   eventStoreId?: string;
   aggregateId: string;

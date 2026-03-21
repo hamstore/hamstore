@@ -1,5 +1,11 @@
 import { ExpandMore } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Stack, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Stack,
+  Typography,
+} from '@mui/material';
 import validator from '@rjsf/validator-ajv8';
 import React, { JSX } from 'react';
 

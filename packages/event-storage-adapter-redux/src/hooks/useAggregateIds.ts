@@ -1,4 +1,8 @@
-import { EventStore, ListAggregateIdsOptions, ListAggregateIdsOutput } from '@hamstore/core';
+import {
+  EventStore,
+  ListAggregateIdsOptions,
+  ListAggregateIdsOutput,
+} from '@hamstore/core';
 import { useSelector } from 'react-redux';
 
 import { ReduxEventStorageAdapter } from '~/adapter';
@@ -15,38 +19,45 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
   eventStore: EVENT_STORE,
   { pageToken: inputPageToken, ...inputOptions }: ListAggregateIdsOptions = {},
 ): ListAggregateIdsOutput => {
-  const storeAggregateEntries = (useSelector<Record<string, EventStoreReduxState<EVENT_STORE>>>(
-    state => {
-      const eventStorageAdapter = eventStore.getEventStorageAdapter();
+  const storeAggregateEntries = (useSelector<
+    Record<string, EventStoreReduxState<EVENT_STORE>>
+  >(state => {
+    const eventStorageAdapter = eventStore.getEventStorageAdapter();
 
-      if (!(eventStorageAdapter instanceof ReduxEventStorageAdapter)) {
-        throw new ReduxEventStorageAdapterNotFoundError({
-          eventStoreId: eventStore.eventStoreId,
-        });
-      }
+    if (!(eventStorageAdapter instanceof ReduxEventStorageAdapter)) {
+      throw new ReduxEventStorageAdapterNotFoundError({
+        eventStoreId: eventStore.eventStoreId,
+      });
+    }
 
-      const eventStoreSliceName = eventStorageAdapter.eventStoreSliceName;
-      const eventStoreState = state[eventStoreSliceName];
+    const eventStoreSliceName = eventStorageAdapter.eventStoreSliceName;
+    const eventStoreState = state[eventStoreSliceName];
 
-      if (eventStoreState === undefined) {
-        throw new ReduxStateNotFoundError({ eventStoreSliceName });
-      }
+    if (eventStoreState === undefined) {
+      throw new ReduxStateNotFoundError({ eventStoreSliceName });
+    }
 
-      return eventStoreState.aggregateIds;
-    },
-  ) ?? []) as {
+    return eventStoreState.aggregateIds;
+  }) ?? []) as {
     aggregateId: string;
     initialEventTimestamp: string;
   }[];
 
-  const { limit, initialEventAfter, initialEventBefore, reverse, exclusiveStartKey } =
-    parseAppliedListAggregateIdsOptions({
-      inputPageToken,
-      inputOptions,
-    });
+  const {
+    limit,
+    initialEventAfter,
+    initialEventBefore,
+    reverse,
+    exclusiveStartKey,
+  } = parseAppliedListAggregateIdsOptions({
+    inputPageToken,
+    inputOptions,
+  });
 
   let aggregateIds = [...storeAggregateEntries].sort((aggregateA, aggregateB) =>
-    aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp ? 1 : -1,
+    aggregateA.initialEventTimestamp > aggregateB.initialEventTimestamp
+      ? 1
+      : -1,
   );
 
   if (initialEventAfter !== undefined) {
@@ -57,7 +68,8 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
 
   if (initialEventBefore !== undefined) {
     aggregateIds = aggregateIds.filter(
-      ({ initialEventTimestamp }) => initialEventTimestamp <= initialEventBefore,
+      ({ initialEventTimestamp }) =>
+        initialEventTimestamp <= initialEventBefore,
     );
   }
 
@@ -78,7 +90,8 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
     aggregateIds = aggregateIds.slice(0, limit);
   }
 
-  const hasNextPage = limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
+  const hasNextPage =
+    limit === undefined ? false : numberOfAggregateIdsBeforeLimit > limit;
 
   const parsedNextPageToken: ParsedPageToken = {
     limit,
@@ -90,6 +103,8 @@ export const useAggregateIds = <EVENT_STORE extends EventStore>(
 
   return {
     aggregateIds,
-    ...(hasNextPage ? { nextPageToken: JSON.stringify(parsedNextPageToken) } : {}),
+    ...(hasNextPage
+      ? { nextPageToken: JSON.stringify(parsedNextPageToken) }
+      : {}),
   };
 };

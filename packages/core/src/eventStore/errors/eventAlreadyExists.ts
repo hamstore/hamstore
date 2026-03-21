@@ -7,7 +7,9 @@ export interface EventAlreadyExistsError extends Error {
   version: number;
 }
 
-export const isEventAlreadyExistsError = (error: unknown): error is EventAlreadyExistsError =>
+export const isEventAlreadyExistsError = (
+  error: unknown,
+): error is EventAlreadyExistsError =>
   typeof error === 'object' &&
   error !== null &&
   'code' in error &&

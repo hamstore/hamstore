@@ -75,7 +75,9 @@ const AggregateIdsList = () => {
   // 🙌 Will synchronously return the store data, as well as hook the component to it
   const { aggregateIds } = useAggregateIds(pokemonsEventStore, { limit: 20 });
 
-  return aggregateIds.map(aggregateId => <Aggregate key={aggregateId} aggregateId={aggregateId} />);
+  return aggregateIds.map(aggregateId => (
+    <Aggregate key={aggregateId} aggregateId={aggregateId} />
+  ));
 };
 
 const Aggregate = ({ aggregateId }) => {

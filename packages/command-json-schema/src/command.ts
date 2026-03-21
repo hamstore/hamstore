@@ -1,11 +1,19 @@
-import { Command, EventStore, $Contravariant, OnEventAlreadyExistsCallback } from '@hamstore/core';
+import {
+  Command,
+  EventStore,
+  $Contravariant,
+  OnEventAlreadyExistsCallback,
+} from '@hamstore/core';
 
 import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export class JSONSchemaCommand<
   COMMAND_ID extends string = string,
   EVENT_STORES extends EventStore[] = EventStore[],
-  $EVENT_STORES extends EventStore[] = $Contravariant<EVENT_STORES, EventStore[]>,
+  $EVENT_STORES extends EventStore[] = $Contravariant<
+    EVENT_STORES,
+    EventStore[]
+  >,
   INPUT_SCHEMA extends JSONSchema | undefined = JSONSchema | undefined,
   INPUT = $Contravariant<
     INPUT_SCHEMA,
@@ -20,7 +28,14 @@ export class JSONSchemaCommand<
   >,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CONTEXT extends any[] = any[],
-> extends Command<COMMAND_ID, EVENT_STORES, $EVENT_STORES, INPUT, OUTPUT, CONTEXT> {
+> extends Command<
+  COMMAND_ID,
+  EVENT_STORES,
+  $EVENT_STORES,
+  INPUT,
+  OUTPUT,
+  CONTEXT
+> {
   inputSchema?: INPUT_SCHEMA;
   outputSchema?: OUTPUT_SCHEMA;
 
@@ -37,7 +52,11 @@ export class JSONSchemaCommand<
     requiredEventStores: EVENT_STORES;
     eventAlreadyExistsRetries?: number;
     onEventAlreadyExists?: OnEventAlreadyExistsCallback;
-    handler: (input: INPUT, eventStores: $EVENT_STORES, ...context: CONTEXT) => Promise<OUTPUT>;
+    handler: (
+      input: INPUT,
+      eventStores: $EVENT_STORES,
+      ...context: CONTEXT
+    ) => Promise<OUTPUT>;
     inputSchema?: INPUT_SCHEMA;
     outputSchema?: OUTPUT_SCHEMA;
   }) {

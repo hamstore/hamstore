@@ -25,11 +25,17 @@ describe('command implementation', () => {
   ]);
 
   it('has correct properties', () => {
-    expect(new Set(Object.keys(incrementCounter))).toStrictEqual(expectedProperties);
+    expect(new Set(Object.keys(incrementCounter))).toStrictEqual(
+      expectedProperties,
+    );
 
     expect(
-      incrementCounter.requiredEventStores.map(({ eventStoreId }) => eventStoreId),
-    ).toStrictEqual(requiredEventStores.map(({ eventStoreId }) => eventStoreId));
+      incrementCounter.requiredEventStores.map(
+        ({ eventStoreId }) => eventStoreId,
+      ),
+    ).toStrictEqual(
+      requiredEventStores.map(({ eventStoreId }) => eventStoreId),
+    );
   });
 
   describe('onEventAlreadyExists retry behavior', () => {
@@ -63,9 +69,13 @@ describe('command implementation', () => {
         .mockImplementationOnce(throwEventAlreadyExistsError)
         .mockResolvedValue({ event: { counterId: '123' } });
 
-      await incrementCounter.handler({ counterId: '123' }, [counterEventStore], {
-        generateUuid: randomUUID,
-      });
+      await incrementCounter.handler(
+        { counterId: '123' },
+        [counterEventStore],
+        {
+          generateUuid: randomUUID,
+        },
+      );
 
       expect(pushEventMock).toHaveBeenCalledTimes(3);
 

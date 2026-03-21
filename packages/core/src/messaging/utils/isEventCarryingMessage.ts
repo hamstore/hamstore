@@ -1,4 +1,8 @@
-import type { Message, NotificationMessage, StateCarryingMessage } from '../message';
+import type {
+  Message,
+  NotificationMessage,
+  StateCarryingMessage,
+} from '../message';
 
 export const isEventCarryingMessage = (
   message: Message,

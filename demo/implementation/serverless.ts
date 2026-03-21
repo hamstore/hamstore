@@ -35,10 +35,16 @@ const serverlessConfiguration: AWS = {
               { 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] },
               { 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] },
               {
-                'Fn::Join': ['/', [{ 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] }, 'index/*']],
+                'Fn::Join': [
+                  '/',
+                  [{ 'Fn::GetAtt': ['TrainerEventsTable', 'Arn'] }, 'index/*'],
+                ],
               },
               {
-                'Fn::Join': ['/', [{ 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] }, 'index/*']],
+                'Fn::Join': [
+                  '/',
+                  [{ 'Fn::GetAtt': ['PokemonEventsTable', 'Arn'] }, 'index/*'],
+                ],
               },
             ],
             Action: [

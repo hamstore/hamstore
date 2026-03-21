@@ -25,7 +25,9 @@ export class EventType<
 
   constructor({ type }: { type: TYPE }) {
     if (reservedEventTypes.has(type)) {
-      throw new Error(`${type} is a reserved event type. Please chose another one.`);
+      throw new Error(
+        `${type} is a reserved event type. Please chose another one.`,
+      );
     }
 
     this.type = type;

@@ -1,4 +1,8 @@
-import { type EventAlreadyExistsError, isEventAlreadyExistsError, EventStore } from '~/eventStore';
+import {
+  type EventAlreadyExistsError,
+  isEventAlreadyExistsError,
+  EventStore,
+} from '~/eventStore';
 
 import type { $Contravariant } from '~/utils';
 
@@ -7,12 +11,17 @@ export type OnEventAlreadyExistsCallback = (
   context: { attemptNumber: number; retriesLeft: number },
 ) => Promise<void>;
 
-export const tuple = <ARGUMENTS extends unknown[]>(...args: ARGUMENTS): ARGUMENTS => args;
+export const tuple = <ARGUMENTS extends unknown[]>(
+  ...args: ARGUMENTS
+): ARGUMENTS => args;
 
 export class Command<
   COMMAND_ID extends string = string,
   EVENT_STORES extends EventStore[] = EventStore[],
-  $EVENT_STORES extends EventStore[] = $Contravariant<EVENT_STORES, EventStore[]>,
+  $EVENT_STORES extends EventStore[] = $Contravariant<
+    EVENT_STORES,
+    EventStore[]
+  >,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   INPUT = any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,7 +38,11 @@ export class Command<
   requiredEventStores: EVENT_STORES;
   eventAlreadyExistsRetries: number;
   onEventAlreadyExists: OnEventAlreadyExistsCallback;
-  handler: (input: INPUT, eventStores: $EVENT_STORES, ...context: CONTEXT) => Promise<OUTPUT>;
+  handler: (
+    input: INPUT,
+    eventStores: $EVENT_STORES,
+    ...context: CONTEXT
+  ) => Promise<OUTPUT>;
 
   constructor({
     commandId,
@@ -42,7 +55,11 @@ export class Command<
     requiredEventStores: EVENT_STORES;
     eventAlreadyExistsRetries?: number;
     onEventAlreadyExists?: OnEventAlreadyExistsCallback;
-    handler: (input: INPUT, eventStores: $EVENT_STORES, ...context: CONTEXT) => Promise<OUTPUT>;
+    handler: (
+      input: INPUT,
+      eventStores: $EVENT_STORES,
+      ...context: CONTEXT
+    ) => Promise<OUTPUT>;
   }) {
     this.commandId = commandId;
     this.requiredEventStores = requiredEventStores;
@@ -87,8 +104,14 @@ export class Command<
 
 export type CommandId<COMMAND extends Command> = COMMAND['commandId'];
 
-export type CommandInput<COMMAND extends Command> = NonNullable<COMMAND['_types']>['input'];
+export type CommandInput<COMMAND extends Command> = NonNullable<
+  COMMAND['_types']
+>['input'];
 
-export type CommandOutput<COMMAND extends Command> = NonNullable<COMMAND['_types']>['output'];
+export type CommandOutput<COMMAND extends Command> = NonNullable<
+  COMMAND['_types']
+>['output'];
 
-export type CommandContext<COMMAND extends Command> = NonNullable<COMMAND['_types']>['context'];
+export type CommandContext<COMMAND extends Command> = NonNullable<
+  COMMAND['_types']
+>['context'];

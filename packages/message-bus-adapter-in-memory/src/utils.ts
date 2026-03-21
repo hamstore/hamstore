@@ -18,7 +18,10 @@ const messageMatchesStoreIdAndEventType = (
 ) =>
   parsedMessage.eventStoreId === filterPattern.eventStoreId &&
   parsedMessage.eventType === filterPattern.eventType;
-export const doesTaskMatchFilterPattern = (task: Task, filterPattern: FilterPattern): boolean => {
+export const doesTaskMatchFilterPattern = (
+  task: Task,
+  filterPattern: FilterPattern,
+): boolean => {
   const { message, replay = false } = task;
   const {
     eventStoreId: filterEventStoreId,
@@ -46,7 +49,10 @@ export const doesTaskMatchFilterPattern = (task: Task, filterPattern: FilterPatt
 export const doesTaskMatchAnyFilterPattern = (
   task: Task,
   filterPatterns: FilterPattern[],
-): boolean => filterPatterns.some(filterPattern => doesTaskMatchFilterPattern(task, filterPattern));
+): boolean =>
+  filterPatterns.some(filterPattern =>
+    doesTaskMatchFilterPattern(task, filterPattern),
+  );
 
 export const parseRetryDelayInMs = (retryDelayInMs: number): number => {
   if (typeof retryDelayInMs !== 'number' || retryDelayInMs < 0) {

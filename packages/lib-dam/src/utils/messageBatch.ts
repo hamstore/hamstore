@@ -14,7 +14,9 @@ export class MessageBatch<EVENT_STORE extends EventStore> {
   };
 
   filterByTimestamp = ({ from, to }: { from?: string; to?: string }): void => {
-    this.messages = this.messages.filter(({ event }) => isBetween(event, { from, to }));
+    this.messages = this.messages.filter(({ event }) =>
+      isBetween(event, { from, to }),
+    );
   };
 
   sortByTimestamp = (): void => {

@@ -71,7 +71,11 @@ export const pikachuLeveledUpEvent: PokemonEventDetails = {
   type: 'POKEMON_LEVELED_UP',
   timestamp: '2024',
 };
-export const pikachuEventsMocks = [pikachuAppearedEvent, pikachuCaughtEvent, pikachuLeveledUpEvent];
+export const pikachuEventsMocks = [
+  pikachuAppearedEvent,
+  pikachuCaughtEvent,
+  pikachuLeveledUpEvent,
+];
 
 export const pokemonsReducer = (
   pokemonAggregate: PokemonAggregate,

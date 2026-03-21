@@ -31,7 +31,9 @@ export const AggregateCard = ({
   const firstEventDate = events[0]?.timestamp;
   const maxVersion = events.length;
 
-  const [aggregateTargetVersion, setAggregateTargetVersion] = useState(events.length);
+  const [aggregateTargetVersion, setAggregateTargetVersion] = useState(
+    events.length,
+  );
 
   const aggregate = eventStore.buildAggregate(
     events.filter(({ version }) => version <= aggregateTargetVersion),
@@ -46,7 +48,9 @@ export const AggregateCard = ({
               {aggregateId}
             </Typography>
             <Typography color="text.secondary">
-              {firstEventDate !== undefined ? formatDate(firstEventDate) : undefined}
+              {firstEventDate !== undefined
+                ? formatDate(firstEventDate)
+                : undefined}
             </Typography>
             <Pagination
               page={aggregateTargetVersion}
@@ -67,9 +71,14 @@ export const AggregateCard = ({
               <AccordionDetails>
                 <Stack spacing={2}>
                   {[...events]
-                    .sort((eventA, eventB) => (eventA.timestamp < eventB.timestamp ? -1 : 1))
+                    .sort((eventA, eventB) =>
+                      eventA.timestamp < eventB.timestamp ? -1 : 1,
+                    )
                     .map(({ type, payload, timestamp, version }, index) => (
-                      <Accordion key={`${aggregateId}_${index}`} variant="outlined">
+                      <Accordion
+                        key={`${aggregateId}_${index}`}
+                        variant="outlined"
+                      >
                         <AccordionSummary
                           expandIcon={<ExpandMore />}
                           aria-controls="panel1a-content"

@@ -1,8 +1,14 @@
-import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import {
+  EventBridgeClient,
+  PutEventsCommand,
+} from '@aws-sdk/client-eventbridge';
 import { __REPLAYED__ } from '@hamstore/core';
 import { mockClient } from 'aws-sdk-client-mock';
 
-import { EventBridgeMessageBusAdapter, EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE } from './adapter';
+import {
+  EventBridgeMessageBusAdapter,
+  EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE,
+} from './adapter';
 
 import type { Message, PublishMessageOptions } from '@hamstore/core';
 import type { A } from 'ts-toolbelt';
@@ -94,7 +100,8 @@ describe('EventBridgeMessageBusAdapter', () => {
     it('works with event bus name getters', async () => {
       const otherAdapter = new EventBridgeMessageBusAdapter({
         eventBusName: () => eventBusNameMock,
-        eventBridgeClient: eventBridgeClientMock as unknown as EventBridgeClient,
+        eventBridgeClient:
+          eventBridgeClientMock as unknown as EventBridgeClient,
       });
 
       await otherAdapter.publishMessage(messageMock);
@@ -167,7 +174,10 @@ describe('EventBridgeMessageBusAdapter', () => {
 
     it('chunk messages in separate PutEventsCommand calls when there are more messages then EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE', async () => {
       await adapter.publishMessages(
-        Array.from({ length: EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE + 1 }, () => messageMock),
+        Array.from(
+          { length: EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE + 1 },
+          () => messageMock,
+        ),
       );
 
       // regularly check if vitest matchers are available (toHaveReceivedCommandWith)

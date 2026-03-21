@@ -1,5 +1,9 @@
 /* eslint-disable max-lines */
-import { SQSClient, SendMessageCommand, SendMessageBatchCommand } from '@aws-sdk/client-sqs';
+import {
+  SQSClient,
+  SendMessageCommand,
+  SendMessageBatchCommand,
+} from '@aws-sdk/client-sqs';
 import { mockClient } from 'aws-sdk-client-mock';
 
 import { SQSMessageQueueAdapter, SQS_MAX_MESSAGE_BATCH_SIZE } from './adapter';
@@ -154,11 +158,17 @@ describe('SQSMessageQueueAdapter', () => {
     expect(sqsClientMock.call(0).args[0].input).toMatchObject({
       Entries: [
         {
-          MessageDeduplicationId: [eventStoreId, aggregateId, version].join('#'),
+          MessageDeduplicationId: [eventStoreId, aggregateId, version].join(
+            '#',
+          ),
           MessageGroupId: [eventStoreId, aggregateId].join('#'),
         },
         {
-          MessageDeduplicationId: [eventStoreId, aggregateId, otherVersion].join('#'),
+          MessageDeduplicationId: [
+            eventStoreId,
+            aggregateId,
+            otherVersion,
+          ].join('#'),
           MessageGroupId: [eventStoreId, aggregateId].join('#'),
         },
       ],

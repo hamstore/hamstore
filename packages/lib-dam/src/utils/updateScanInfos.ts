@@ -9,7 +9,10 @@ export const updateScanInfos = ({
   aggregateIds: { aggregateId: string; initialEventTimestamp: string }[];
   areAllAggregatesScanned: boolean;
 }): void => {
-  if (scanInfos.firstScannedAggregate === undefined && aggregateIds[0] !== undefined) {
+  if (
+    scanInfos.firstScannedAggregate === undefined &&
+    aggregateIds[0] !== undefined
+  ) {
     const { aggregateId, initialEventTimestamp } = aggregateIds[0];
     scanInfos.firstScannedAggregate = {
       aggregateId,

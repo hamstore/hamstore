@@ -34,7 +34,9 @@ export type EventPusher<
   AGGREGATE extends Aggregate,
   $AGGREGATE extends Aggregate,
 > = (
-  event: $EVENT_DETAILS extends EventDetail ? OptionalTimestamp<$EVENT_DETAILS> : $EVENT_DETAILS,
+  event: $EVENT_DETAILS extends EventDetail
+    ? OptionalTimestamp<$EVENT_DETAILS>
+    : $EVENT_DETAILS,
   options?: { prevAggregate?: $AGGREGATE; force?: boolean },
 ) => Promise<{ event: EVENT_DETAILS; nextAggregate?: AGGREGATE }>;
 
@@ -48,32 +50,45 @@ export type EventGrouper<
   AGGREGATE extends Aggregate,
   $AGGREGATE,
 > = (
-  event: $EVENT_DETAILS extends EventDetail ? OptionalTimestamp<$EVENT_DETAILS> : $EVENT_DETAILS,
+  event: $EVENT_DETAILS extends EventDetail
+    ? OptionalTimestamp<$EVENT_DETAILS>
+    : $EVENT_DETAILS,
   options?: { prevAggregate?: $AGGREGATE },
 ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>;
 
 export type EventGroupPusher = <
-  GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]] = [GroupedEvent, ...GroupedEvent[]],
-  OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } = GroupedEvent,
+  GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]] = [
+    GroupedEvent,
+    ...GroupedEvent[],
+  ],
+  OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } =
+    GroupedEvent,
 >(
   optionsOrGroupedEventsHead: OPTIONS_OR_GROUPED_EVENTS_HEAD,
   ...groupedEvents: GROUPED_EVENTS
 ) => Promise<{
   eventGroup: OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent
-    ? EventGroupPusherResponse<[OPTIONS_OR_GROUPED_EVENTS_HEAD, ...GROUPED_EVENTS]>
+    ? EventGroupPusherResponse<
+        [OPTIONS_OR_GROUPED_EVENTS_HEAD, ...GROUPED_EVENTS]
+      >
     : EventGroupPusherResponse<GROUPED_EVENTS>;
 }>;
 
 export type EventGroupPusherResponse<GROUPED_EVENTS extends GroupedEvent[]> =
   number extends GROUPED_EVENTS['length']
     ? { event: EventDetail; nextAggregate?: Aggregate }[]
-    : GROUPED_EVENTS extends [infer HEAD_GROUPED_EVENT, ...infer TAIL_GROUPED_EVENTS]
+    : GROUPED_EVENTS extends [
+          infer HEAD_GROUPED_EVENT,
+          ...infer TAIL_GROUPED_EVENTS,
+        ]
       ? HEAD_GROUPED_EVENT extends GroupedEvent
         ? TAIL_GROUPED_EVENTS extends GroupedEvent[]
           ? [
               {
                 event: NonNullable<HEAD_GROUPED_EVENT['_types']>['details'];
-                nextAggregate?: NonNullable<HEAD_GROUPED_EVENT['_types']>['aggregate'];
+                nextAggregate?: NonNullable<
+                  HEAD_GROUPED_EVENT['_types']
+                >['aggregate'];
               },
               ...EventGroupPusherResponse<TAIL_GROUPED_EVENTS>,
             ]
@@ -100,7 +115,9 @@ export type AggregateGetter<
 ) => Promise<{
   aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
   events: EVENT_DETAIL[];
-  lastEvent: SHOULD_EXIST extends true ? EVENT_DETAIL : EVENT_DETAIL | undefined;
+  lastEvent: SHOULD_EXIST extends true
+    ? EVENT_DETAIL
+    : EVENT_DETAIL | undefined;
 }>;
 
 export type SimulationOptions = { simulationDate?: string };

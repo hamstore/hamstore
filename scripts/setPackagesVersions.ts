@@ -15,20 +15,24 @@ const PREFIXED_SEM_VER_REGEX =
 
 const prefixedSemVerMatches = newVersionTag.match(PREFIXED_SEM_VER_REGEX);
 
-if (!PREFIXED_SEM_VER_REGEX.test(newVersionTag) || prefixedSemVerMatches === null) {
+if (
+  !PREFIXED_SEM_VER_REGEX.test(newVersionTag) ||
+  prefixedSemVerMatches === null
+) {
   throw new Error(
     'Please provide a version tag that follows semantic versioning prefixed with v (e.g. "v1.2.3")',
   );
 }
 
-const [, NEW_SEM_VER_MAJOR, NEW_SEM_VER_MINOR, NEW_SEM_VER_PATCH] = [...prefixedSemVerMatches] as [
-  string,
-  string,
-  string,
-  string,
-];
+const [, NEW_SEM_VER_MAJOR, NEW_SEM_VER_MINOR, NEW_SEM_VER_PATCH] = [
+  ...prefixedSemVerMatches,
+] as [string, string, string, string];
 
-const NEW_SEM_VER = [NEW_SEM_VER_MAJOR, NEW_SEM_VER_MINOR, NEW_SEM_VER_PATCH].join('.');
+const NEW_SEM_VER = [
+  NEW_SEM_VER_MAJOR,
+  NEW_SEM_VER_MINOR,
+  NEW_SEM_VER_PATCH,
+].join('.');
 
 type PackageJson = {
   version?: string;
@@ -43,7 +47,9 @@ const packagesNames = readdirSync(packagesPath);
 packagesNames.forEach(packageName => {
   const packageJsonPath = join(packagesPath, packageName, 'package.json');
 
-  const packageJson = JSON.parse(readFileSync(packageJsonPath).toString()) as PackageJson;
+  const packageJson = JSON.parse(
+    readFileSync(packageJsonPath).toString(),
+  ) as PackageJson;
 
   packageJson.version = NEW_SEM_VER;
 

@@ -3,4 +3,7 @@ import type { Aggregate } from '@hamstore/core';
 export type PokemonAggregate = Aggregate & {
   name: string;
   level: number;
-} & ({ status: 'wild'; trainerId?: undefined } | { status: 'caught'; trainerId: string });
+} & (
+    | { status: 'wild'; trainerId?: undefined }
+    | { status: 'caught'; trainerId: string }
+  );

@@ -18,7 +18,10 @@ In Hamstore, they are implemented by the `AggregateExistsMessage`, `Notification
 
 ```ts
 // AggregateExistsMessage
-import type { AggregateExistsMessage, EventStoreAggregateExistsMessage } from '@hamstore/core';
+import type {
+  AggregateExistsMessage,
+  EventStoreAggregateExistsMessage,
+} from '@hamstore/core';
 
 type PokemonAggregateExistsMessage = AggregateExistsMessage<'POKEMONS'>;
 
@@ -29,14 +32,22 @@ type PokemonAggregateExistsMessage = {
 };
 
 // // 👇 Also equivalent to:
-type PokemonAggregateExistsMessage = EventStoreAggregateExistsMessage<typeof pokemonsEventStore>;
+type PokemonAggregateExistsMessage = EventStoreAggregateExistsMessage<
+  typeof pokemonsEventStore
+>;
 ```
 
 ```ts
 // NotificationMessage
-import type { NotificationMessage, EventStoreNotificationMessage } from '@hamstore/core';
+import type {
+  NotificationMessage,
+  EventStoreNotificationMessage,
+} from '@hamstore/core';
 
-type PokemonEventNotificationMessage = NotificationMessage<'POKEMONS', PokemonEventDetails>;
+type PokemonEventNotificationMessage = NotificationMessage<
+  'POKEMONS',
+  PokemonEventDetails
+>;
 
 // 👇 Equivalent to:
 type PokemonEventNotificationMessage = {
@@ -45,12 +56,17 @@ type PokemonEventNotificationMessage = {
 };
 
 // 👇 Also equivalent to:
-type PokemonEventNotificationMessage = EventStoreNotificationMessage<typeof pokemonsEventStore>;
+type PokemonEventNotificationMessage = EventStoreNotificationMessage<
+  typeof pokemonsEventStore
+>;
 ```
 
 ```ts
 // StateCarryingMessage
-import type { StateCarryingMessage, EventStoreStateCarryingMessage } from '@hamstore/core';
+import type {
+  StateCarryingMessage,
+  EventStoreStateCarryingMessage,
+} from '@hamstore/core';
 
 type PokemonEventStateCarryingMessage = StateCarryingMessage<
   'POKEMONS',
@@ -66,7 +82,9 @@ type PokemonEventStateCarryingMessage = {
 };
 
 // 👇 Also equivalent to:
-type PokemonEventStateCarryingMessage = EventStoreStateCarryingMessage<typeof pokemonsEventStore>;
+type PokemonEventStateCarryingMessage = EventStoreStateCarryingMessage<
+  typeof pokemonsEventStore
+>;
 ```
 
 All types of message can be published through message channels, i.e. [Message Queues](./2-message-queues.md) or [Message Buses](./3-message-buses.md).

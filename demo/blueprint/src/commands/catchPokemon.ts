@@ -20,10 +20,11 @@ export const catchPokemonCommand = new JSONSchemaCommand({
     const { pokemonId, trainerId } = input;
     const [pokemonsStore, trainersStore] = eventStores;
 
-    const [{ aggregate: pokemonAggregate }, { aggregate: trainerAggregate }] = await Promise.all([
-      pokemonsStore.getAggregate(pokemonId),
-      trainersStore.getAggregate(trainerId),
-    ]);
+    const [{ aggregate: pokemonAggregate }, { aggregate: trainerAggregate }] =
+      await Promise.all([
+        pokemonsStore.getAggregate(pokemonId),
+        trainersStore.getAggregate(trainerId),
+      ]);
 
     if (pokemonAggregate === undefined) {
       throw new Error('Pokemon not found');

@@ -3,5 +3,6 @@ import MuiForm from '@rjsf/mui';
 import { JSX } from 'react';
 
 // @ts-expect-error exported Form type is incorrect
-export const Form: (props: Omit<FormProps, 'schema'> & { schema: unknown }) => JSX.Element =
-  MuiForm;
+export const Form: (
+  props: Omit<FormProps, 'schema'> & { schema: unknown },
+) => JSX.Element = MuiForm;

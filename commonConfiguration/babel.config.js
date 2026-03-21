@@ -1,9 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
-const reactPreset = ['@babel/preset-react', { runtime: 'automatic', development: false }];
+const reactPreset = [
+  '@babel/preset-react',
+  { runtime: 'automatic', development: false },
+];
 
-const tsPreset = ['@babel/preset-typescript', { allowNamespaces: true, allowDeclareFields: true }];
+const tsPreset = [
+  '@babel/preset-typescript',
+  { allowNamespaces: true, allowDeclareFields: true },
+];
 
 const defaultPresets = [reactPreset, tsPreset];
 
@@ -40,7 +46,9 @@ const addImportExtension = (ext, options = {}) => {
 
     // Case 1: folder with index.*
     if (fs.existsSync(absBase) && fs.statSync(absBase).isDirectory()) {
-      const hasIndex = indexCandidates.some(cand => fs.existsSync(path.join(absBase, cand)));
+      const hasIndex = indexCandidates.some(cand =>
+        fs.existsSync(path.join(absBase, cand)),
+      );
       if (hasIndex) {
         return `${spec.replace(/\/$/, '')}/index${dotExt}`;
       }
@@ -94,9 +102,15 @@ const addImportExtension = (ext, options = {}) => {
   };
 };
 
-const presetsForESM = [['@babel/preset-env', { modules: false }], ...defaultPresets];
+const presetsForESM = [
+  ['@babel/preset-env', { modules: false }],
+  ...defaultPresets,
+];
 
-const presetsForCJS = [['@babel/preset-env', { modules: 'cjs' }], ...defaultPresets];
+const presetsForCJS = [
+  ['@babel/preset-env', { modules: 'cjs' }],
+  ...defaultPresets,
+];
 
 export default (plugins = []) => ({
   env: {

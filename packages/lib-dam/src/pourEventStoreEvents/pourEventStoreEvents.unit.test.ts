@@ -1,4 +1,8 @@
-import { NotificationMessage, NotificationMessageQueue, EventStoreId } from '@hamstore/core';
+import {
+  NotificationMessage,
+  NotificationMessageQueue,
+  EventStoreId,
+} from '@hamstore/core';
 import {
   InMemoryMessageQueueAdapter,
   TaskContext,
@@ -144,7 +148,9 @@ describe('pourEventStoreEvents', () => {
         (receivedMessages[index]?.date as Date).getTime();
 
       // Expect delay imprecision to be less than 5%
-      expect(Math.abs((receivedDelay - expectedDelay) / expectedDelay)).toBeLessThan(0.05);
+      expect(
+        Math.abs((receivedDelay - expectedDelay) / expectedDelay),
+      ).toBeLessThan(0.05);
     });
   });
 });

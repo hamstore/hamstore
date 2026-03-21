@@ -25,4 +25,7 @@ export type StateCarryingMessage<
   aggregate: AGGREGATE;
 };
 
-export type Message = AggregateExistsMessage | NotificationMessage | StateCarryingMessage;
+export type Message =
+  | AggregateExistsMessage
+  | NotificationMessage
+  | StateCarryingMessage;

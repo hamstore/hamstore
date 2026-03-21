@@ -29,7 +29,8 @@ The simplest way to use this adapter is to use the `attachTo` static method:
 ```ts
 import { InMemoryMessageQueueAdapter } from '@hamstore/message-queue-adapter-in-memory';
 
-const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(appMessageQueue);
+const messageQueueAdapter =
+  InMemoryMessageQueueAdapter.attachTo(appMessageQueue);
 ```
 
 This will make your `messageQueueAdapter` inherit from your `appMessageQueue` types while plugging them together 🙌
@@ -52,12 +53,15 @@ appMessageQueue.messageQueueAdapter = messageQueueAdapter;
 You can provide an async worker for the queue at construction time, or in context later:
 
 ```ts
-const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(appMessageQueue, {
-  worker: async message => {
-    // 🙌 Correctly typed!
-    const { eventStoreId, event } = message;
+const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(
+  appMessageQueue,
+  {
+    worker: async message => {
+      // 🙌 Correctly typed!
+      const { eventStoreId, event } = message;
+    },
   },
-});
+);
 
 // 👇 Alternatively
 const messageQueueAdapter = new InMemoryMessageQueueAdapter<
@@ -104,11 +108,14 @@ This adapter will retry failed messages handling. You can specify a different re
 - <code>retryBackoffRate <i>(?number = 2)</i></code>: A factor applied to the `retryDelayInMs` at each subsequent retry.
 
 ```ts
-const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(appMessageQueue, {
-  retryAttempts: 3,
-  retryDelayInMs: 10000,
-  retryBackoffRate: 1.5,
-});
+const messageQueueAdapter = InMemoryMessageQueueAdapter.attachTo(
+  appMessageQueue,
+  {
+    retryAttempts: 3,
+    retryDelayInMs: 10000,
+    retryBackoffRate: 1.5,
+  },
+);
 
 // 👇 Alternatively
 const messageQueueAdapter = new InMemoryMessageQueueAdapter<

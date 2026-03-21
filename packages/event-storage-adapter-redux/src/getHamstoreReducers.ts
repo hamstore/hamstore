@@ -2,7 +2,10 @@ import { EventDetail, EventStore } from '@hamstore/core';
 import { createSlice, Draft } from '@reduxjs/toolkit';
 
 import { EventStoreReduxReducer } from '~/types';
-import { DEFAULT_PREFIX, getEventStoreSliceName } from '~/utils/getEventStoreSliceName';
+import {
+  DEFAULT_PREFIX,
+  getEventStoreSliceName,
+} from '~/utils/getEventStoreSliceName';
 
 export const getHamstoreReducers = ({
   prefix = DEFAULT_PREFIX,
@@ -77,7 +80,8 @@ export const getHamstoreReducers = ({
           if (revertedEvent.version === 1) {
             delete state.eventsByAggregateId[aggregateId];
             state.aggregateIds = state.aggregateIds.filter(
-              ({ aggregateId: storedAggregateId }) => storedAggregateId !== aggregateId,
+              ({ aggregateId: storedAggregateId }) =>
+                storedAggregateId !== aggregateId,
             );
           }
         },

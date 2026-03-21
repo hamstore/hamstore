@@ -23,7 +23,11 @@ export const wildPokemonAppearCommand = new JSONSchemaCommand({
     required: ['pokemonId'],
     additionalProperties: false,
   } as const,
-  handler: async (input, eventStores, { generateUuid }: { generateUuid: () => string }) => {
+  handler: async (
+    input,
+    eventStores,
+    { generateUuid }: { generateUuid: () => string },
+  ) => {
     const { pokemonName, pokemonLevel } = input;
     const [eventStore] = eventStores;
 

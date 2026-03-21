@@ -30,8 +30,10 @@ export const parseAppliedListAggregateIdsOptions = ({
 
   return {
     limit: inputOptions.limit ?? prevOptions.limit,
-    initialEventAfter: inputOptions.initialEventAfter ?? prevOptions.initialEventAfter,
-    initialEventBefore: inputOptions.initialEventBefore ?? prevOptions.initialEventBefore,
+    initialEventAfter:
+      inputOptions.initialEventAfter ?? prevOptions.initialEventAfter,
+    initialEventBefore:
+      inputOptions.initialEventBefore ?? prevOptions.initialEventBefore,
     reverse: inputOptions.reverse ?? prevOptions.reverse,
     exclusiveStartKey: prevOptions.lastEvaluatedKey,
   };

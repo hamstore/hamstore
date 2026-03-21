@@ -113,7 +113,10 @@ const requiredEventStores = doSomethingCommand.requiredEventStores;
 - <code>handler <i>((input: Input, requiredEventsStores: EventStore[]) => Promise&lt;Output&gt;)</i></code>: Function to invoke the command
 
 ```ts
-const output = await doSomethingCommand.handler(input, [eventStore1, eventStore2]);
+const output = await doSomethingCommand.handler(input, [
+  eventStore1,
+  eventStore2,
+]);
 ```
 
 </details>

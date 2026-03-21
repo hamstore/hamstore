@@ -94,7 +94,9 @@ const eventType = pokemonAppearedEventType.type;
 ```ts
 import type { EventTypeDetail } from '@hamstore/core';
 
-type PokemonAppearedEventTypeDetail = EventTypeDetail<typeof pokemonAppearedEventType>;
+type PokemonAppearedEventTypeDetail = EventTypeDetail<
+  typeof pokemonAppearedEventType
+>;
 
 // 👇 Equivalent to:
 type PokemonCaughtEventTypeDetail = {

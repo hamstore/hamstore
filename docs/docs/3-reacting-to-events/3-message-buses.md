@@ -64,7 +64,10 @@ import type { EventBridgeMessageBusMessage } from '@hamstore/message-bus-adapter
 
 const pokemonMessagesListener = async (
   // 👇 Specify that you only listen to the pokemonsEventStore messages
-  eventBridgeMessage: EventBridgeMessageBusMessage<typeof appMessageQueue, 'POKEMONS'>,
+  eventBridgeMessage: EventBridgeMessageBusMessage<
+    typeof appMessageQueue,
+    'POKEMONS'
+  >,
 ) => {
   // 👇 Correctly typed!
   const message = eventBridgeMessage.detail;

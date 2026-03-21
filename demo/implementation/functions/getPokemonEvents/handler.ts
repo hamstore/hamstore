@@ -5,7 +5,9 @@ import { applyConsoleMiddleware } from '~/libs/middlewares/console';
 
 import { Input, inputSchema } from './schema';
 
-export const getPokemonEvents = async (event: Input): Promise<{ events: EventDetail[] }> => {
+export const getPokemonEvents = async (
+  event: Input,
+): Promise<{ events: EventDetail[] }> => {
   const {
     queryStringParameters: { aggregateId },
   } = event;
