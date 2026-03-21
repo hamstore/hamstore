@@ -3,8 +3,8 @@ import { EventStore, Command, CommandId, CommandContext } from '@hamstore/core';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import React, { JSX } from 'react';
 
-import { UnthemedVisualizer } from './UnthemedVisualizer';
 import { defaultTheme } from './defaultTheme';
+import { UnthemedVisualizer } from './UnthemedVisualizer';
 
 type ContextsByCommandId<COMMANDS extends Command[]> = COMMANDS extends [
   infer HEAD_COMMAND,

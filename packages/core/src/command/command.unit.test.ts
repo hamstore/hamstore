@@ -72,7 +72,9 @@ describe('command implementation', () => {
       await incrementCounter.handler(
         { counterId: '123' },
         [counterEventStore],
-        { generateUuid: randomUUID },
+        {
+          generateUuid: randomUUID,
+        },
       );
 
       expect(pushEventMock).toHaveBeenCalledTimes(3);

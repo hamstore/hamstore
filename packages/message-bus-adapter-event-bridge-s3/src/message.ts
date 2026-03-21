@@ -15,8 +15,8 @@ export type EventBridgeS3MessageBusMessage<
     | AggregateExistsMessageBus
     | NotificationMessageBus
     | StateCarryingMessageBus,
-  EVENT_STORE_IDS extends
-    MessageChannelSourceEventStoreIds<MESSAGE_BUS> = MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
+  EVENT_STORE_IDS extends MessageChannelSourceEventStoreIds<MESSAGE_BUS> =
+    MessageChannelSourceEventStoreIds<MESSAGE_BUS>,
   EVENT_TYPES extends MESSAGE_BUS extends
     | NotificationMessageBus
     | StateCarryingMessageBus

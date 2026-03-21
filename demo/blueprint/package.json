@@ -1,20 +1,34 @@
 {
   "name": "@hamstore/demo-blueprint",
-  "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",
     "directory": "demo/blueprint"
   },
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
   "scripts": {
-    "lint-fix": "pnpm eslint --fix",
+    "lint-fix": "pnpm oxlint --fix",
     "lint-fix-all": "pnpm lint-fix .",
     "package": "rm -rf dist && pnpm package-cjs && pnpm package-esm && pnpm package-types",
     "package-cjs": "NODE_ENV=cjs pnpm transpile --out-dir dist/cjs --source-maps --out-file-extension .cjs",
@@ -22,7 +36,7 @@
     "package-types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "pnpm test-type && pnpm test-circular && pnpm test-linter",
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
-    "test-linter": "pnpm eslint .",
+    "test-linter": "pnpm oxlint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "transpile": "babel src --extensions .ts --quiet",
     "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
@@ -41,27 +55,13 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.0.1",
-    "eslint": "^9.36.0",
     "json-schema-to-ts": "^3.1.1",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "ts-node": "^10.9.2",
     "ts-toolbelt": "^9.6.0",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.9.2"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
   },
   "peerDependencies": {
     "@hamstore/core": "*",

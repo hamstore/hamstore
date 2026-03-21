@@ -8,7 +8,9 @@ type CounterCreatedEventPayload = { startCount: number };
 const counterCreatedEvent = new EventType<
   'COUNTER_CREATED',
   CounterCreatedEventPayload
->({ type: 'COUNTER_CREATED' });
+>({
+  type: 'COUNTER_CREATED',
+});
 
 const assertCounterCreatedEventDetail: A.Equals<
   EventTypeDetail<typeof counterCreatedEvent>,
@@ -44,7 +46,9 @@ const counterRemovedEvent = new EventType<
   'COUNTER_REMOVED',
   never,
   CounterRemovedEventMetadata
->({ type: 'COUNTER_REMOVED' });
+>({
+  type: 'COUNTER_REMOVED',
+});
 
 const assertCounterRemovedEventDetail: A.Equals<
   EventTypeDetail<typeof counterRemovedEvent>,

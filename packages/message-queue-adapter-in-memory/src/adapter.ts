@@ -58,9 +58,9 @@ type ConstructorArgs<MESSAGE extends Message = Message> = {
   retryBackoffRate?: number;
 };
 
-export class InMemoryMessageQueueAdapter<MESSAGE extends Message = Message>
-  implements MessageChannelAdapter
-{
+export class InMemoryMessageQueueAdapter<
+  MESSAGE extends Message = Message,
+> implements MessageChannelAdapter {
   static attachTo<
     MESSAGE_QUEUE extends
       | AggregateExistsMessageQueue

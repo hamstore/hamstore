@@ -1,11 +1,11 @@
 /* eslint-disable max-lines */
+import { GroupedEvent } from '@hamstore/core';
 import type {
   Aggregate,
   EventDetail,
   PushEventOptions,
   EventStorageAdapter,
 } from '@hamstore/core';
-import { GroupedEvent } from '@hamstore/core';
 
 import { InMemoryEventAlreadyExistsError } from './error';
 import {

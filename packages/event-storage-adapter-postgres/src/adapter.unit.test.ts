@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
 import {
   PostgreSqlContainer,
@@ -383,13 +384,17 @@ describe('postgres storage adapter', () => {
 
       const { events: eventsA } = await eventStorageAdapter.getEvents(
         aggregateIdMock1,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsA).toStrictEqual([eventMock1]);
 
       const { events: eventsB } = await eventStorageAdapterB.getEvents(
         aggregateIdMock2,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsB).toStrictEqual([aggregate2EventMock]);
     });
@@ -473,13 +478,17 @@ describe('postgres storage adapter', () => {
 
       const { events: eventsA } = await eventStorageAdapter.getEvents(
         aggregateIdMock1,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsA).toStrictEqual([eventMock1]);
 
       const { events: eventsB } = await eventStorageAdapterB.getEvents(
         aggregateIdMock2,
-        { eventStoreId },
+        {
+          eventStoreId,
+        },
       );
       expect(eventsB).toStrictEqual([]);
     });

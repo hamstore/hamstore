@@ -3,16 +3,16 @@ import {
   PutEventsCommand,
   PutEventsRequestEntry,
 } from '@aws-sdk/client-eventbridge';
-import type {
-  Message,
-  MessageChannelAdapter,
-  PublishMessageOptions,
-} from '@hamstore/core';
 import {
   __REPLAYED__,
   __AGGREGATE_EXISTS__,
   isAggregateExistsMessage,
   isEventCarryingMessage,
+} from '@hamstore/core';
+import type {
+  Message,
+  MessageChannelAdapter,
+  PublishMessageOptions,
 } from '@hamstore/core';
 import chunk from 'lodash.chunk';
 

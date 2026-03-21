@@ -1,0 +1,100 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "typescript"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true,
+    "es2024": true,
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "vi": "writable",
+    "describe": "writable",
+    "it": "writable",
+    "test": "writable",
+    "expect": "writable",
+    "beforeEach": "writable",
+    "afterEach": "writable",
+    "beforeAll": "writable",
+    "afterAll": "writable"
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/build/**",
+    ".pnpm-store/**",
+    "./docs/.docusaurus/**"
+  ],
+  "rules": {
+    "import/no-duplicates": "error",
+    "complexity": ["error", 8],
+    "max-lines": ["error", 200],
+    "max-depth": ["error", 3],
+    "max-params": ["error", 4],
+    "eqeqeq": ["error", "smart"],
+    "no-shadow": ["error", { "hoist": "all" }],
+    "prefer-const": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@hamstore/*/*"],
+            "message": "import of internal modules must be done at the root level."
+          }
+        ],
+        "paths": [
+          {
+            "name": "lodash",
+            "message": "Please use lodash/{module} import instead"
+          },
+          {
+            "name": "aws-sdk",
+            "message": "Please use aws-sdk/{module} import instead"
+          },
+          {
+            "name": ".",
+            "message": "Please use explicit import file"
+          }
+        ]
+      }
+    ],
+    "curly": ["error", "all"],
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        "ts-ignore": "allow-with-description",
+        "minimumDescriptionLength": 10
+      }
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unsafe-function-type": "error",
+    "@typescript-eslint/no-wrapper-object-types": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "no-redeclare": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.{ts,tsx}"],
+      "rules": {
+        "complexity": "off",
+        "no-unused-expressions": "off",
+        "no-unsafe-optional-chaining": "off"
+      }
+    },
+    {
+      "files": ["**/*.type.test.{ts,tsx}"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    }
+  ]
+}

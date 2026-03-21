@@ -56,8 +56,8 @@ export type MessageChannelSourceEventStoreIdTypes<
     | AggregateExistsMessageChannel
     | StateCarryingMessageChannel
     | NotificationMessageChannel,
-  EVENT_STORE_ID extends
-    MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL> = MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL>,
+  EVENT_STORE_ID extends MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL> =
+    MessageChannelSourceEventStoreIds<MESSAGE_CHANNEL>,
 > = EventStoreEventTypes<
   Extract<
     MessageChannelSourceEventStores<MESSAGE_CHANNEL>,

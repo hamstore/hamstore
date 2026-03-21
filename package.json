@@ -1,19 +1,20 @@
 {
   "name": "@hamstore/hamstore",
   "description": "Making Event Sourcing easy 😎",
-  "license": "MIT",
-  "homepage": "https://github.com/hamstore/hamstore#readme",
-  "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hamstore/hamstore.git"
-  },
   "keywords": [
     "event",
     "source",
     "store",
     "typescript"
   ],
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git"
+  },
+  "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
@@ -32,24 +33,14 @@
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "@eslint/js": "^9.36.0",
     "@nx/workspace": "^21.5.3",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^24.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.44.0",
-    "@typescript-eslint/parser": "^8.44.0",
     "aws-sdk": "^2.1692.0",
     "dependency-cruiser": "^17.0.1",
-    "eslint": "^9.36.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-config-vitest-globals": "^2.0.2",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.4.0",
     "husky": "^9.1.7",
     "nx": "^21.5.3",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "syncpack": "^13.0.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2"
@@ -77,6 +68,5 @@
       "tree-sitter-json"
     ]
   },
-  "type": "module",
   "owner": "@geostrategists"
 }

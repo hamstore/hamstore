@@ -81,7 +81,9 @@ describe('ConnectedEventStore', () => {
 
       await pokemonsEventStoreWithNotificationMessageQueue.pushEvent(
         eventInput,
-        { prevAggregate: v1Aggregate },
+        {
+          prevAggregate: v1Aggregate,
+        },
       );
 
       expect(pushEvent).toHaveBeenCalledOnce();
@@ -117,7 +119,9 @@ describe('ConnectedEventStore', () => {
       const eventGroup = [
         pokemonsEventStoreWithStateCarryingMessageBus.groupEvent(
           pikachuCaughtEvent,
-          { prevAggregate: prevPikachuAggregate },
+          {
+            prevAggregate: prevPikachuAggregate,
+          },
         ),
         pokemonsEventStoreWithNotificationMessageQueue.groupEvent(
           charizardLeveledUpEvent,
