@@ -18,7 +18,7 @@ autolabeler:
       - '/^.+!:/'
   - label: minor
     title:
-      - '/^feat(\(.+\))?:/'
+      - '/^feat(ure)?(\(.+\))?:/'
   - label: patch
     title:
       - '/^fix(\(.+\))?:/'
