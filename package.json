@@ -67,6 +67,5 @@
       "tree-sitter",
       "tree-sitter-json"
     ]
-  },
-  "owner": "@geostrategists"
+  }
 }

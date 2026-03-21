@@ -84,6 +84,5 @@
   },
   "peerDependencies": {
     "@hamstore/core": "*"
-  },
-  "owner": "@geostrategists"
+  }
 }

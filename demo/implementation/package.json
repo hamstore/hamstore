@@ -43,7 +43,6 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
-  "owner": "@geostrategists",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",

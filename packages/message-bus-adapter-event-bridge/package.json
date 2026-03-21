@@ -84,6 +84,5 @@
   "peerDependencies": {
     "@aws-sdk/client-eventbridge": "^3.0.0",
     "@hamstore/core": "*"
-  },
-  "owner": "@geostrategists"
+  }
 }

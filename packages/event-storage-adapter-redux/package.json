@@ -80,6 +80,5 @@
     "@hamstore/core": "*",
     "@reduxjs/toolkit": "^1.9.0",
     "react-redux": "^8.0.0"
-  },
-  "owner": "@geostrategists"
+  }
 }

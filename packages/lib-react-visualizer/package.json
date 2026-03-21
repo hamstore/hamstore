@@ -105,6 +105,5 @@
     "@hamstore/command-json-schema": "*",
     "@hamstore/core": "*",
     "react": "^19.0.0"
-  },
-  "owner": "@geostrategists"
+  }
 }
