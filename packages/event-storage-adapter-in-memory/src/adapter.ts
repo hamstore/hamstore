@@ -1,5 +1,5 @@
-import { GroupedEvent } from '@hamstore/core';
 /* eslint-disable max-lines */
+import { GroupedEvent } from '@hamstore/core';
 import type {
   Aggregate,
   EventDetail,
