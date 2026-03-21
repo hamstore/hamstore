@@ -29,30 +29,9 @@ jobs:
         uses: amannn/action-semantic-pull-request@v6
         with:
           types: |
-            break
-            breaking
-            release
-            new
-            update
             feature
             fix
-            deps
-            docs
-            perf
-            revert
-            style
-            styles
-            security
-            type
-            types
-            chore
-            misc
-            ci
-            cd
-            build
-            test
-            tests
-            internal
+            breaking
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
