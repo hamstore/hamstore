@@ -1,12 +1,12 @@
+import type {
+  EventStoreAggregate,
+  EventStoreEventDetails,
+} from '~/eventStore/generics';
 import {
   NotificationMessageChannel,
   StateCarryingMessageChannel,
 } from '~/messaging';
 
-import type {
-  EventStoreAggregate,
-  EventStoreEventDetails,
-} from '~/eventStore/generics';
 import type { ConnectedEventStore } from './connectedEventStore';
 
 export const publishPushedEvent = async <

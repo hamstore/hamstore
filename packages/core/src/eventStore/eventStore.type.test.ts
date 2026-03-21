@@ -1,3 +1,11 @@
+/* eslint-disable max-lines */
+import type { A } from 'ts-toolbelt';
+
+import type { Aggregate } from '~/aggregate';
+import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
+import type { EventTypeDetail } from '~/event/eventType';
+import type { GroupedEvent } from '~/event/groupedEvent';
+import type { EventsQueryOptions } from '~/eventStorageAdapter';
 import {
   EventStore,
   EventStoreAggregate,
@@ -15,14 +23,6 @@ import {
   pikachuAppearedEvent,
   pikachuCaughtEvent,
 } from './eventStore.fixtures.test';
-
-/* eslint-disable max-lines */
-import type { A } from 'ts-toolbelt';
-import type { Aggregate } from '~/aggregate';
-import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
-import type { EventTypeDetail } from '~/event/eventType';
-import type { GroupedEvent } from '~/event/groupedEvent';
-import type { EventsQueryOptions } from '~/eventStorageAdapter';
 
 // --- EXTENDS ---
 

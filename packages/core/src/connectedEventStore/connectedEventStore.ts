@@ -1,5 +1,3 @@
-import { publishPushedEvent } from './publishPushedEvent';
-
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
@@ -18,6 +16,8 @@ import type {
 } from '~/eventStore';
 import type { EventStoreMessageChannel } from '~/messaging';
 import type { $Contravariant } from '~/utils';
+
+import { publishPushedEvent } from './publishPushedEvent';
 
 export class ConnectedEventStore<
   EVENT_STORE_ID extends string = string,

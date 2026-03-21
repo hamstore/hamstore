@@ -25,7 +25,6 @@ import {
   arcanineId,
   arcanineEvents,
 } from '../fixtures.test';
-
 import { pourEventStoreCollectionEvents } from './pourEventStoreCollectionEvents';
 
 const messageQueue = new NotificationMessageQueue({

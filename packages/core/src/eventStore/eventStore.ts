@@ -1,14 +1,13 @@
-import { GroupedEvent } from '~/event/groupedEvent';
-
-import { AggregateNotFoundError } from './errors/aggregateNotFound';
-import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
-
 /* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
+import { GroupedEvent } from '~/event/groupedEvent';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
+
+import { AggregateNotFoundError } from './errors/aggregateNotFound';
+import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import type {
   AggregateIdsLister,
   EventPusher,

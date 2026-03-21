@@ -10,6 +10,12 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { GroupedEvent } from '@hamstore/core';
+import type {
+  Aggregate,
+  EventDetail,
+  EventStorageAdapter,
+  PushEventOptions,
+} from '@hamstore/core';
 
 import {
   EVENT_TABLE_EVENT_STORE_ID_KEY,
@@ -26,13 +32,6 @@ import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
-
-import type {
-  Aggregate,
-  EventDetail,
-  EventStorageAdapter,
-  PushEventOptions,
-} from '@hamstore/core';
 
 const prefixAggregateId = (eventStoreId: string, aggregateId: string): string =>
   `${eventStoreId}#${aggregateId}`;

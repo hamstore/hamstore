@@ -1,8 +1,8 @@
-import { JSONSchemaEventType } from './eventType';
-
 import type { EventTypeDetail } from '@hamstore/core';
 import type { FromSchema } from 'json-schema-to-ts';
 import type { A } from 'ts-toolbelt';
+
+import { JSONSchemaEventType } from './eventType';
 
 const expectedProperties = new Set([
   // applying super(...) apparently adds { _types: undefined, parseEventDetail: undefined } to the class

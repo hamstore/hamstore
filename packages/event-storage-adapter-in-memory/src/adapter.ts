@@ -1,11 +1,4 @@
 import { GroupedEvent } from '@hamstore/core';
-
-import { InMemoryEventAlreadyExistsError } from './error';
-import {
-  parseAppliedListAggregateIdsOptions,
-  ParsedPageToken,
-} from './utils/parseAppliedListAggregateIdsOptions';
-
 /* eslint-disable max-lines */
 import type {
   Aggregate,
@@ -13,6 +6,12 @@ import type {
   PushEventOptions,
   EventStorageAdapter,
 } from '@hamstore/core';
+
+import { InMemoryEventAlreadyExistsError } from './error';
+import {
+  parseAppliedListAggregateIdsOptions,
+  ParsedPageToken,
+} from './utils/parseAppliedListAggregateIdsOptions';
 
 type InMemoryGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,

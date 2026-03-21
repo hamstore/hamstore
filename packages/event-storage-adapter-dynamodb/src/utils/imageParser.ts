@@ -1,9 +1,8 @@
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import {
   unmarshall,
   unmarshallOptions as UnmarshallOptions,
 } from '@aws-sdk/util-dynamodb';
-
-import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import type {
   EventDetail,
   EventStore,

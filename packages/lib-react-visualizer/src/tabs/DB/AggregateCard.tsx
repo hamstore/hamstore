@@ -1,3 +1,4 @@
+import type { EventStore } from '@hamstore/core';
 import { useAggregateEvents } from '@hamstore/event-storage-adapter-redux';
 import { ExpandMore } from '@mui/icons-material';
 import {
@@ -16,8 +17,6 @@ import React, { useState, JSX } from 'react';
 import { JsonView } from '~/components/JsonView';
 
 import { formatDate } from '../../libs/utils';
-
-import type { EventStore } from '@hamstore/core';
 
 export const AggregateCard = ({
   eventStore,

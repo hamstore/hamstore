@@ -3,7 +3,6 @@ import {
   isEventAlreadyExistsError,
   EventStore,
 } from '~/eventStore';
-
 import type { $Contravariant } from '~/utils';
 
 export type OnEventAlreadyExistsCallback = (

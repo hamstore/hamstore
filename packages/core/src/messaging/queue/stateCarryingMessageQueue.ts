@@ -1,7 +1,7 @@
-import { StateCarryingMessageChannel } from '../channel/stateCarryingMessageChannel';
-
 import type { EventStore } from '~/eventStore/eventStore';
+
 import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
+import { StateCarryingMessageChannel } from '../channel/stateCarryingMessageChannel';
 
 export class StateCarryingMessageQueue<
   EVENT_STORE extends EventStore = EventStore,

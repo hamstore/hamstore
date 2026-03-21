@@ -15,7 +15,6 @@ import {
   pikachuId,
   pikachuEvents,
 } from '../fixtures.test';
-
 import { pourAggregateEvents } from './pourAggregateEvents';
 
 const messageQueue = new NotificationMessageQueue({

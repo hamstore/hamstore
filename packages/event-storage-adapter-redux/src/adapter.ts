@@ -6,20 +6,19 @@ import {
   PushEventOptions,
   Aggregate,
 } from '@hamstore/core';
+import type { EnhancedStore } from '@reduxjs/toolkit';
 
 import {
   ReduxStoreEventAlreadyExistsError,
   ReduxStateNotFoundError,
 } from '~/errors';
 
+import type { EventStoreReduxState, EventStoresReduxState } from './types';
 import { getEventStoreSliceName } from './utils/getEventStoreSliceName';
 import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
-
-import type { EnhancedStore } from '@reduxjs/toolkit';
-import type { EventStoreReduxState, EventStoresReduxState } from './types';
 
 type ReduxGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,

@@ -1,10 +1,9 @@
+import type { EventStoreEventDetails } from '@hamstore/core';
 import {
   pokemonsEventStore,
   trainersEventStore,
 } from '@hamstore/demo-blueprint';
 import { mockEventStore } from '@hamstore/lib-test-tools';
-
-import type { EventStoreEventDetails } from '@hamstore/core';
 
 export const pokemonEvtStoreId = pokemonsEventStore.eventStoreId;
 export const trainerEvtStoreId = trainersEventStore.eventStoreId;

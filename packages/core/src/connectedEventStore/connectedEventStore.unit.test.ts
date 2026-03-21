@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 
+import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import { EventStore } from '~/eventStore/eventStore';
 import {
   eventStorageAdapterMock,
@@ -16,8 +17,6 @@ import {
   pokemonsEventStoreWithStateCarryingMessageBus,
 } from './connectedEventStore.fixtures.test';
 import * as publishPushedEventModule from './publishPushedEvent';
-
-import type { EventStorageAdapter } from '~/eventStorageAdapter';
 
 const publishPushedEventMock = vi
   .spyOn(publishPushedEventModule, 'publishPushedEvent')

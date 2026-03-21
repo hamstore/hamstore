@@ -1,11 +1,10 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 import { configureHamstore } from '@hamstore/event-storage-adapter-redux';
 import React, { JSX } from 'react';
 import { Provider } from 'react-redux';
 
 import { VisualizerContent } from './VisualizerContent';
-
-import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
-import type { EventStore } from '@hamstore/core';
 
 export const UnthemedVisualizer = ({
   commands,

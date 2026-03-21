@@ -1,3 +1,8 @@
+/* eslint-disable max-lines */
+import type {
+  EventBridgeClient,
+  PutEventsRequestEntry,
+} from '@aws-sdk/client-eventbridge';
 import {
   S3Client,
   PutObjectCommand,
@@ -5,19 +10,13 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { isEventCarryingMessage } from '@hamstore/core';
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import { EventBridgeMessageBusAdapter } from '@hamstore/message-bus-adapter-event-bridge';
 
 import {
   getFormattedMessageSize,
   PUT_EVENTS_ENTRIES_SIZE_LIMIT,
 } from './getFormattedMessageSize';
-
-/* eslint-disable max-lines */
-import type {
-  EventBridgeClient,
-  PutEventsRequestEntry,
-} from '@aws-sdk/client-eventbridge';
-import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import type { OversizedEntryDetail } from './message';
 
 const EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE = 10;

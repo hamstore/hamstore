@@ -4,6 +4,7 @@ import type {
   EventStoreContext,
 } from '~/eventStorageAdapter';
 import type { EventStore } from '~/eventStore/eventStore';
+
 import type { EventDetail, OptionalTimestamp } from './eventDetail';
 
 export class GroupedEvent<

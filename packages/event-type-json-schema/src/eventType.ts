@@ -1,5 +1,4 @@
 import { EventType } from '@hamstore/core';
-
 import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export class JSONSchemaEventType<

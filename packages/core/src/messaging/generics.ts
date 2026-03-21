@@ -4,6 +4,7 @@ import type {
   EventStoreEventDetails,
   EventStoreAggregate,
 } from '~/eventStore';
+
 import type {
   AggregateExistsMessage,
   NotificationMessage,

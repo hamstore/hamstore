@@ -1,4 +1,5 @@
 import type { EventBridgeEvent } from 'aws-lambda';
+
 import type { OversizedEntryDetail } from './message';
 
 type ParsedMessage<MESSAGES extends EventBridgeEvent<string, unknown>> =

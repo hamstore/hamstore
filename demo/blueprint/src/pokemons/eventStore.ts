@@ -1,8 +1,7 @@
 import { EventStore } from '@hamstore/core';
 
-import { appearedEvent, caughtByTrainerEvent, levelledUpEvent } from './events';
-
 import type { PokemonAggregate } from './aggregate';
+import { appearedEvent, caughtByTrainerEvent, levelledUpEvent } from './events';
 
 export const pokemonsEventStore = new EventStore({
   eventStoreId: 'POKEMONS',

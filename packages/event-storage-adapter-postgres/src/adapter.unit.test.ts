@@ -1,11 +1,10 @@
-/* eslint-disable max-lines */
-import { randomUUID } from 'crypto';
-
 import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
 import {
   PostgreSqlContainer,
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
+/* eslint-disable max-lines */
+import { randomUUID } from 'crypto';
 import omit from 'lodash.omit';
 
 import { PostgresEventStorageAdapter } from './adapter';

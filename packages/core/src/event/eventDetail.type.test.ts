@@ -1,4 +1,5 @@
 import type { A } from 'ts-toolbelt';
+
 import type { EventDetail } from './eventDetail';
 
 const assertAnyEventDetail: A.Equals<

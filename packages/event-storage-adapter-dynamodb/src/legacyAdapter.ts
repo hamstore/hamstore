@@ -10,6 +10,12 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { GroupedEvent } from '@hamstore/core';
+import type {
+  Aggregate,
+  EventDetail,
+  PushEventOptions,
+  EventStorageAdapter,
+} from '@hamstore/core';
 
 import {
   EVENT_TABLE_INITIAL_EVENT_INDEX_NAME,
@@ -26,13 +32,6 @@ import {
   parseAppliedListAggregateIdsOptions,
   ParsedPageToken,
 } from './utils/parseAppliedListAggregateIdsOptions';
-
-import type {
-  Aggregate,
-  EventDetail,
-  PushEventOptions,
-  EventStorageAdapter,
-} from '@hamstore/core';
 
 type LegacyDynamoDBGroupedEvent<
   EVENT_DETAILS extends EventDetail = EventDetail,

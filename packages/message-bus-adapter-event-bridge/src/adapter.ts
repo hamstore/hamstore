@@ -9,13 +9,12 @@ import {
   isAggregateExistsMessage,
   isEventCarryingMessage,
 } from '@hamstore/core';
-import chunk from 'lodash.chunk';
-
 import type {
   Message,
   MessageChannelAdapter,
   PublishMessageOptions,
 } from '@hamstore/core';
+import chunk from 'lodash.chunk';
 
 export const EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE = 10;
 

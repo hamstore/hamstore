@@ -4,7 +4,6 @@ import {
   $Contravariant,
   OnEventAlreadyExistsCallback,
 } from '@hamstore/core';
-
 import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 export class JSONSchemaCommand<

@@ -1,12 +1,5 @@
-import {
-  counterEventStore,
-  incrementCounter,
-  Input,
-  Output,
-  Context,
-} from './command.fixtures.test';
-
 import type { A } from 'ts-toolbelt';
+
 import type {
   Command,
   CommandId,
@@ -14,6 +7,13 @@ import type {
   CommandOutput,
   CommandContext,
 } from './command';
+import {
+  counterEventStore,
+  incrementCounter,
+  Input,
+  Output,
+  Context,
+} from './command.fixtures.test';
 
 // --- CLASS ---
 

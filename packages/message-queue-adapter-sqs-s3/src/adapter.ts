@@ -11,11 +11,10 @@ import {
 } from '@aws-sdk/client-sqs';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { isEventCarryingMessage } from '@hamstore/core';
+import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import { SQSMessageQueueAdapter } from '@hamstore/message-queue-adapter-sqs';
 
 import { getMessageSize, SEND_MESSAGES_SIZE_LIMIT } from './getMessageSize';
-
-import type { Message, MessageChannelAdapter } from '@hamstore/core';
 import type { OversizedEntryDetail } from './message';
 
 export const SQS_MAX_MESSAGE_BATCH_SIZE = 10;

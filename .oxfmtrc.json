@@ -7,21 +7,18 @@
   "sortImports": {
     "newlinesBetween": false,
     "groups": [
-      "value-builtin",
+      ["value-builtin", "value-external", "type-builtin", "type-external"],
       { "newlinesBetween": true },
-      "value-external",
+      ["value-internal", "type-internal"],
       { "newlinesBetween": true },
-      "value-internal",
-      { "newlinesBetween": true },
-      "value-parent",
-      { "newlinesBetween": true },
-      ["value-sibling", "value-index"],
-      { "newlinesBetween": true },
-      "type-builtin",
-      "type-external",
-      "type-internal",
-      "type-parent",
-      ["type-sibling", "type-index"],
+      [
+        "value-parent",
+        "value-sibling",
+        "value-index",
+        "type-parent",
+        "type-sibling",
+        "type-index"
+      ],
       "unknown"
     ]
   }

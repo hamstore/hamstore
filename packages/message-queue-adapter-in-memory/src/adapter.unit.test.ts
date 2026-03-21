@@ -9,11 +9,10 @@ import {
   trainersEventStore,
   pikachuAppearedEvent,
 } from '@hamstore/demo-blueprint';
-
-import { Task, InMemoryMessageQueueAdapter, TaskContext } from './adapter';
-
 import type { queueAsPromised } from 'fastq';
 import type { A } from 'ts-toolbelt';
+
+import { Task, InMemoryMessageQueueAdapter, TaskContext } from './adapter';
 
 const messageQueue = new NotificationMessageQueue({
   messageQueueId: 'messageQueueId',

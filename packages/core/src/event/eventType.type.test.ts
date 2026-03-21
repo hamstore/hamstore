@@ -1,6 +1,6 @@
-import { EventType, EventTypeDetail, EventTypeDetails } from './eventType';
-
 import type { A } from 'ts-toolbelt';
+
+import { EventType, EventTypeDetail, EventTypeDetails } from './eventType';
 
 // Payload, no metadata
 

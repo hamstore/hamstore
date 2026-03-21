@@ -1,9 +1,8 @@
+import type { EventTypeDetail } from '@hamstore/core';
+import type { A } from 'ts-toolbelt';
 import { z } from 'zod';
 
 import { ZodEventType } from './eventType';
-
-import type { EventTypeDetail } from '@hamstore/core';
-import type { A } from 'ts-toolbelt';
 
 const expectedProperties = new Set([
   // applying super(...) apparently adds { _types: undefined, parseEventDetail: undefined } to the class

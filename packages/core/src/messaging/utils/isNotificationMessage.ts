@@ -1,6 +1,5 @@
-import { isEventCarryingMessage } from './isEventCarryingMessage';
-
 import type { Message, NotificationMessage } from '../message';
+import { isEventCarryingMessage } from './isEventCarryingMessage';
 
 export const isNotificationMessage = (
   message: Message,

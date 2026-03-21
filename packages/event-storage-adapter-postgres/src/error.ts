@@ -1,5 +1,4 @@
 import { eventAlreadyExistsErrorCode } from '@hamstore/core';
-
 import type { EventAlreadyExistsError } from '@hamstore/core';
 
 export class PostgresEventAlreadyExistsError

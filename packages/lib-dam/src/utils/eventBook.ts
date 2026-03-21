@@ -1,11 +1,11 @@
-import { MessageBatch } from './messageBatch';
-
 import type {
   EventDetail,
   EventStore,
   EventStoreEventDetails,
   EventStoreNotificationMessage,
 } from '@hamstore/core';
+
+import { MessageBatch } from './messageBatch';
 
 export class EventBook<EVENT_STORE extends EventStore> {
   eventStore: EVENT_STORE;

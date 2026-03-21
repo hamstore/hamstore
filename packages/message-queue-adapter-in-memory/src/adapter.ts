@@ -1,11 +1,3 @@
-import { promise as fastQ, queueAsPromised } from 'fastq';
-
-import {
-  parseBackoffRate,
-  parseRetryAttempts,
-  parseRetryDelayInMs,
-} from './utils';
-
 import type {
   MessageChannelSourceEventStores,
   AggregateExistsMessageQueue,
@@ -17,6 +9,13 @@ import type {
   MessageChannelAdapter,
   Message,
 } from '@hamstore/core';
+import { promise as fastQ, queueAsPromised } from 'fastq';
+
+import {
+  parseBackoffRate,
+  parseRetryAttempts,
+  parseRetryDelayInMs,
+} from './utils';
 
 export type InMemoryQueueMessage<
   MESSAGE_QUEUE extends

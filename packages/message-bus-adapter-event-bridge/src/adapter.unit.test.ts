@@ -3,15 +3,14 @@ import {
   PutEventsCommand,
 } from '@aws-sdk/client-eventbridge';
 import { __REPLAYED__ } from '@hamstore/core';
+import type { Message, PublishMessageOptions } from '@hamstore/core';
 import { mockClient } from 'aws-sdk-client-mock';
+import type { A } from 'ts-toolbelt';
 
 import {
   EventBridgeMessageBusAdapter,
   EVENTBRIDGE_MAX_ENTRIES_BATCH_SIZE,
 } from './adapter';
-
-import type { Message, PublishMessageOptions } from '@hamstore/core';
-import type { A } from 'ts-toolbelt';
 
 const eventBridgeClientMock = mockClient(EventBridgeClient);
 

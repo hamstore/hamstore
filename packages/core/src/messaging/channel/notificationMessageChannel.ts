@@ -1,11 +1,11 @@
+import type { EventStore } from '~/eventStore/eventStore';
+import type { $Contravariant } from '~/utils';
+
+import type { EventStoreNotificationMessage } from '../generics';
 import {
   MessageChannelEventStoreNotFoundError,
   UndefinedMessageChannelAdapterError,
 } from './errors';
-
-import type { EventStore } from '~/eventStore/eventStore';
-import type { $Contravariant } from '~/utils';
-import type { EventStoreNotificationMessage } from '../generics';
 import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 

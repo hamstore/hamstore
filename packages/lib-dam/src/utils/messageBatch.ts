@@ -1,6 +1,6 @@
-import { isBetween } from './isBetween';
-
 import type { EventStore, EventStoreNotificationMessage } from '@hamstore/core';
+
+import { isBetween } from './isBetween';
 
 export class MessageBatch<EVENT_STORE extends EventStore> {
   messages: EventStoreNotificationMessage<EVENT_STORE>[];

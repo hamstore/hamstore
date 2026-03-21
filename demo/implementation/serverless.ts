@@ -1,7 +1,7 @@
+import type { AWS } from '@serverless/typescript';
+
 import { functions } from './functions';
 import { resources } from './resources';
-
-import type { AWS } from '@serverless/typescript';
 
 const serverlessConfiguration: AWS = {
   service: 'hamstore-demo',

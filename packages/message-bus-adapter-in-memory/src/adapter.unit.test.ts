@@ -1,5 +1,3 @@
-import { EventEmitter } from 'events';
-
 /* eslint-disable max-lines */
 import {
   MessageChannelMessage,
@@ -12,10 +10,10 @@ import {
   pikachuAppearedEvent,
   pikachuCaughtEvent,
 } from '@hamstore/demo-blueprint';
+import { EventEmitter } from 'events';
+import type { A } from 'ts-toolbelt';
 
 import { InMemoryMessageBusAdapter } from './adapter';
-
-import type { A } from 'ts-toolbelt';
 import type { TaskContext } from './types';
 
 const messageBus = new NotificationMessageBus({

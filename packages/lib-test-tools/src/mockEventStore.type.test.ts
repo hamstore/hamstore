@@ -1,8 +1,7 @@
 import { pokemonsEventStore } from '@hamstore/demo-blueprint';
+import type { A } from 'ts-toolbelt';
 
 import { mockEventStore } from './mockEventStore';
-
-import type { A } from 'ts-toolbelt';
 
 const mockedCounterEventStore = mockEventStore(pokemonsEventStore, [
   {

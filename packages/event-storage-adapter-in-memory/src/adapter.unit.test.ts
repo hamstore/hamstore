@@ -1,7 +1,6 @@
-import { randomUUID } from 'crypto';
-
 /* eslint-disable max-lines */
 import { GroupedEvent, EventStorageAdapter } from '@hamstore/core';
+import { randomUUID } from 'crypto';
 import omit from 'lodash.omit';
 import MockDate from 'mockdate';
 

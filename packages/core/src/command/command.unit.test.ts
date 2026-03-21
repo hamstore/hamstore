@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
 
+import type { EventDetail } from '~/event/eventDetail';
+
 import {
   counterEventsMocks,
   counterEventStore,
@@ -10,8 +12,6 @@ import {
   pushEventMock,
   requiredEventStores,
 } from './command.fixtures.test';
-
-import type { EventDetail } from '~/event/eventDetail';
 
 getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 

@@ -8,15 +8,8 @@ import {
   StateCarryingMessageBus,
   StateCarryingMessage,
 } from '@hamstore/core';
-
-import {
-  doesTaskMatchAnyFilterPattern,
-  parseBackoffRate,
-  parseRetryAttempts,
-  parseRetryDelayInMs,
-} from './utils';
-
 import type { EventEmitter } from 'node:events';
+
 import type { InMemoryMessageBusMessage, Task } from './message';
 import type {
   ConstructorArgs,
@@ -24,6 +17,12 @@ import type {
   InMemoryBusMessage,
   TaskContext,
 } from './types';
+import {
+  doesTaskMatchAnyFilterPattern,
+  parseBackoffRate,
+  parseRetryAttempts,
+  parseRetryDelayInMs,
+} from './utils';
 
 export class InMemoryMessageBusAdapter<
   MESSAGE extends Message = Message,

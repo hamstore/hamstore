@@ -1,6 +1,8 @@
 import type { A } from 'ts-toolbelt';
+
 import type { EventStore } from '~/eventStore';
 import type { pokemonsEventStore } from '~/eventStore/eventStore.fixtures.test';
+
 import type { ConnectedEventStore } from './connectedEventStore';
 import type { pokemonsEventStoreWithStateCarryingMessageBus } from './connectedEventStore.fixtures.test';
 

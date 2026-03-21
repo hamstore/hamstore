@@ -1,3 +1,5 @@
+import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
+import type { EventStore } from '@hamstore/core';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion,
@@ -6,14 +8,11 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import type { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 import React, { JSX } from 'react';
 
 import { Form } from '~/components/Form';
-
-import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
-import type { EventStore } from '@hamstore/core';
-import type { IChangeEvent } from '@rjsf/core';
 
 export const CommandCard = ({
   command,

@@ -4,6 +4,7 @@ import type {
   StateCarryingMessageQueue,
 } from '@hamstore/core';
 import type { SQSMessageQueueMessageBody } from '@hamstore/message-queue-adapter-sqs';
+
 import type { OversizedEntryDetail } from './message';
 
 export const parseBody = async <

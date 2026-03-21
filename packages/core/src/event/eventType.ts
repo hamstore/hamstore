@@ -1,6 +1,5 @@
-import { reservedEventTypes } from './reservedEventTypes';
-
 import type { EventDetail } from './eventDetail';
+import { reservedEventTypes } from './reservedEventTypes';
 
 export class EventType<
   TYPE extends string = string,

@@ -19,7 +19,6 @@ import {
   arcanineEvents,
   charizardEvents,
 } from '../fixtures.test';
-
 import { pourEventStoreAggregateIds } from './pourEventStoreAggregateIds';
 
 const messageQueue = new AggregateExistsMessageQueue({

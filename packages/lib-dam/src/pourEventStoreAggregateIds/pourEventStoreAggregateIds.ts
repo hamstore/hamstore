@@ -1,6 +1,3 @@
-import { getThrottle } from '~/utils/getThrottle';
-import { updateScanInfos } from '~/utils/updateScanInfos';
-
 import type {
   AggregateExistsMessage,
   EventStore,
@@ -8,7 +5,10 @@ import type {
   ListAggregateIdsOptions,
   PublishMessageOptions,
 } from '@hamstore/core';
+
 import type { ScanInfos } from '~/types';
+import { getThrottle } from '~/utils/getThrottle';
+import { updateScanInfos } from '~/utils/updateScanInfos';
 
 interface Props<EVENT_STORE extends EventStore> {
   eventStore: EVENT_STORE;

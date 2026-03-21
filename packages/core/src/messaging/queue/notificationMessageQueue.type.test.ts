@@ -1,4 +1,5 @@
 import type { A } from 'ts-toolbelt';
+
 import type { NotificationMessageChannel } from '../channel/notificationMessageChannel';
 import type { NotificationMessageQueue } from './notificationMessageQueue';
 import type { notificationMessageQueue } from './notificationMessageQueue.fixtures.test';

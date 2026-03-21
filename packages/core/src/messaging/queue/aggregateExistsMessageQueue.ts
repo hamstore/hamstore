@@ -1,6 +1,6 @@
-import { AggregateExistsMessageChannel } from '../channel/aggregateExistsMessageChannel';
-
 import type { EventStore } from '~/eventStore/eventStore';
+
+import { AggregateExistsMessageChannel } from '../channel/aggregateExistsMessageChannel';
 import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 
 export class AggregateExistsMessageQueue<

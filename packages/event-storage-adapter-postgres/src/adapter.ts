@@ -1,9 +1,5 @@
 /* eslint-disable complexity, max-lines */
 import { GroupedEvent } from '@hamstore/core';
-import postgres from 'postgres';
-
-import { PostgresEventAlreadyExistsError } from './error';
-
 import type {
   EventDetail,
   EventsQueryOptions,
@@ -14,7 +10,10 @@ import type {
   OptionalTimestamp,
   PushEventOptions,
 } from '@hamstore/core';
+import postgres from 'postgres';
 import type { SerializableParameter } from 'postgres';
+
+import { PostgresEventAlreadyExistsError } from './error';
 
 type AggregateId =
   | {

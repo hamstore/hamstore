@@ -3,6 +3,7 @@ import type {
   EventStoreEventTypes,
   EventStoreId,
 } from '~/eventStore';
+
 import type {
   EventStoreAggregateExistsMessage,
   EventStoreNotificationMessage,

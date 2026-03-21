@@ -1,15 +1,15 @@
-import { EventBook } from '~/utils/eventBook';
-import { MessageBatch } from '~/utils/messageBatch';
-import { MessagePourer } from '~/utils/messagePourer';
-import { updateScanInfos } from '~/utils/updateScanInfos';
-
 import type {
   EventStore,
   EventStoreId,
   EventStoreNotificationMessage,
   PublishMessageOptions,
 } from '@hamstore/core';
+
 import type { ScanInfos } from '~/types';
+import { EventBook } from '~/utils/eventBook';
+import { MessageBatch } from '~/utils/messageBatch';
+import { MessagePourer } from '~/utils/messagePourer';
+import { updateScanInfos } from '~/utils/updateScanInfos';
 
 interface Props<EVENT_STORES extends EventStore> {
   eventStores: EVENT_STORES[];
