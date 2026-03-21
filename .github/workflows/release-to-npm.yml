@@ -18,6 +18,23 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Validate release type consistency
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          IS_PRERELEASE="${{ github.event.release.prerelease }}"
+          
+          # Check if tag has a pre-release suffix (e.g., -rc1, -beta.1, -alpha.2)
+          if [[ "$TAG_NAME" =~ -[a-zA-Z] ]]; then
+            TAG_HAS_PRERELEASE="true"
+          else
+            TAG_HAS_PRERELEASE="false"
+          fi
+          
+          if [ "$TAG_HAS_PRERELEASE" != "$IS_PRERELEASE" ]; then
+            echo "::error::Mismatch between tag name and release type. Tag '$TAG_NAME' $([ "$TAG_HAS_PRERELEASE" = "true" ] && echo "has" || echo "does not have") a pre-release suffix, but the GitHub release pre-release flag is set to '$IS_PRERELEASE'. Either both must indicate a pre-release, or neither."
+            exit 1
+          fi
+
       - name: Install node_modules
         uses: ./.github/actions/install-node-modules
 
@@ -36,5 +53,16 @@ jobs:
           node-version-file: .nvmrc
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Determine npm dist-tag
+        id: dist-tag
+        run: |
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            echo "tag=next" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish packages to npm
         run: pnpm nx run-many --target=publish-package --all --parallel=1
+        env:
+          NPM_DIST_TAG: ${{ steps.dist-tag.outputs.tag }}

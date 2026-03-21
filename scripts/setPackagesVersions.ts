@@ -24,15 +24,15 @@ if (
   );
 }
 
-const [, NEW_SEM_VER_MAJOR, NEW_SEM_VER_MINOR, NEW_SEM_VER_PATCH] = [
+const [, NEW_SEM_VER_MAJOR, NEW_SEM_VER_MINOR, NEW_SEM_VER_PATCH, NEW_SEM_VER_PRERELEASE] = [
   ...prefixedSemVerMatches,
-] as [string, string, string, string];
+] as [string, string, string, string, string | undefined];
 
 const NEW_SEM_VER = [
   NEW_SEM_VER_MAJOR,
   NEW_SEM_VER_MINOR,
   NEW_SEM_VER_PATCH,
-].join('.');
+].join('.') + (NEW_SEM_VER_PRERELEASE ? `-${NEW_SEM_VER_PRERELEASE}` : '');
 
 type PackageJson = {
   version?: string;
@@ -66,7 +66,9 @@ packagesNames.forEach(packageName => {
   if (peerDependencies !== undefined) {
     Object.keys(peerDependencies).forEach(dependencyName => {
       if (dependencyName.startsWith('@hamstore/')) {
-        peerDependencies[dependencyName] = `^${NEW_SEM_VER_MAJOR}.0.0`;
+        peerDependencies[dependencyName] = NEW_SEM_VER_PRERELEASE
+          ? `^${NEW_SEM_VER_MAJOR}.0.0-0`
+          : `^${NEW_SEM_VER_MAJOR}.0.0`;
       }
     });
   }

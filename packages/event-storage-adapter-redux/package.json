@@ -48,7 +48,7 @@
     "package-cjs": "NODE_ENV=cjs pnpm transpile --out-dir dist/cjs --source-maps --out-file-extension .cjs",
     "package-esm": "NODE_ENV=esm pnpm transpile --out-dir dist/esm --source-maps --out-file-extension .mjs",
     "package-types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "publish-package": "npm publish --provenance --access public",
+    "publish-package": "npm publish --provenance --access public --tag ${NPM_DIST_TAG:-latest}",
     "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
     "test-linter": "pnpm oxlint .",
