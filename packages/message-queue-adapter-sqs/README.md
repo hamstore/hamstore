@@ -43,8 +43,9 @@ const messageQueueAdapter = new SQSMessageQueueAdapter({
 });
 
 const appMessageQueue = new NotificationMessageQueue({
-  ...messageQueueAdapter,
-});
+  ...
+  messageQueueAdapter
+})
 ```
 
 This will directly plug your MessageQueue to SQS 🙌

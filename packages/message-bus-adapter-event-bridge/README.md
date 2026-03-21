@@ -43,8 +43,9 @@ const messageBusAdapter = new EventBridgeMessageBusAdapter({
 });
 
 const appMessageBus = new NotificationMessageBus({
-  ...messageBusAdapter,
-});
+  ...
+  messageBusAdapter
+})
 ```
 
 This will directly plug your MessageBus to EventBridge 🙌
