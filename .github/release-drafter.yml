@@ -12,16 +12,21 @@ version-resolver:
     labels:
       - patch
   default: patch
+exclude-labels:
+  - ignore-for-release
 autolabeler:
   - label: major
     title:
-      - '/^breaking(\(.+\))?:/'
+      - '/^.+!:/'
   - label: minor
     title:
-      - '/^feature(\(.+\))?:/'
+      - '/^feat(\(.+\))?!?:/'
   - label: patch
     title:
-      - '/^fix(\(.+\))?:/'
+      - '/^(fix|perf)(\(.+\))?!?:/'
+  - label: ignore-for-release
+    title:
+      - '/^(refactor|chore|docs|ci|test)(\(.+\))?:/'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 template: |

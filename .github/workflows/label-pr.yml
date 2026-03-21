@@ -29,9 +29,14 @@ jobs:
         uses: amannn/action-semantic-pull-request@v6
         with:
           types: |
-            feature
+            feat
             fix
-            breaking
+            perf
+            refactor
+            chore
+            docs
+            ci
+            test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
