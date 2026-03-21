@@ -43,7 +43,7 @@ import { pourEventStoreAggregateIds } from '@hamstore/lib-dam';
 // 👇 ...or AggregateExistsMessageBus
 const maintenanceMessageQueue = new AggregateExistsMessageQueue({
   sourceEventStores: [pokemonEventStore],
-  // ...
+  ...
 });
 
 const results = await pourEventStoreAggregateIds({
@@ -79,7 +79,7 @@ import { pourAggregateEvents } from '@hamstore/lib-dam';
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({
   sourceEventStores: [pokemonEventStore],
-  // ...
+  ...
 });
 
 const results = await pourAggregateEvents({
@@ -121,7 +121,7 @@ import { pourEventStoreEvents } from '@hamstore/lib-dam';
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({
   sourceEventStores: [pokemonEventStore],
-  // ...
+  ...
 });
 
 const results = await pourEventStoreEvents({
@@ -155,7 +155,7 @@ import { pourEventStoreEvents } from '@hamstore/lib-dam';
 // 👇 ...or NotificationMessageBus
 const maintenanceMessageQueue = new NotificationMessageQueue({
   sourceEventStores: [pokemonEventStore, trainerEventStore],
-  // ...
+  ...
 });
 
 const results = await pourEventStoreCollectionEvents({

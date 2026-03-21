@@ -30,7 +30,7 @@ const pokemonsEventStore = new EventStore({
     pokemonAppearedEventType,
     pokemonCaughtEventType,
     pokemonLeveledUpEventType,
-    // ...
+    ...
   ],
   reducer: pokemonsReducer,
 });

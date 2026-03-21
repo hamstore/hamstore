@@ -24,7 +24,7 @@ await connectedPokemonsEventStore.pushEvent({
   aggregateId: pokemonId,
   version: 2,
   type: 'POKEMON_LEVELED_UP',
-  // ...
+  ...
 });
 ```
 
@@ -41,7 +41,7 @@ await connectedPokemonsEventStore.pushEvent(
   {
     aggregateId: pokemonId,
     version: 2,
-    // ...
+    ...
   },
   // 👇 Aggregate at version 1
   { prevAggregate: pokemonAggregate },

@@ -34,7 +34,7 @@ import { swagger } from './swagger.json'; // your swagger file
 const pokemonHttpEventStorageAdapter = new HttpEventStorageAdapter({ swagger });
 
 const pokemonEventStore = new EventStore({
-  // ...
+  ...
   eventStorageAdapter: pokemonHttpEventStorageAdapter,
 });
 ```

@@ -33,7 +33,7 @@ const pokemonsEventStorageAdapter = new PostgresEventStorageAdapter({
 });
 
 const pokemonsEventStore = new EventStore({
-  // ...
+  ...
   eventStorageAdapter: pokemonsEventStorageAdapter,
 });
 ```

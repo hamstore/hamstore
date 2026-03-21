@@ -20,13 +20,13 @@ await EventStore.pushEventGroup(
     aggregateId: 'pikachu1',
     type: 'CAUGHT_BY_TRAINER',
     payload: { trainerId: 'ashKetchum' },
-    // ...
+    ...
   }),
   trainersEventStore.groupEvent({
     aggregateId: 'ashKetchum',
     type: 'POKEMON_CAUGHT',
     payload: { pokemonId: 'pikachu1' },
-    // ...
+    ...
   }),
 );
 
@@ -34,9 +34,9 @@ await EventStore.pushEventGroup(
 await EventStore.pushEventGroup(
   { force: true },
   pokemonsEventStore.groupEvent({
-    // ...
+    ...
   }),
-  // ...
+  ...
 );
 ```
 
