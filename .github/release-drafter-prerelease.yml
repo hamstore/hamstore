@@ -1,5 +1,5 @@
 # cf https://github.com/marketplace/actions/release-drafter
-name-template: 'v$RESOLVED_VERSION 🌈'
+name-template: 'v$RESOLVED_VERSION 🧪'
 tag-template: 'v$RESOLVED_VERSION'
 prerelease: true
 prerelease-identifier: rc
