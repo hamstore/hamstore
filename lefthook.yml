@@ -1,0 +1,9 @@
+pre-commit:
+  jobs:
+    - name: syncpack format
+      run: pnpm syncpack format && git add $(git diff --name-only -- '**/package.json')
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm commitlint --edit {1}

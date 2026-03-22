@@ -1,6 +1,7 @@
 {
   "name": "@hamstore/message-queue-adapter-sqs-s3",
   "description": "DRY Hamstore MessageQueue definition using AWS SQS and S3",
+  "license": "MIT",
   "keywords": [
     "event",
     "source",
@@ -9,7 +10,6 @@
   ],
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",

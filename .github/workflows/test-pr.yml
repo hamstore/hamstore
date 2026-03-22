@@ -32,6 +32,9 @@ jobs:
       - name: Install node_modules
         uses: ./.github/actions/install-node-modules
 
+      - name: Check syncpack format
+        run: pnpm syncpack format --check
+
       - name: Package
         uses: ./.github/actions/package
 
