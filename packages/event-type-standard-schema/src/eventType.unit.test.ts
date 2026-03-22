@@ -20,6 +20,14 @@ const createMockSchema = <I, O = I>(
     },
   }) as StandardSchemaV1<I, O>;
 
+const expectedProperties = new Set([
+  '_types',
+  'type',
+  'parseEventDetail',
+  'payloadSchema',
+  'metadataSchema',
+]);
+
 describe('standardSchemaEventType implementation', () => {
   const type = 'SOMETHING_HAPPENED';
 
@@ -69,7 +77,7 @@ describe('standardSchemaEventType implementation', () => {
     assertSimpleEventTypeDetail;
 
     expect(new Set(Object.keys(simpleEventType))).toStrictEqual(
-      new Set(['type', 'parseEventDetail']),
+      expectedProperties,
     );
     expect(simpleEventType.type).toStrictEqual(type);
     expect(simpleEventType.payloadSchema).toStrictEqual(undefined);
@@ -102,7 +110,7 @@ describe('standardSchemaEventType implementation', () => {
     assertPayloadEventTypeDetail;
 
     expect(new Set(Object.keys(payloadEventType))).toStrictEqual(
-      new Set(['type', 'parseEventDetail', 'payloadSchema']),
+      expectedProperties,
     );
     expect(payloadEventType.type).toStrictEqual(type);
     expect(payloadEventType.payloadSchema).toStrictEqual(payloadSchema);
@@ -135,7 +143,7 @@ describe('standardSchemaEventType implementation', () => {
     assertMetadataEventTypeDetail;
 
     expect(new Set(Object.keys(metadataEventType))).toStrictEqual(
-      new Set(['type', 'parseEventDetail', 'metadataSchema']),
+      expectedProperties,
     );
     expect(metadataEventType.type).toStrictEqual(type);
     expect(metadataEventType.payloadSchema).toStrictEqual(undefined);
@@ -170,12 +178,7 @@ describe('standardSchemaEventType implementation', () => {
     assertFullEventTypeDetail;
 
     expect(new Set(Object.keys(fullEventType))).toStrictEqual(
-      new Set([
-        'type',
-        'parseEventDetail',
-        'payloadSchema',
-        'metadataSchema',
-      ]),
+      expectedProperties,
     );
     expect(fullEventType.type).toStrictEqual(type);
     expect(fullEventType.payloadSchema).toStrictEqual(payloadSchema);

@@ -17,6 +17,7 @@ getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
 describe('standardSchemaCommand implementation', () => {
   const expectedProperties = new Set([
+    '_types',
     'commandId',
     'requiredEventStores',
     'inputSchema',
@@ -44,10 +45,11 @@ describe('standardSchemaCommand implementation', () => {
   });
 
   it('has correct properties (no output)', () => {
-    expect(Object.keys(incrementCounterNoOutput)).toHaveLength(
-      expectedProperties.size - 1,
+    expect(new Set(Object.keys(incrementCounterNoOutput))).toStrictEqual(
+      expectedProperties,
     );
     expect(incrementCounterNoOutput.inputSchema).toStrictEqual(inputSchema);
+    expect(incrementCounterNoOutput.outputSchema).toBeUndefined();
   });
 
   describe('input validation', () => {
