@@ -1,138 +1,53 @@
 /* eslint-disable max-lines */
-import {
-  EventStore,
-  EventType,
-  EventStorageAdapter,
-  tuple,
-} from '@hamstore/core';
-import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { vi } from 'vitest';
 
+import {
+  counterEventsMocks,
+  createMockSchema,
+  getEventsMock,
+  incrementCounter,
+  incrementCounterNoOutput,
+  inputSchema,
+  outputSchema,
+  requiredEventStores,
+} from './command.fixtures.test';
 import { StandardSchemaCommand } from './command';
 
-// Mock Standard Schema helpers
+getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
-const createMockSchema = <I, O = I>(
-  validateFn: (
-    value: unknown,
-  ) => StandardSchemaV1.Result<O> | Promise<StandardSchemaV1.Result<O>>,
-): StandardSchemaV1<I, O> =>
-  ({
-    '~standard': {
-      version: 1,
-      vendor: 'test',
-      validate: validateFn,
-    },
-  }) as StandardSchemaV1<I, O>;
+describe('standardSchemaCommand implementation', () => {
+  const expectedProperties = new Set([
+    'commandId',
+    'requiredEventStores',
+    'inputSchema',
+    'outputSchema',
+    'eventAlreadyExistsRetries',
+    'onEventAlreadyExists',
+    'handler',
+  ]);
 
-// Event store fixtures
+  it('has correct properties', () => {
+    expect(new Set(Object.keys(incrementCounter))).toStrictEqual(
+      expectedProperties,
+    );
 
-const pushEventMock = vi.fn();
-const pushEventGroupMock = vi.fn();
-const groupEventMock = vi.fn();
-const getEventsMock = vi.fn();
-const listAggregateIdsMock = vi.fn();
+    expect(
+      incrementCounter.requiredEventStores.map(
+        ({ eventStoreId }) => eventStoreId,
+      ),
+    ).toStrictEqual(
+      requiredEventStores.map(({ eventStoreId }) => eventStoreId),
+    );
 
-const eventStorageAdapterMock: EventStorageAdapter = {
-  pushEvent: pushEventMock,
-  pushEventGroup: pushEventGroupMock,
-  groupEvent: groupEventMock,
-  getEvents: getEventsMock,
-  listAggregateIds: listAggregateIdsMock,
-};
+    expect(incrementCounter.inputSchema).toStrictEqual(inputSchema);
+    expect(incrementCounter.outputSchema).toStrictEqual(outputSchema);
+  });
 
-const counterCreatedEvent = new EventType<'COUNTER_CREATED'>({
-  type: 'COUNTER_CREATED',
-});
-const counterIncrementedEvent = new EventType<'COUNTER_INCREMENTED'>({
-  type: 'COUNTER_INCREMENTED',
-});
-
-type CounterAggregate = {
-  aggregateId: string;
-  version: number;
-  count: number;
-};
-
-const counterEventStore = new EventStore({
-  eventStoreId: 'Counters',
-  eventTypes: [counterCreatedEvent, counterIncrementedEvent],
-  reducer: (aggregate: CounterAggregate, event): CounterAggregate => {
-    const { aggregateId, version } = event;
-    if (event.type === 'COUNTER_INCREMENTED') {
-      return {
-        aggregateId,
-        version,
-        count: (aggregate?.count ?? 0) + 1,
-      };
-    }
-
-    return aggregate ?? { aggregateId, version, count: 0 };
-  },
-  eventStorageAdapter: eventStorageAdapterMock,
-});
-
-// Schemas
-
-const inputSchema = createMockSchema<
-  { counterId: string },
-  { counterId: string }
->(value => {
-  const obj = value as Record<string, unknown>;
-  if (typeof obj?.counterId === 'string') {
-    return { value: obj as { counterId: string } };
-  }
-
-  return {
-    issues: [{ message: 'Expected object with counterId: string' }],
-  };
-});
-
-const outputSchema = createMockSchema<
-  { nextCount: number },
-  { nextCount: number }
->(value => {
-  const obj = value as Record<string, unknown>;
-  if (typeof obj?.nextCount === 'number') {
-    return { value: obj as { nextCount: number } };
-  }
-
-  return {
-    issues: [{ message: 'Expected object with nextCount: number' }],
-  };
-});
-
-describe('StandardSchemaCommand implementation', () => {
-  const requiredEventStores = tuple(counterEventStore);
-
-  describe('construction', () => {
-    it('has correct properties (with input and output schemas)', () => {
-      const command = new StandardSchemaCommand({
-        commandId: 'INCREMENT_COUNTER',
-        requiredEventStores,
-        inputSchema,
-        outputSchema,
-        handler: async () => ({ nextCount: 1 }),
-      });
-
-      expect(command.commandId).toBe('INCREMENT_COUNTER');
-      expect(command.inputSchema).toBe(inputSchema);
-      expect(command.outputSchema).toBe(outputSchema);
-    });
-
-    it('has correct properties (input only, no output schema)', () => {
-      const command = new StandardSchemaCommand({
-        commandId: 'INCREMENT_COUNTER',
-        requiredEventStores,
-        inputSchema,
-        handler: async () => {
-          /* no return */
-        },
-      });
-
-      expect(command.inputSchema).toBe(inputSchema);
-      expect(command.outputSchema).toBeUndefined();
-    });
+  it('has correct properties (no output)', () => {
+    expect(Object.keys(incrementCounterNoOutput)).toHaveLength(
+      expectedProperties.size - 1,
+    );
+    expect(incrementCounterNoOutput.inputSchema).toStrictEqual(inputSchema);
   });
 
   describe('input validation', () => {
