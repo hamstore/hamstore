@@ -11,6 +11,7 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "sideEffects": false,
   "types": "dist/types/index.d.ts",
   "exports": {
@@ -56,6 +57,5 @@
     "@hamstore/core": "*",
     "@hamstore/event-type-json-schema": "*",
     "json-schema-to-ts": "^2.0.0 || ^3.0.0"
-  },
-  "type": "module"
+  }
 }
