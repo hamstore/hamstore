@@ -23,5 +23,8 @@ jobs:
       - name: Package
         uses: ./.github/actions/package
 
+      - name: Set placeholder versions
+        run: pnpm set-packages-versions v0.0.0-preview
+
       - name: Publish Preview
         run: npx pkg-pr-new publish --compact './packages/*'
