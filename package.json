@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": "hamstore/hamstore",
   "keywords": [
     "event",
     "source",
