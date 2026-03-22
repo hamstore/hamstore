@@ -10,7 +10,10 @@
   ],
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git"
+  },
   "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
