@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import type { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
-import React, { JSX } from 'react';
+import { JSX } from 'react';
 
 import { Form } from '~/components/Form';
 

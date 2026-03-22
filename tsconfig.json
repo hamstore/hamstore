@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2019",
+    "target": "es2024",
+    "module": "esnext",
     "esModuleInterop": true,
     "types": ["node", "vitest/globals"],
     "lib": ["ESNext"],
     "removeComments": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,

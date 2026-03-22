@@ -1,7 +1,7 @@
 import type { EventStore } from '@hamstore/core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
-import React, { useState, JSX } from 'react';
+import { useState, JSX } from 'react';
 
 import { EventStoreDB } from './EventStoreDB';
 

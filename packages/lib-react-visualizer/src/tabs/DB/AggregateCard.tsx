@@ -12,7 +12,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import React, { useState, JSX } from 'react';
+import { useState, JSX } from 'react';
 
 import { JsonView } from '~/components/JsonView';
 

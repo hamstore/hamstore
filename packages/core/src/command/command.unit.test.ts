@@ -17,6 +17,7 @@ getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
 describe('command implementation', () => {
   const expectedProperties = new Set([
+    '_types',
     'commandId',
     'requiredEventStores',
     'eventAlreadyExistsRetries',

@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { ZodEventType } from './eventType';
 
 const expectedProperties = new Set([
+  '_types',
   'type',
+  'parseEventDetail',
   'payloadSchema',
   'metadataSchema',
 ]);
