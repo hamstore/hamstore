@@ -35,6 +35,10 @@ jobs:
       - name: Package
         uses: ./.github/actions/package
 
+      - name: Check syncpack format
+        run: pnpm syncpack format && git diff --exit-code
+        shell: bash
+
       - name: Get affected packages paths
         id: get-affected-packages-paths
         uses: ./.github/actions/get-affected-packages-paths
