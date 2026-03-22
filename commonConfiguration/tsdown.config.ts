@@ -8,36 +8,32 @@ const tsxEntry = [
   '!src/**/*.test.tsx',
 ];
 
-const jsConfig = (entry: string[]): Options => ({
-  entry,
-  unbundle: true,
-  fixedExtension: true,
-  sourcemap: true,
-  clean: true,
-  format: ['esm', 'cjs'],
-  dts: false,
-  outputOptions(options, format) {
-    options.dir = format === 'es' ? 'dist/esm' : 'dist/cjs';
+const base = (entry: string[]) =>
+  ({
+    entry,
+    unbundle: true,
+    sourcemap: true,
+    outExtensions({ format }) {
+      if (format === 'es') return { js: '.mjs', dts: '.d.ts' };
+      return { js: '.cjs' };
+    },
+    tsconfig: './tsconfig.build.json',
+  }) satisfies Options;
+
+const createConfig = (entry: string[]): Options[] => [
+  {
+    ...base(entry),
+    clean: true,
+    format: { esm: { outDir: 'dist/esm' }, cjs: { outDir: 'dist/cjs' } },
+    dts: false,
   },
-  tsconfig: './tsconfig.build.json',
-});
-
-const dtsConfig = (entry: string[]): Options => ({
-  entry,
-  unbundle: true,
-  fixedExtension: false,
-  format: 'esm',
-  outDir: 'dist/types',
-  dts: { emitDtsOnly: true },
-  tsconfig: './tsconfig.build.json',
-});
-
-export const baseConfig: Options[] = [
-  jsConfig(tsEntry),
-  dtsConfig(tsEntry),
+  {
+    ...base(entry),
+    format: 'esm',
+    outDir: 'dist/types',
+    dts: { emitDtsOnly: true },
+  },
 ];
 
-export const reactConfig: Options[] = [
-  jsConfig(tsxEntry),
-  dtsConfig(tsxEntry),
-];
+export const baseConfig = createConfig(tsEntry);
+export const reactConfig = createConfig(tsxEntry);
