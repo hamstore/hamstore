@@ -32,12 +32,12 @@ jobs:
       - name: Install node_modules
         uses: ./.github/actions/install-node-modules
 
-      - name: Package
-        uses: ./.github/actions/package
-
       - name: Check syncpack format
         run: pnpm syncpack format && git diff --exit-code
         shell: bash
+
+      - name: Package
+        uses: ./.github/actions/package
 
       - name: Get affected packages paths
         id: get-affected-packages-paths
