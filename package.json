@@ -1,16 +1,20 @@
 {
   "name": "@hamstore/hamstore",
   "description": "Making Event Sourcing easy 😎",
-  "license": "MIT",
-  "homepage": "https://github.com/hamstore/hamstore#readme",
-  "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
     "store",
     "typescript"
   ],
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git"
+  },
+  "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
@@ -37,11 +41,10 @@
     "nx": "^21.5.3",
     "oxfmt": "^0.41.0",
     "oxlint": "^1.56.0",
-    "syncpack": "^14.2.0",
+    "syncpack": "^13.0.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2"
   },
-  "type": "module",
   "engines": {
     "node": "^22.19.0 || ^24.0.0"
   },
