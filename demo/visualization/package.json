@@ -1,6 +1,10 @@
 {
   "name": "@hamstore/demo-visualization",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "demo/visualization"
+  },
   "scripts": {
     "build": "rm -rf dist && vite build",
     "lint-fix": "pnpm oxlint --fix",
@@ -10,6 +14,18 @@
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
     "test-linter": "pnpm oxlint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "dependencies": {
     "@hamstore/command-json-schema": "workspace:",
@@ -36,21 +52,5 @@
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hamstore/hamstore.git",
-    "directory": "demo/visualization"
-  }
+  "type": "module"
 }

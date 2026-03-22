@@ -1,6 +1,11 @@
 {
   "name": "@hamstore/demo-implementation",
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "demo/implementation"
+  },
   "sideEffects": false,
   "scripts": {
     "deploy": "env-cmd sls deploy",
@@ -42,10 +47,5 @@
     "serverless-esbuild": "^1.55.1",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hamstore/hamstore.git",
-    "directory": "demo/implementation"
   }
 }
