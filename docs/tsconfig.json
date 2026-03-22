@@ -19,7 +19,7 @@
     "strict": true,
     "skipLibCheck": true,
     "preserveSymlinks": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "esnext",
     "noFallthroughCasesInSwitch": true
   },
