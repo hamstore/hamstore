@@ -1,8 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "useDefineForClassFields": true
+    "rootDir": "src"
   },
   "exclude": [
     "./dist"

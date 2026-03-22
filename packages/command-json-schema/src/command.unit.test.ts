@@ -14,8 +14,6 @@ getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
 describe('jsonSchemaCommand implementation', () => {
   const expectedProperties = new Set([
-    // applying super(...) apparently adds { _types: undefined } to the class
-    '_types',
     'commandId',
     'requiredEventStores',
     'inputSchema',
