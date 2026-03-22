@@ -44,7 +44,12 @@ const catchPokemonCommand = new StandardSchemaCommand({
 });
 ```
 
-The `StandardSchemaCommand` extends the core `Command` and stores input/output schemas for type inference and documentation.
+The `StandardSchemaCommand` extends the core `Command` with **runtime validation**:
+
+- The `inputSchema` is **required** and validates every command invocation before the handler runs. The handler receives the parsed/transformed output of the schema (e.g. after Zod transforms).
+- The `outputSchema` is **optional** and validates the handler's return value if provided.
+
+If validation fails, the command throws an error with the schema's validation issues. Input validation failures do **not** trigger the retry mechanism (retries only apply to `EventAlreadyExistsError`).
 
 ## Why Standard Schema?
 
