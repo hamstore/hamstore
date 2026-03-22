@@ -11,7 +11,6 @@
     "store",
     "typescript"
   ],
-  "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
@@ -27,6 +26,7 @@
     "test-unit": "nx run-many --target=test-unit --all --parallel=4",
     "watch": "nx run-many --target=watch --all  --parallel=4"
   },
+  "type": "module",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",

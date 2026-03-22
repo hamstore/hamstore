@@ -13,20 +13,6 @@
     "dist"
   ],
   "types": "dist/types/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
-  },
   "scripts": {
     "lint-fix": "pnpm oxlint --fix",
     "lint-fix-all": "pnpm lint-fix .",
@@ -40,6 +26,20 @@
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "transpile": "babel src --extensions .ts --quiet",
     "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
   },
   "dependencies": {
     "@hamstore/command-json-schema": "workspace:"

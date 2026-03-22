@@ -27,11 +27,11 @@ export default {
     'main',
     'module',
     'types',
-    'exports',
-    'type',
     'contracts',
     'generators',
     'scripts',
+    'exports',
+    'type',
   ],
   versionGroups: [],
 };
