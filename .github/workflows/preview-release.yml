@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/package
 
       - name: Set placeholder versions
-        run: pnpm set-packages-versions "v0.0.0-sha.${GITHUB_SHA::7}" --version-only
+        run: pnpm set-packages-versions "v0.0.0-sha${GITHUB_SHA::7}" --version-only
 
       - name: Publish Preview
         run: npx pkg-pr-new publish --compact './packages/*'
