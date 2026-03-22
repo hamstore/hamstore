@@ -7,6 +7,8 @@ import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
+import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
+import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import type {
   AggregateIdsLister,
@@ -20,6 +22,7 @@ import type {
   AggregateGetter,
   AggregateSimulator,
   Reducer,
+  ValidateEventDetail,
 } from './types';
 
 export class EventStore<
@@ -58,6 +61,48 @@ export class EventStore<
     ) as { force?: boolean };
 
     const [groupedEventsHead] = groupedEvents;
+
+    // Validate all grouped events that have validation configured
+    await Promise.all(
+      groupedEvents.map(async groupedEvent => {
+        const validate = groupedEvent.validate ?? 'auto';
+        if (validate === false || groupedEvent.eventStore === undefined) return;
+
+        const eventStore = groupedEvent.eventStore;
+        const eventDetail = groupedEvent.event;
+
+        const eventType = eventStore.eventTypes.find(
+          ({ type }: { type: string }) => type === eventDetail.type,
+        );
+
+        if (eventType === undefined) {
+          if (validate === true) {
+            throw new EventDetailTypeDoesNotExistError({
+              type: eventDetail.type,
+              allowedTypes: eventStore.eventTypes.map(
+                ({ type }: { type: string }) => type,
+              ),
+            });
+          }
+          return;
+        }
+
+        if (eventType.parseEventDetail === undefined) {
+          if (validate === true) {
+            throw new EventDetailParserNotDefinedError(eventDetail.type);
+          }
+          return;
+        }
+
+        const result = await eventType.parseEventDetail(
+          eventDetail as EventDetail,
+        );
+
+        if (!result.isValid) {
+          throw new Error(result.parsingErrors[0].message);
+        }
+      }),
+    );
 
     const { eventGroup: eventGroupWithoutAggregates } =
       await groupedEventsHead.eventStorageAdapter.pushEventGroup(
@@ -183,10 +228,46 @@ export class EventStore<
          */
       ) as Promise<{ events: EVENT_DETAILS[] }>;
 
+    const resolveEventValidation = async (
+      eventDetail: EventDetail,
+      validate: ValidateEventDetail,
+    ): Promise<void> => {
+      if (validate === false) return;
+
+      const eventType = this.eventTypes.find(
+        ({ type }) => type === eventDetail.type,
+      );
+
+      if (eventType === undefined) {
+        if (validate === true) {
+          throw new EventDetailTypeDoesNotExistError({
+            type: eventDetail.type,
+            allowedTypes: this.eventTypes.map(({ type }) => type),
+          });
+        }
+        return;
+      }
+
+      if (eventType.parseEventDetail === undefined) {
+        if (validate === true) {
+          throw new EventDetailParserNotDefinedError(eventDetail.type);
+        }
+        return;
+      }
+
+      const result = await eventType.parseEventDetail(eventDetail);
+
+      if (!result.isValid) {
+        throw new Error(result.parsingErrors[0].message);
+      }
+    };
+
     this.pushEvent = async (
       eventDetail,
-      { prevAggregate, force = false } = {},
+      { prevAggregate, force = false, validate = 'auto' } = {},
     ) => {
+      await resolveEventValidation(eventDetail as EventDetail, validate);
+
       const { event } = (await this.getEventStorageAdapter().pushEvent(
         eventDetail,
         {
@@ -217,10 +298,14 @@ export class EventStore<
       return response;
     };
 
-    this.groupEvent = (eventDetail, { prevAggregate } = {}) => {
+    this.groupEvent = (eventDetail, { prevAggregate, validate } = {}) => {
       const groupedEvent = this.getEventStorageAdapter().groupEvent(
         eventDetail,
       ) as GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+
+      if (validate !== undefined) {
+        groupedEvent.validate = validate;
+      }
 
       groupedEvent.eventStore = this;
       groupedEvent.context = { eventStoreId: this.eventStoreId };
