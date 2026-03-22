@@ -24,19 +24,7 @@ jobs:
         uses: ./.github/actions/package
 
       - name: Set placeholder versions
-        run: |
-          # Packages don't carry a version field (set dynamically at release time).
-          # npm pack requires one, so we inject a placeholder.
-          # Unlike set-packages-versions, this does NOT rewrite dependency ranges,
-          # so preview packages stay compatible with published releases.
-          for pkg in packages/*/package.json; do
-            node -e "
-              const fs = require('fs');
-              const j = JSON.parse(fs.readFileSync('$pkg', 'utf8'));
-              j.version = '0.0.0';
-              fs.writeFileSync('$pkg', JSON.stringify(j, null, 2) + '\n');
-            "
-          done
+        run: pnpm set-packages-versions v0.0.0 --version-only
 
       - name: Publish Preview
         run: npx pkg-pr-new publish --compact './packages/*'

@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const newVersionTag = process.argv[2];
+const versionOnly = process.argv.includes('--version-only');
+const newVersionTag = process.argv.filter(arg => !arg.startsWith('--')).at(2);
 
 if (newVersionTag === undefined) {
   throw new Error('Please provide a version tag');
@@ -53,24 +54,26 @@ packagesNames.forEach(packageName => {
 
   packageJson.version = NEW_SEM_VER;
 
-  const dependencies = packageJson.dependencies;
-  if (dependencies !== undefined) {
-    Object.keys(dependencies).forEach(dependencyName => {
-      if (dependencyName.startsWith('@hamstore/')) {
-        dependencies[dependencyName] = NEW_SEM_VER;
-      }
-    });
-  }
+  if (!versionOnly) {
+    const dependencies = packageJson.dependencies;
+    if (dependencies !== undefined) {
+      Object.keys(dependencies).forEach(dependencyName => {
+        if (dependencyName.startsWith('@hamstore/')) {
+          dependencies[dependencyName] = NEW_SEM_VER;
+        }
+      });
+    }
 
-  const peerDependencies = packageJson.peerDependencies;
-  if (peerDependencies !== undefined) {
-    Object.keys(peerDependencies).forEach(dependencyName => {
-      if (dependencyName.startsWith('@hamstore/')) {
-        peerDependencies[dependencyName] = NEW_SEM_VER_PRERELEASE
-          ? `^${NEW_SEM_VER_MAJOR}.0.0-0`
-          : `^${NEW_SEM_VER_MAJOR}.0.0`;
-      }
-    });
+    const peerDependencies = packageJson.peerDependencies;
+    if (peerDependencies !== undefined) {
+      Object.keys(peerDependencies).forEach(dependencyName => {
+        if (dependencyName.startsWith('@hamstore/')) {
+          peerDependencies[dependencyName] = NEW_SEM_VER_PRERELEASE
+            ? `^${NEW_SEM_VER_MAJOR}.0.0-0`
+            : `^${NEW_SEM_VER_MAJOR}.0.0`;
+        }
+      });
+    }
   }
 
   writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
