@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/package
 
       - name: Set placeholder versions
-        run: pnpm set-packages-versions v0.0.0-preview
+        run: node -e "const fs=require('fs'),path=require('path');for(const d of fs.readdirSync('packages')){const p=path.join('packages',d,'package.json');if(!fs.existsSync(p))continue;const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version='0.0.0';fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n')}"
 
       - name: Publish Preview
         run: npx pkg-pr-new publish --compact './packages/*'
