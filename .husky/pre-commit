@@ -1,0 +1,2 @@
+pnpm syncpack format
+git add $(git diff --name-only --cached -- '**/package.json')

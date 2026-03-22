@@ -19,7 +19,7 @@
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
     "package": "nx run-many --target=package --all --parallel=4",
-    "postinstall": "husky install && syncpack format",
+    "postinstall": "husky install",
     "resolve-audit": "pnpm audit --fix",
     "set-packages-versions": "tsx scripts/setPackagesVersions.ts",
     "test": "nx run-many --target=test --all",
