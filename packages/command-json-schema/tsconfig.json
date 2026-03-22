@@ -7,6 +7,11 @@
     "outDir": "./dist/types",
     "esModuleInterop": true
   },
-  "exclude": ["./dist"],
-  "include": ["./**/*.ts"]
+  "exclude": [
+    "./dist",
+    "./tsdown.config.ts"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
 }

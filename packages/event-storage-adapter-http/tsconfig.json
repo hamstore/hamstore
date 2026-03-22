@@ -3,7 +3,11 @@
   "compilerOptions": {
     "baseUrl": "src",
     "composite": true,
-    "plugins": [{ "transform": "@zerollup/ts-transform-paths" }],
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths"
+      }
+    ],
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist/types",
@@ -14,6 +18,11 @@
   "ts-node": {
     "files": true
   },
-  "exclude": ["./dist"],
-  "include": ["./**/*.ts"]
+  "exclude": [
+    "./dist",
+    "./tsdown.config.ts"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
 }

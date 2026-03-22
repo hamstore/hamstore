@@ -5,9 +5,6 @@ import type { A } from 'ts-toolbelt';
 import { JSONSchemaEventType } from './eventType';
 
 const expectedProperties = new Set([
-  // applying super(...) apparently adds { _types: undefined, parseEventDetail: undefined } to the class
-  '_types',
-  'parseEventDetail',
   'type',
   'payloadSchema',
   'metadataSchema',
