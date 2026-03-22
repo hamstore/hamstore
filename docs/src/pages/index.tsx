@@ -2,7 +2,7 @@
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import React, { JSX } from 'react';
+import { JSX } from 'react';
 import { BsStars } from 'react-icons/bs';
 import {
   FaRegCopy,

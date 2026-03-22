@@ -8,7 +8,7 @@ import {
   levelUpPokemonCommand,
 } from '@hamstore/demo-blueprint';
 import { Visualizer } from '@hamstore/lib-react-visualizer';
-import React from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { v4 as uuid } from 'uuid';
 
@@ -16,7 +16,7 @@ import './index.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <Visualizer
       eventStores={[pokemonsEventStore, trainersEventStore]}
       /**
@@ -33,5 +33,5 @@ root.render(
         WILD_POKEMON_APPEAR: [{ generateUuid: uuid }],
       }}
     />
-  </React.StrictMode>,
+  </StrictMode>,
 );

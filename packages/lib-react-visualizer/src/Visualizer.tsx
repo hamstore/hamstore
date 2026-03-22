@@ -1,7 +1,7 @@
 import type { JSONSchemaCommand } from '@hamstore/command-json-schema';
 import { EventStore, Command, CommandId, CommandContext } from '@hamstore/core';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import React, { JSX } from 'react';
+import { JSX } from 'react';
 
 import { defaultTheme } from './defaultTheme';
 import { UnthemedVisualizer } from './UnthemedVisualizer';

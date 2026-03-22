@@ -9,7 +9,7 @@ import {
   levelUpPokemonCommand,
 } from '@hamstore/demo-blueprint';
 import Layout from '@theme/Layout';
-import React, { JSX } from 'react';
+import { JSX } from 'react';
 
 import './index.css';
 

@@ -14,6 +14,7 @@ getEventsMock.mockResolvedValue({ events: counterEventsMocks });
 
 describe('zodCommand implementation', () => {
   const expectedProperties = new Set([
+    '_types',
     'commandId',
     'requiredEventStores',
     'inputSchema',
@@ -41,22 +42,26 @@ describe('zodCommand implementation', () => {
   });
 
   it('has correct properties (no output)', () => {
-    expect(Object.keys(incrementCounterNoOutput)).toHaveLength(
-      expectedProperties.size - 1,
+    expect(new Set(Object.keys(incrementCounterNoOutput))).toStrictEqual(
+      expectedProperties,
     );
     expect(incrementCounterNoOutput.inputSchema).toStrictEqual(inputSchema);
+    expect(incrementCounterNoOutput.outputSchema).toBeUndefined();
   });
 
   it('has correct properties (no input)', () => {
-    expect(Object.keys(incrementCounterA)).toHaveLength(
-      expectedProperties.size - 1,
+    expect(new Set(Object.keys(incrementCounterA))).toStrictEqual(
+      expectedProperties,
     );
+    expect(incrementCounterA.inputSchema).toBeUndefined();
     expect(incrementCounterA.outputSchema).toStrictEqual(outputSchema);
   });
 
   it('has correct properties (no input, no output)', () => {
-    expect(Object.keys(incrementCounterANoOutput)).toHaveLength(
-      expectedProperties.size - 2,
+    expect(new Set(Object.keys(incrementCounterANoOutput))).toStrictEqual(
+      expectedProperties,
     );
+    expect(incrementCounterANoOutput.inputSchema).toBeUndefined();
+    expect(incrementCounterANoOutput.outputSchema).toBeUndefined();
   });
 });

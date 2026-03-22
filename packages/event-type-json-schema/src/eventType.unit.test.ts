@@ -5,7 +5,9 @@ import type { A } from 'ts-toolbelt';
 import { JSONSchemaEventType } from './eventType';
 
 const expectedProperties = new Set([
+  '_types',
   'type',
+  'parseEventDetail',
   'payloadSchema',
   'metadataSchema',
 ]);

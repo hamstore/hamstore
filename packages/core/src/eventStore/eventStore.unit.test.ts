@@ -36,6 +36,7 @@ describe('event store', () => {
   it('has correct properties', () => {
     expect(new Set(Object.keys(pokemonsEventStore))).toStrictEqual(
       new Set([
+        '_types',
         'eventStoreId',
         'eventTypes',
         'reducer',
