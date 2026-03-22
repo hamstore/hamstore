@@ -41,21 +41,6 @@
     "transpile": "babel src --extensions .ts,.tsx --quiet",
     "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
-  },
-  "type": "module",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -101,9 +86,24 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
   "peerDependencies": {
     "@hamstore/command-json-schema": "*",
     "@hamstore/core": "*",
     "react": "^19.0.0"
-  }
+  },
+  "type": "module"
 }

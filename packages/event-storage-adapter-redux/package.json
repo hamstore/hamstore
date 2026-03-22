@@ -42,21 +42,6 @@
     "transpile": "babel src --extensions .ts --quiet",
     "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
-  },
-  "type": "module",
   "devDependencies": {
     "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.4",
@@ -76,9 +61,24 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
   "peerDependencies": {
     "@hamstore/core": "*",
     "@reduxjs/toolkit": "^1.9.0",
     "react-redux": "^8.0.0"
-  }
+  },
+  "type": "module"
 }

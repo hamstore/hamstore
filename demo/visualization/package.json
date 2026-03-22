@@ -15,19 +15,6 @@
     "test-linter": "pnpm oxlint .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false"
   },
-  "type": "module",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "dependencies": {
     "@hamstore/command-json-schema": "workspace:",
     "@hamstore/core": "workspace:",
@@ -52,5 +39,18 @@
     "vite": "^7.1.6",
     "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "type": "module",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

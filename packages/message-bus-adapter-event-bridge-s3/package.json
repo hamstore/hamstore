@@ -41,21 +41,6 @@
     "transpile": "babel src --extensions .ts --quiet",
     "watch": "rm -rf dist && concurrently 'pnpm:package-* --watch'"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/esm/index.mjs"
-    },
-    "./*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/esm/*.mjs",
-      "require": "./dist/cjs/*.cjs",
-      "default": "./dist/esm/*.mjs"
-    }
-  },
-  "type": "module",
   "dependencies": {
     "@hamstore/message-bus-adapter-event-bridge": "workspace:",
     "@types/aws-lambda": "^8.10.152",
@@ -85,10 +70,25 @@
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
   "peerDependencies": {
     "@aws-sdk/client-eventbridge": "^3.0.0",
     "@aws-sdk/client-s3": "^3.0.0",
     "@aws-sdk/s3-request-presigner": "^3.0.0",
     "@hamstore/core": "*"
-  }
+  },
+  "type": "module"
 }

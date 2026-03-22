@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "repository": "hamstore/hamstore",
+  "repository": "hamstore/hamstore.git",
   "keywords": [
     "event",
     "source",
@@ -26,7 +26,6 @@
     "test-unit": "nx run-many --target=test-unit --all --parallel=4",
     "watch": "nx run-many --target=watch --all  --parallel=4"
   },
-  "type": "module",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
@@ -42,6 +41,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.2"
   },
+  "type": "module",
   "engines": {
     "node": "^22.19.0 || ^24.0.0"
   },
