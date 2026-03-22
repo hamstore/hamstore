@@ -1,0 +1,30 @@
+name: Preview Release
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+jobs:
+  preview:
+    name: Publish Preview
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install node_modules
+        uses: ./.github/actions/install-node-modules
+
+      - name: Package
+        uses: ./.github/actions/package
+
+      - name: Set placeholder versions
+        run: pnpm set-packages-versions "v0.0.0-sha${GITHUB_SHA::7}" --version-only
+
+      - name: Publish Preview
+        run: npx pkg-pr-new publish --compact './packages/*'
