@@ -1,5 +1,7 @@
 # Zod Event
 
+> **Deprecated:** This package provides type inference only and does **not** perform runtime validation of event payloads or metadata. It is deprecated in favor of [`@hamstore/event-type-standard-schema`](../event-type-standard-schema), which supports runtime validation via the [Standard Schema](https://standardschema.dev/) interface (compatible with Zod, Valibot, ArkType, and more). This package will be removed in a future release.
+
 DRY Hamstore [`EventType`](https://hamstore.github.io/hamstore/docs/event-sourcing/events/) definition using [`zod`](https://github.com/colinhacks/zod).
 
 ## 📥 Installation

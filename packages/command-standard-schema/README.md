@@ -1,0 +1,53 @@
+# @hamstore/command-standard-schema
+
+DRY Hamstore `Command` definition using [Standard Schema](https://standardschema.dev/).
+
+## Installation
+
+```bash
+# npm
+npm install @hamstore/command-standard-schema
+
+# yarn
+yarn add @hamstore/command-standard-schema
+
+# pnpm
+pnpm add @hamstore/command-standard-schema
+```
+
+You also need a Standard Schema-compatible validation library as a peer dependency, for example:
+
+- [Zod](https://zod.dev/) (v3.25+ or v4+)
+- [Valibot](https://valibot.dev/)
+- [ArkType](https://arktype.io/)
+
+## Usage
+
+```typescript
+import { StandardSchemaCommand } from '@hamstore/command-standard-schema';
+import { z } from 'zod'; // or valibot, arktype, etc.
+
+const catchPokemonCommand = new StandardSchemaCommand({
+  commandId: 'CATCH_POKEMON',
+  requiredEventStores: [pokemonsEventStore],
+  inputSchema: z.object({
+    pokemonId: z.string(),
+    trainerName: z.string(),
+  }),
+  outputSchema: z.object({
+    caughtAt: z.date(),
+  }),
+  handler: async (input, [pokemonsEventStore]) => {
+    // ... business logic
+    return { caughtAt: new Date() };
+  },
+});
+```
+
+The `StandardSchemaCommand` extends the core `Command` and stores input/output schemas for type inference and documentation.
+
+## Why Standard Schema?
+
+Standard Schema is a shared interface implemented by multiple validation libraries. Using `@hamstore/command-standard-schema` means your commands work with **any** Standard Schema-compatible library, without library-specific adapters.
+
+This package is the recommended replacement for `@hamstore/command-zod` and `@hamstore/command-json-schema`.

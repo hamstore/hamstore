@@ -1,5 +1,7 @@
 # JSON Schema Command
 
+> **Deprecated:** This package provides type inference only and does **not** perform runtime validation of command inputs or outputs. It is deprecated in favor of [`@hamstore/command-standard-schema`](../command-standard-schema), which uses the [Standard Schema](https://standardschema.dev/) interface (compatible with Zod, Valibot, ArkType, and more). This package will be removed in a future release.
+
 DRY Hamstore [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts).
 
 ## 📥 Installation

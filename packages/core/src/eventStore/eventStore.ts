@@ -25,6 +25,43 @@ import type {
   ValidateEventDetail,
 } from './types';
 
+const resolveEventValidation = async (
+  candidateEventTypes: EventType[],
+  eventDetail: EventDetail,
+  validate: ValidateEventDetail,
+): Promise<void> => {
+  if (validate === false) {
+    return;
+  }
+
+  const eventType = candidateEventTypes.find(
+    ({ type }) => type === eventDetail.type,
+  );
+
+  if (eventType === undefined) {
+    if (validate === true) {
+      throw new EventDetailTypeDoesNotExistError({
+        type: eventDetail.type,
+        allowedTypes: candidateEventTypes.map(({ type }) => type),
+      });
+    }
+    return;
+  }
+
+  if (eventType.parseEventDetail === undefined) {
+    if (validate === true) {
+      throw new EventDetailParserNotDefinedError(eventDetail.type);
+    }
+    return;
+  }
+
+  const result = await eventType.parseEventDetail(eventDetail);
+
+  if (!result.isValid) {
+    throw new Error(result.parsingErrors[0].message);
+  }
+};
+
 export class EventStore<
   EVENT_STORE_ID extends string = string,
   EVENT_TYPES extends EventType[] = EventType[],
@@ -66,41 +103,15 @@ export class EventStore<
     await Promise.all(
       groupedEvents.map(async groupedEvent => {
         const validate = groupedEvent.validate ?? 'auto';
-        if (validate === false || groupedEvent.eventStore === undefined) return;
-
-        const eventStore = groupedEvent.eventStore;
-        const eventDetail = groupedEvent.event;
-
-        const eventType = eventStore.eventTypes.find(
-          ({ type }: { type: string }) => type === eventDetail.type,
-        );
-
-        if (eventType === undefined) {
-          if (validate === true) {
-            throw new EventDetailTypeDoesNotExistError({
-              type: eventDetail.type,
-              allowedTypes: eventStore.eventTypes.map(
-                ({ type }: { type: string }) => type,
-              ),
-            });
-          }
+        if (validate === false || groupedEvent.eventStore === undefined) {
           return;
         }
 
-        if (eventType.parseEventDetail === undefined) {
-          if (validate === true) {
-            throw new EventDetailParserNotDefinedError(eventDetail.type);
-          }
-          return;
-        }
-
-        const result = await eventType.parseEventDetail(
-          eventDetail as EventDetail,
+        await resolveEventValidation(
+          groupedEvent.eventStore.eventTypes,
+          groupedEvent.event as EventDetail,
+          validate,
         );
-
-        if (!result.isValid) {
-          throw new Error(result.parsingErrors[0].message);
-        }
       }),
     );
 
@@ -228,45 +239,15 @@ export class EventStore<
          */
       ) as Promise<{ events: EVENT_DETAILS[] }>;
 
-    const resolveEventValidation = async (
-      eventDetail: EventDetail,
-      validate: ValidateEventDetail,
-    ): Promise<void> => {
-      if (validate === false) return;
-
-      const eventType = this.eventTypes.find(
-        ({ type }) => type === eventDetail.type,
-      );
-
-      if (eventType === undefined) {
-        if (validate === true) {
-          throw new EventDetailTypeDoesNotExistError({
-            type: eventDetail.type,
-            allowedTypes: this.eventTypes.map(({ type }) => type),
-          });
-        }
-        return;
-      }
-
-      if (eventType.parseEventDetail === undefined) {
-        if (validate === true) {
-          throw new EventDetailParserNotDefinedError(eventDetail.type);
-        }
-        return;
-      }
-
-      const result = await eventType.parseEventDetail(eventDetail);
-
-      if (!result.isValid) {
-        throw new Error(result.parsingErrors[0].message);
-      }
-    };
-
     this.pushEvent = async (
       eventDetail,
       { prevAggregate, force = false, validate = 'auto' } = {},
     ) => {
-      await resolveEventValidation(eventDetail as EventDetail, validate);
+      await resolveEventValidation(
+        this.eventTypes,
+        eventDetail as EventDetail,
+        validate,
+      );
 
       const { event } = (await this.getEventStorageAdapter().pushEvent(
         eventDetail,

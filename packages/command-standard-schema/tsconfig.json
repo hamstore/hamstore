@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist/types",
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "./dist",
+    "./tsdown.config.ts"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
+}
