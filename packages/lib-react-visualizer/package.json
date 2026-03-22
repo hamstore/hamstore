@@ -1,6 +1,7 @@
 {
   "name": "@hamstore/lib-react-visualizer",
   "description": "React component to visualize, design and manually test Hamstore event stores and commands.",
+  "license": "MIT",
   "keywords": [
     "event",
     "source",
@@ -9,7 +10,6 @@
   ],
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",

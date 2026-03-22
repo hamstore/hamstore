@@ -1,8 +1,8 @@
 {
   "name": "@hamstore/demo-blueprint",
+  "license": "MIT",
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",

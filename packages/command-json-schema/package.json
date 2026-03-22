@@ -1,6 +1,7 @@
 {
   "name": "@hamstore/command-json-schema",
   "description": "DRY Hamstore Command definition using JSON Schemas and json-schema-to-ts",
+  "license": "MIT",
   "keywords": [
     "event",
     "source",
@@ -9,7 +10,6 @@
   ],
   "homepage": "https://github.com/hamstore/hamstore#readme",
   "bugs": "https://github.com/hamstore/hamstore/issues",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hamstore/hamstore.git",
