@@ -11,6 +11,7 @@
     "store",
     "typescript"
   ],
+  "type": "module",
   "scripts": {
     "check-audit": "pnpm audit",
     "graph": "nx dep-graph",
@@ -63,6 +64,5 @@
       "tree-sitter",
       "tree-sitter-json"
     ]
-  },
-  "type": "module"
+  }
 }
