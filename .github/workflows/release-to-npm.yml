@@ -62,7 +62,28 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: Publish packages to npm
+      # Default path: publish with OIDC provenance (no token needed).
+      # Used for all full releases, and for prereleases when NPM_TOKEN is not set.
+      - name: Publish packages to npm (with provenance)
+        if: ${{ !github.event.release.prerelease || !secrets.NPM_TOKEN }}
         run: pnpm nx run-many --target=publish-package --all --parallel=1
         env:
           NPM_DIST_TAG: ${{ steps.dist-tag.outputs.tag }}
+
+      # Fallback path: publish with a token, without provenance.
+      # Useful for bootstrapping new packages that don't have OIDC configured yet.
+      # Only allowed for prereleases to ensure full releases always have provenance.
+      # To use: add an NPM_TOKEN repository secret, publish a prerelease, then
+      # configure OIDC for the new packages and remove the secret.
+      - name: Publish packages to npm (with token, no provenance)
+        if: ${{ github.event.release.prerelease && secrets.NPM_TOKEN }}
+        run: |
+          for pkg in packages/*/; do
+            if [ -f "$pkg/package.json" ] && grep -q '"publish-package"' "$pkg/package.json"; then
+              echo "Publishing $pkg..."
+              (cd "$pkg" && npm publish --access public --tag "${NPM_DIST_TAG:-latest}")
+            fi
+          done
+        env:
+          NPM_DIST_TAG: ${{ steps.dist-tag.outputs.tag }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
