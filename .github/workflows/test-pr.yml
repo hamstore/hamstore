@@ -33,8 +33,7 @@ jobs:
         uses: ./.github/actions/install-node-modules
 
       - name: Check syncpack format
-        run: pnpm syncpack format && git diff --exit-code
-        shell: bash
+        run: pnpm syncpack format --check
 
       - name: Package
         uses: ./.github/actions/package

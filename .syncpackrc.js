@@ -1,10 +1,5 @@
 export default {
-  dev: true,
-  filter: '.',
   indent: '  ',
-  peer: true,
-  prod: true,
-  semverRange: '',
   sortAz: [
     'contributors',
     'scripts',
