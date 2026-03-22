@@ -58,7 +58,8 @@ const resolveEventValidation = async (
   const result = await eventType.parseEventDetail(eventDetail);
 
   if (!result.isValid) {
-    throw new Error(result.parsingErrors[0].message);
+    const messages = result.parsingErrors.map(e => e.message);
+    throw new Error(messages.join('; '));
   }
 };
 
