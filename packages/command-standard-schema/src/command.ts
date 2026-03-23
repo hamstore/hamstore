@@ -9,7 +9,7 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 type InferInput<T extends StandardSchemaV1> = StandardSchemaV1.InferInput<T>;
 type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
-export type ValidateOption = boolean | 'warn' | ((error: Error) => void);
+export type ValidateOption = boolean | 'auto' | 'warn' | ((error: Error) => void);
 export type ValidateCommandOption =
   | ValidateOption
   | { input?: ValidateOption; output?: ValidateOption };
@@ -26,20 +26,28 @@ const buildValidationError = (
   return new Error(`${label} validation failed: ${messages.join('; ')}`);
 };
 
+const isObjectForm = (
+  value: ValidateCommandOption,
+): value is { input?: ValidateOption; output?: ValidateOption } =>
+  typeof value === 'object' &&
+  value !== null &&
+  ('input' in value || 'output' in value);
+
 const resolveValidateOption = (
   commandValidate: ValidateCommandOption | undefined,
   which: 'input' | 'output',
 ): ValidateOption => {
   if (commandValidate === undefined) {
-    return true;
+    return which === 'output' ? 'auto' : true;
   }
 
-  if (
-    typeof commandValidate === 'object' &&
-    commandValidate !== null &&
-    ('input' in commandValidate || 'output' in commandValidate)
-  ) {
-    return commandValidate[which] ?? true;
+  if (isObjectForm(commandValidate)) {
+    return commandValidate[which] ?? (which === 'output' ? 'auto' : true);
+  }
+
+  // Shorthand: for output, treat true as 'auto' (validate if schema exists)
+  if (which === 'output' && commandValidate === true) {
+    return 'auto';
   }
 
   return commandValidate as ValidateOption;
@@ -144,6 +152,19 @@ export class StandardSchemaCommand<
       ...context: CONTEXT
     ) => Promise<OUTPUT>;
   }) {
+    if (validate !== undefined && isObjectForm(validate)) {
+      if (
+        validate.output !== undefined &&
+        validate.output !== false &&
+        validate.output !== 'auto' &&
+        outputSchema === undefined
+      ) {
+        throw new Error(
+          'validate.output is set but no outputSchema was provided',
+        );
+      }
+    }
+
     super({
       ...args,
       handler: async (input, eventStores, ...context) => {
@@ -158,7 +179,12 @@ export class StandardSchemaCommand<
         const result = await handler(validatedInput, eventStores, ...context);
 
         if (outputSchema !== undefined) {
-          const outputValidate = resolveValidateOption(validate, 'output');
+          let outputValidate = resolveValidateOption(validate, 'output');
+
+          // 'auto' means: validate if schema exists, skip if not
+          if (outputValidate === 'auto') {
+            outputValidate = true;
+          }
 
           return (await validateSchema(
             outputSchema,

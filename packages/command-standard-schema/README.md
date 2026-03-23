@@ -77,12 +77,15 @@ new StandardSchemaCommand({
 
 The `validate` option accepts:
 
-- `true` (default) — throw on validation failure
+- `true` — throw on validation failure (default for input)
 - `false` — skip validation entirely
+- `'auto'` — validate if a schema exists, skip if not (default for output)
 - `'warn'` — log a warning via `console.warn` and continue with the original value
 - `(error: Error) => void` — call a custom handler and continue with the original value
 
-For granular control, pass an object with `input` and/or `output` keys, each accepting the same options above. Unspecified keys default to `true`.
+For granular control, pass an object with `input` and/or `output` keys, each accepting the same options above. Unspecified input defaults to `true`; unspecified output defaults to `'auto'`.
+
+When using the shorthand form (e.g. `validate: true`), output is always resolved as `'auto'` — meaning it validates when `outputSchema` is provided and skips otherwise. If you explicitly set `validate: { output: true }` without providing an `outputSchema`, the constructor throws an error to catch the misconfiguration early.
 
 ## Why Standard Schema?
 

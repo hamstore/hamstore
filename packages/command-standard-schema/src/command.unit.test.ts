@@ -362,6 +362,107 @@ describe('standardSchemaCommand implementation', () => {
 
       expect(command.validate).toBeUndefined();
     });
+
+    it('skips output validation with shorthand validate=true and no outputSchema', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: true,
+        handler: async () => ({ anything: 'goes' }),
+      });
+
+      const result = await command.handler(
+        { counterId: 'abc' },
+        requiredEventStores,
+      );
+
+      expect(result).toStrictEqual({ anything: 'goes' });
+    });
+
+    it('validates output with validate=auto when outputSchema exists', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        outputSchema,
+        validate: { input: true, output: 'auto' },
+        handler: async () => ({ nextCount: 'invalid' }) as never,
+      });
+
+      await expect(
+        command.handler({ counterId: 'abc' }, requiredEventStores),
+      ).rejects.toThrow('Output validation failed');
+    });
+
+    it('skips output validation with validate=auto when no outputSchema', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: { input: true, output: 'auto' },
+        handler: async () => ({ anything: 'goes' }),
+      });
+
+      const result = await command.handler(
+        { counterId: 'abc' },
+        requiredEventStores,
+      );
+
+      expect(result).toStrictEqual({ anything: 'goes' });
+    });
+
+    it('throws in constructor when validate.output is true but no outputSchema', () => {
+      expect(
+        () =>
+          new StandardSchemaCommand({
+            commandId: 'TEST_COMMAND',
+            requiredEventStores,
+            inputSchema,
+            validate: { output: true },
+            handler: vi.fn().mockResolvedValue(undefined),
+          }),
+      ).toThrow('validate.output is set but no outputSchema was provided');
+    });
+
+    it('throws in constructor when validate.output is warn but no outputSchema', () => {
+      expect(
+        () =>
+          new StandardSchemaCommand({
+            commandId: 'TEST_COMMAND',
+            requiredEventStores,
+            inputSchema,
+            validate: { output: 'warn' },
+            handler: vi.fn().mockResolvedValue(undefined),
+          }),
+      ).toThrow('validate.output is set but no outputSchema was provided');
+    });
+
+    it('does not throw when validate.output is false without outputSchema', () => {
+      expect(
+        () =>
+          new StandardSchemaCommand({
+            commandId: 'TEST_COMMAND',
+            requiredEventStores,
+            inputSchema,
+            validate: { output: false },
+            handler: vi.fn().mockResolvedValue(undefined),
+          }),
+      ).not.toThrow();
+    });
+
+    it('does not throw when validate.output is auto without outputSchema', () => {
+      expect(
+        () =>
+          new StandardSchemaCommand({
+            commandId: 'TEST_COMMAND',
+            requiredEventStores,
+            inputSchema,
+            validate: { output: 'auto' },
+            handler: vi.fn().mockResolvedValue(undefined),
+          }),
+      ).not.toThrow();
+    });
   });
 
   describe('async validation', () => {
