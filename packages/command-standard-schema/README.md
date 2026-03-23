@@ -55,4 +55,4 @@ If validation fails, the command throws an error with the schema's validation is
 
 Standard Schema is a shared interface implemented by multiple validation libraries. Using `@hamstore/command-standard-schema` means your commands work with **any** Standard Schema-compatible library, without library-specific adapters.
 
-This package is the recommended replacement for `@hamstore/command-zod` and `@hamstore/command-json-schema`.
+This package is the recommended replacement for `@hamstore/command-zod`.

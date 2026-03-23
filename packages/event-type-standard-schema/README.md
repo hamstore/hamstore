@@ -61,4 +61,4 @@ await eventStore.pushEvent(eventDetail, { validate: false });
 
 Standard Schema is a shared interface implemented by multiple validation libraries. Using `@hamstore/event-type-standard-schema` means your event types work with **any** Standard Schema-compatible library, without library-specific adapters.
 
-This package is the recommended replacement for `@hamstore/event-type-zod` and `@hamstore/event-type-json-schema`.
+This package is the recommended replacement for `@hamstore/event-type-zod`.
