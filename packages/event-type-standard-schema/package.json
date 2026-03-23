@@ -46,7 +46,7 @@
     "lint-fix": "pnpm oxlint --fix",
     "lint-fix-all": "pnpm lint-fix .",
     "package": "tsdown",
-    "publish-package": "npm publish --provenance --access public --tag ${NPM_DIST_TAG:-latest}",
+    "publish-package": "npm publish ${NPM_PROVENANCE:+--provenance} --access public --tag ${NPM_DIST_TAG:-latest}",
     "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
     "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
     "test-linter": "pnpm oxlint .",
