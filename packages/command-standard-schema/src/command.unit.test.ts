@@ -438,6 +438,20 @@ describe('standardSchemaCommand implementation', () => {
       ).toThrow('validate.output is set but no outputSchema was provided');
     });
 
+    it('treats input auto as true (inputSchema always exists)', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: { input: 'auto' },
+        handler: vi.fn().mockResolvedValue(undefined),
+      });
+
+      await expect(
+        command.handler({ notCounterId: 123 } as never, requiredEventStores),
+      ).rejects.toThrow('Input validation failed');
+    });
+
     it('does not throw when validate.output is false without outputSchema', () => {
       expect(
         () =>

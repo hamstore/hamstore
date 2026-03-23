@@ -168,7 +168,13 @@ export class StandardSchemaCommand<
     super({
       ...args,
       handler: async (input, eventStores, ...context) => {
-        const inputValidate = resolveValidateOption(validate, 'input');
+        let inputValidate = resolveValidateOption(validate, 'input');
+
+        // inputSchema is always present, so 'auto' resolves to 'true'
+        if (inputValidate === 'auto') {
+          inputValidate = true;
+        }
+
         const validatedInput = (await validateSchema(
           inputSchema,
           input,
