@@ -51,6 +51,39 @@ The `StandardSchemaCommand` extends the core `Command` with **runtime validation
 
 If validation fails, the command throws an error with the schema's validation issues. Input validation failures do **not** trigger the retry mechanism (retries only apply to `EventAlreadyExistsError`).
 
+### Controlling validation
+
+By default, validation throws on invalid data. You can change this behavior with the `validate` option:
+
+```typescript
+// Disable all validation (type inference only, like command-zod)
+new StandardSchemaCommand({ validate: false, ... });
+
+// Log warnings instead of throwing
+new StandardSchemaCommand({ validate: 'warn', ... });
+
+// Custom error handler
+new StandardSchemaCommand({
+  validate: (error) => myLogger.error(error),
+  ...
+});
+
+// Different modes for input and output
+new StandardSchemaCommand({
+  validate: { input: true, output: 'warn' },
+  ...
+});
+```
+
+The `validate` option accepts:
+
+- `true` (default) — throw on validation failure
+- `false` — skip validation entirely
+- `'warn'` — log a warning via `console.warn` and continue with the original value
+- `(error: Error) => void` — call a custom handler and continue with the original value
+
+For granular control, pass an object with `input` and/or `output` keys, each accepting the same options above. Unspecified keys default to `true`.
+
 ## Why Standard Schema?
 
 Standard Schema is a shared interface implemented by multiple validation libraries. Using `@hamstore/command-standard-schema` means your commands work with **any** Standard Schema-compatible library, without library-specific adapters.

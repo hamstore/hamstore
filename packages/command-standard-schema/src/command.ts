@@ -9,20 +9,70 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 type InferInput<T extends StandardSchemaV1> = StandardSchemaV1.InferInput<T>;
 type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
+export type ValidateOption = boolean | 'warn' | ((error: Error) => void);
+export type ValidateCommandOption =
+  | ValidateOption
+  | { input?: ValidateOption; output?: ValidateOption };
+
+const buildValidationError = (
+  issues: ReadonlyArray<StandardSchemaV1.Issue>,
+  label: string,
+): Error => {
+  const messages = issues.map(
+    issue =>
+      `${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`,
+  );
+
+  return new Error(`${label} validation failed: ${messages.join('; ')}`);
+};
+
+const resolveValidateOption = (
+  commandValidate: ValidateCommandOption | undefined,
+  which: 'input' | 'output',
+): ValidateOption => {
+  if (commandValidate === undefined) {
+    return true;
+  }
+
+  if (
+    typeof commandValidate === 'object' &&
+    commandValidate !== null &&
+    ('input' in commandValidate || 'output' in commandValidate)
+  ) {
+    return commandValidate[which] ?? true;
+  }
+
+  return commandValidate as ValidateOption;
+};
+
 const validateSchema = async (
   schema: StandardSchemaV1,
   value: unknown,
   label: string,
+  validate: ValidateOption,
 ): Promise<unknown> => {
+  if (validate === false) {
+    return value;
+  }
+
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
-    const messages = result.issues.map(
-      issue =>
-        `${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`,
-    );
+    const error = buildValidationError(result.issues, label);
 
-    throw new Error(`${label} validation failed: ${messages.join('; ')}`);
+    if (validate === true) {
+      throw error;
+    }
+
+    if (validate === 'warn') {
+      console.warn(error.message);
+    }
+
+    if (typeof validate === 'function') {
+      validate(error);
+    }
+
+    return value;
   }
 
   return result.value;
@@ -68,11 +118,13 @@ export class StandardSchemaCommand<
 > {
   inputSchema: INPUT_SCHEMA;
   outputSchema?: OUTPUT_SCHEMA;
+  validate?: ValidateCommandOption;
 
   constructor({
     handler,
     inputSchema,
     outputSchema,
+    validate,
     ...args
   }: Omit<
     {
@@ -82,6 +134,7 @@ export class StandardSchemaCommand<
       onEventAlreadyExists?: OnEventAlreadyExistsCallback;
       inputSchema: INPUT_SCHEMA;
       outputSchema?: OUTPUT_SCHEMA;
+      validate?: ValidateCommandOption;
     },
     'handler'
   > & {
@@ -94,19 +147,24 @@ export class StandardSchemaCommand<
     super({
       ...args,
       handler: async (input, eventStores, ...context) => {
+        const inputValidate = resolveValidateOption(validate, 'input');
         const validatedInput = (await validateSchema(
           inputSchema,
           input,
           'Input',
+          inputValidate,
         )) as HANDLER_INPUT;
 
         const result = await handler(validatedInput, eventStores, ...context);
 
         if (outputSchema !== undefined) {
+          const outputValidate = resolveValidateOption(validate, 'output');
+
           return (await validateSchema(
             outputSchema,
             result,
             'Output',
+            outputValidate,
           )) as OUTPUT;
         }
 
@@ -118,6 +176,10 @@ export class StandardSchemaCommand<
 
     if (outputSchema !== undefined) {
       this.outputSchema = outputSchema;
+    }
+
+    if (validate !== undefined) {
+      this.validate = validate;
     }
   }
 }

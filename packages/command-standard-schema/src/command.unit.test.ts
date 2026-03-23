@@ -22,6 +22,7 @@ describe('standardSchemaCommand implementation', () => {
     'requiredEventStores',
     'inputSchema',
     'outputSchema',
+    'validate',
     'eventAlreadyExistsRetries',
     'onEventAlreadyExists',
     'handler',
@@ -210,6 +211,156 @@ describe('standardSchemaCommand implementation', () => {
       await expect(
         command.handler({} as never, requiredEventStores),
       ).rejects.toThrow('a is required; b is required');
+    });
+  });
+
+  describe('validate option', () => {
+    it('throws on invalid input by default (validate=true)', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        handler: vi.fn().mockResolvedValue(undefined),
+      });
+
+      await expect(
+        command.handler({ notCounterId: 123 } as never, requiredEventStores),
+      ).rejects.toThrow('Input validation failed');
+    });
+
+    it('skips validation with validate=false', async () => {
+      const handlerMock = vi.fn().mockResolvedValue(undefined);
+
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: false,
+        handler: handlerMock,
+      });
+
+      await command.handler(
+        { notCounterId: 123 } as never,
+        requiredEventStores,
+      );
+
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+      expect(handlerMock).toHaveBeenCalledWith(
+        { notCounterId: 123 },
+        requiredEventStores,
+      );
+    });
+
+    it('logs warning with validate=warn', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const handlerMock = vi.fn().mockResolvedValue(undefined);
+
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: 'warn',
+        handler: handlerMock,
+      });
+
+      await command.handler(
+        { notCounterId: 123 } as never,
+        requiredEventStores,
+      );
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Input validation failed'),
+      );
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+      expect(handlerMock).toHaveBeenCalledWith(
+        { notCounterId: 123 },
+        requiredEventStores,
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('calls callback with validate=callback', async () => {
+      const callbackMock = vi.fn();
+      const handlerMock = vi.fn().mockResolvedValue(undefined);
+
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: callbackMock,
+        handler: handlerMock,
+      });
+
+      await command.handler(
+        { notCounterId: 123 } as never,
+        requiredEventStores,
+      );
+
+      expect(callbackMock).toHaveBeenCalledTimes(1);
+      expect(callbackMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('Input validation failed'),
+        }),
+      );
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('supports object form with separate input/output options', async () => {
+      const handlerMock = vi.fn().mockResolvedValue({ nextCount: 'invalid' });
+
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        outputSchema,
+        validate: { input: false, output: true },
+        handler: handlerMock,
+      });
+
+      await expect(
+        command.handler({ notCounterId: 123 } as never, requiredEventStores),
+      ).rejects.toThrow('Output validation failed');
+
+      expect(handlerMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('defaults to true for unspecified keys in object form', async () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: { output: false },
+        handler: vi.fn().mockResolvedValue(undefined),
+      });
+
+      await expect(
+        command.handler({ notCounterId: 123 } as never, requiredEventStores),
+      ).rejects.toThrow('Input validation failed');
+    });
+
+    it('stores validate on instance', () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        validate: 'warn',
+        handler: vi.fn().mockResolvedValue(undefined),
+      });
+
+      expect(command.validate).toStrictEqual('warn');
+    });
+
+    it('does not set validate when not provided', () => {
+      const command = new StandardSchemaCommand({
+        commandId: 'TEST_COMMAND',
+        requiredEventStores,
+        inputSchema,
+        handler: vi.fn().mockResolvedValue(undefined),
+      });
+
+      expect(command.validate).toBeUndefined();
     });
   });
 
