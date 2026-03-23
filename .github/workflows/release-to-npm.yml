@@ -62,26 +62,22 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
-      # Provenance requires OIDC, which isn't available for new packages.
-      # To bootstrap new packages: add an NPM_PUBLISH_TOKEN repo secret →
-      # publish a prerelease → configure OIDC for the new packages → remove
-      # the secret. Full releases always require OIDC provenance.
-      - name: Determine publish auth mode
-        id: publish-auth
-        run: |
-          if [ -n "$NPM_PUBLISH_TOKEN" ] && [ "${{ github.event.release.prerelease }}" = "true" ]; then
-            echo "provenance=" >> $GITHUB_OUTPUT
-            echo "::notice::Publishing with NPM_PUBLISH_TOKEN (no provenance)"
-          else
-            echo "provenance=1" >> $GITHUB_OUTPUT
-            echo "::notice::Publishing with OIDC provenance"
-          fi
-        env:
-          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-
-      - name: Publish packages to npm
+      # Default: publish with OIDC provenance (no token needed).
+      - name: Publish packages to npm (with provenance)
+        if: ${{ !github.event.release.prerelease || !secrets.NPM_PUBLISH_TOKEN }}
         run: pnpm nx run-many --target=publish-package --all --parallel=1
         env:
           NPM_DIST_TAG: ${{ steps.dist-tag.outputs.tag }}
-          NPM_PROVENANCE: ${{ steps.publish-auth.outputs.provenance }}
+          NPM_PROVENANCE: '1'
+
+      # Fallback: publish with a token, without provenance.
+      # Useful for bootstrapping new packages that don't have OIDC configured yet.
+      # Only allowed for prereleases to ensure full releases always have provenance.
+      # To use: add an NPM_PUBLISH_TOKEN repository secret, publish a prerelease,
+      # then configure OIDC for the new packages and remove the secret.
+      - name: Publish packages to npm (with token, no provenance)
+        if: ${{ github.event.release.prerelease && secrets.NPM_PUBLISH_TOKEN }}
+        run: pnpm nx run-many --target=publish-package --all --parallel=1
+        env:
+          NPM_DIST_TAG: ${{ steps.dist-tag.outputs.tag }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
