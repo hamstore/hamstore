@@ -617,6 +617,27 @@ describe('event store', () => {
       expect(pushEventGroupMock).not.toHaveBeenCalled();
     });
 
+    it('throws when validate=true but no eventStore is assigned', async () => {
+      const groupedEvent1 = new GroupedEvent({
+        event: pikachuAppearedEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+      groupedEvent1.validate = true;
+
+      const groupedEvent2 = new GroupedEvent({
+        event: pikachuCaughtEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+
+      await expect(
+        EventStore.pushEventGroup(groupedEvent1, groupedEvent2),
+      ).rejects.toThrow(
+        'Cannot validate grouped event: no eventStore is assigned',
+      );
+
+      expect(pushEventGroupMock).not.toHaveBeenCalled();
+    });
+
     it('allows grouped event with validate=false even if payload is invalid', async () => {
       const invalidEvent = {
         ...pikachuAppearedEvent,

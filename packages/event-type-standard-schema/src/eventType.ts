@@ -6,9 +6,7 @@ import {
 } from '@hamstore/core';
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 
-type InferOutput<T extends StandardSchemaV1> = NonNullable<
-  T['~standard']['types']
->['output'];
+type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
 const validateSchema = async (
   schema: StandardSchemaV1,

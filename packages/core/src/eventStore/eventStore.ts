@@ -104,7 +104,15 @@ export class EventStore<
     await Promise.all(
       groupedEvents.map(async groupedEvent => {
         const validate = groupedEvent.validate ?? 'auto';
-        if (validate === false || groupedEvent.eventStore === undefined) {
+        if (validate === false) {
+          return;
+        }
+        if (groupedEvent.eventStore === undefined) {
+          if (validate === true) {
+            throw new Error(
+              'Cannot validate grouped event: no eventStore is assigned. Use eventStore.groupEvent() to create grouped events with validation.',
+            );
+          }
           return;
         }
 
