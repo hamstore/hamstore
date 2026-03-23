@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
-import type { EventDetailParser } from '~/event/eventType';
 import { EventType } from '~/event/eventType';
 import { GroupedEvent } from '~/event/groupedEvent';
 
@@ -368,22 +367,28 @@ describe('event store', () => {
   });
 
   describe('validate (pushEvent)', () => {
-    const parseAppearedEventDetail: EventDetailParser = candidate => {
-      const payload = candidate.payload as
-        | { name: string; level: number }
-        | undefined;
-      if (payload != null && typeof payload.name === 'string') {
-        return { isValid: true as const, parsedEventDetail: candidate };
-      }
-      return {
-        isValid: false as const,
-        parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
-      };
-    };
+    type AppearedDetail = EventDetail<'POKEMON_APPEARED', { name: string; level: number }>;
 
-    const pokemonAppearedWithParser = new EventType({
+    const pokemonAppearedWithParser = new EventType<
+      'POKEMON_APPEARED',
+      { name: string; level: number }
+    >({
       type: 'POKEMON_APPEARED',
-      parseEventDetail: parseAppearedEventDetail,
+      parseEventDetail: candidate => {
+        const payload = candidate.payload as
+          | { name: string; level: number }
+          | undefined;
+        if (payload != null && typeof payload.name === 'string') {
+          return {
+            isValid: true as const,
+            parsedEventDetail: candidate as AppearedDetail,
+          };
+        }
+        return {
+          isValid: false as const,
+          parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
+        };
+      },
     });
 
     const pokemonCaughtNoParser = new EventType({ type: 'POKEMON_CAUGHT' });
@@ -542,22 +547,28 @@ describe('event store', () => {
   });
 
   describe('validate (pushEventGroup)', () => {
-    const parseAppearedEventDetail: EventDetailParser = candidate => {
-      const payload = candidate.payload as
-        | { name: string; level: number }
-        | undefined;
-      if (payload != null && typeof payload.name === 'string') {
-        return { isValid: true as const, parsedEventDetail: candidate };
-      }
-      return {
-        isValid: false as const,
-        parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
-      };
-    };
+    type AppearedDetail = EventDetail<'POKEMON_APPEARED', { name: string; level: number }>;
 
-    const pokemonAppearedWithParser = new EventType({
+    const pokemonAppearedWithParser = new EventType<
+      'POKEMON_APPEARED',
+      { name: string; level: number }
+    >({
       type: 'POKEMON_APPEARED',
-      parseEventDetail: parseAppearedEventDetail,
+      parseEventDetail: candidate => {
+        const payload = candidate.payload as
+          | { name: string; level: number }
+          | undefined;
+        if (payload != null && typeof payload.name === 'string') {
+          return {
+            isValid: true as const,
+            parsedEventDetail: candidate as AppearedDetail,
+          };
+        }
+        return {
+          isValid: false as const,
+          parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
+        };
+      },
     });
 
     const pokemonCaughtNoParser = new EventType({ type: 'POKEMON_CAUGHT' });
