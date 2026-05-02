@@ -52,7 +52,7 @@ describe('publishPushedEvent', () => {
 
     const getAggregate = vi
       .spyOn(pokemonsEventStoreWithStateCarryingMessageBus, 'getAggregate')
-      .mockResolvedValue({ aggregate: v2Aggregate, events, lastEvent: event });
+      .mockResolvedValue({ aggregate: v2Aggregate });
 
     const publishStateCarryingMessageMock = vi
       .spyOn(stateCarryingMessageBus, 'publishMessage')
