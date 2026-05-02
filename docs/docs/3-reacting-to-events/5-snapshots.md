@@ -277,7 +277,7 @@ Useful when you want the speed benefit of snapshots and only care about the even
 
 ### `lastN: K` — at least the last K events
 
-Guarantees that at least the last `K` events of the aggregate's history (up to `maxVersion`) appear in the returned `events` array. The snapshot picker is unconstrained; if the snapshot already covers more than `aggregate.version - K` events, the missing earlier events are re-fetched in a second read:
+Guarantees that at least the last `K` events of the aggregate's history — i.e. events from version `aggregate.version - K + 1` onward, up to `maxVersion` — appear in the returned `events` array. The snapshot picker is unconstrained; if the snapshot's seed sits past that floor (`snapshot.version >= aggregate.version - K + 1`), the missing earlier events are re-fetched in a second read:
 
 ```ts
 const { aggregate, events, lastEvent } =
@@ -359,7 +359,7 @@ snapshotConfig: {
 }
 ```
 
-`phase` is `'read'` (read-path failures), `'save'` (background save failures) or `'prune'` (background prune failures).
+`phase` is `'read'` (read-path failures) or `'save'` (background save failures, including prune failures that occur as part of the same fire-and-forget save). The type union also includes `'prune'` so that future implementations or custom hooks can distinguish prune errors separately.
 
 ## Authoring a custom adapter
 
@@ -378,7 +378,7 @@ The simplest reference implementation is [`@hamstore/snapshot-storage-adapter-in
 - <code>policy <i>(SnapshotPolicy)</i></code>: When to save snapshots. See [save policies](#when-to-save-snapshotpolicy).
 - <code>pruning <i>(?PruningPolicy)</i></code>: What to do with older snapshots after a successful save. Defaults to `{ strategy: 'NONE' }`. See [pruning policies](#what-to-keep-pruningpolicy).
 - <code>migrateSnapshotReducerVersion <i>(?(snapshot: Snapshot) => Promise&lt;Snapshot | undefined&gt; | Snapshot | undefined)</i></code>: Optional migrator invoked when a snapshot under a different `reducerVersion` is found. Returning the migrated snapshot uses it as the seed; returning `undefined` rebuilds from events.
-- <code>onSnapshotError <i>(?(args) => void)</i></code>: Optional error hook. `args` is `{ phase, aggregateId, eventStoreId, error }`. `phase` is `'read'`, `'save'` or `'prune'`.
+- <code>onSnapshotError <i>(?(args) => void)</i></code>: Optional error hook. `args` is `{ phase, aggregateId, eventStoreId, error }`. The EventStore currently emits `phase: 'read'` (read-path failures) and `phase: 'save'` (background save failures, including prune failures that occur during the same save). The type union also includes `'prune'` for future use.
 
 ---
 
