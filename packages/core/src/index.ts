@@ -22,6 +22,7 @@ export type {
   EventAlreadyExistsError,
   UndefinedEventStorageAdapterError,
   GetAggregateOptions,
+  GetEventsAndAggregateOptions,
   SimulationOptions,
   EventStoreId,
   EventStoreEventTypes,

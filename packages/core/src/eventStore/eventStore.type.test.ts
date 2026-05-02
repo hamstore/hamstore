@@ -11,6 +11,7 @@ import {
   EventStoreAggregate,
   EventStoreEventDetails,
   GetAggregateOptions,
+  GetEventsAndAggregateOptions,
 } from '~/eventStore';
 
 import {
@@ -99,7 +100,7 @@ assertGetAggregateOutput;
 
 const assertGetEventsAndAggregateInput: A.Equals<
   Parameters<typeof pokemonsEventStore.getEventsAndAggregate>,
-  [aggregateId: string, options?: GetAggregateOptions]
+  [aggregateId: string, options?: GetEventsAndAggregateOptions]
 > = 1;
 assertGetEventsAndAggregateInput;
 

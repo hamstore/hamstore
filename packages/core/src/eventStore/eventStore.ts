@@ -297,12 +297,18 @@ export class EventStore<
 
     this.getEventsAndAggregate = async (
       aggregateId,
-      { maxVersion } = {},
+      { maxVersion, fromVersion } = {},
     ) => {
-      const { aggregate, events, lastEvent } = await rebuildAggregate(
-        aggregateId,
-        maxVersion,
-      );
+      const {
+        aggregate,
+        events: allEvents,
+      } = await rebuildAggregate(aggregateId, maxVersion);
+
+      const events =
+        fromVersion !== undefined && fromVersion > 1
+          ? allEvents.filter(event => event.version >= fromVersion)
+          : allEvents;
+      const lastEvent = events[events.length - 1];
 
       return { aggregate, events, lastEvent };
     };

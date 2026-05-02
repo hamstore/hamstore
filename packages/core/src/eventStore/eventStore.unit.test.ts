@@ -152,6 +152,33 @@ describe('event store', () => {
         lastEvent: pikachuEventsMocks[pikachuEventsMocks.length - 1],
       });
     });
+
+    it('returns events filtered by fromVersion (aggregate still reflects full history)', async () => {
+      const response = await pokemonsEventStore.getEventsAndAggregate(
+        pikachuId,
+        { fromVersion: 2 },
+      );
+
+      const eventsFromV2 = pikachuEventsMocks.filter(e => e.version >= 2);
+
+      expect(response).toStrictEqual({
+        aggregate: pikachuEventsMocks.reduce(
+          pokemonsReducer,
+          undefined as unknown as PokemonAggregate,
+        ),
+        events: eventsFromV2,
+        lastEvent: eventsFromV2[eventsFromV2.length - 1],
+      });
+    });
+
+    it('treats fromVersion <= 1 the same as undefined', async () => {
+      const response = await pokemonsEventStore.getEventsAndAggregate(
+        pikachuId,
+        { fromVersion: 1 },
+      );
+
+      expect(response.events).toEqual(pikachuEventsMocks);
+    });
   });
 
   describe('getExistingEventsAndAggregate', () => {

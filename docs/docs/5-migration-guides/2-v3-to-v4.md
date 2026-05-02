@@ -57,6 +57,20 @@ const { aggregate, events, lastEvent } =
 
 Their return shape is identical to the old `getAggregate` / `getExistingAggregate`.
 
+`getEventsAndAggregate` accepts an additional `fromVersion` option that filters
+the returned `events` array to versions `>= fromVersion`. The `aggregate` still
+reflects the full history (or `maxVersion` if set). This is intended for
+incremental projection / "events since checkpoint" patterns, e.g. a read-side
+projection that has already processed events up to version `V` and wants to
+catch up:
+
+```ts
+const { aggregate, events } =
+  await pokemonsEventStore.getEventsAndAggregate(pikachuId, {
+    fromVersion: lastProcessedVersion + 1,
+  });
+```
+
 ### `AggregateGetter` type
 
 The exported `AggregateGetter` type now corresponds to the lean `getAggregate` shape and no longer takes the `EVENT_DETAIL` type parameter. The legacy shape is exposed under a new type name:
