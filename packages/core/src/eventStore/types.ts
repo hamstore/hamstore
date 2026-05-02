@@ -105,7 +105,29 @@ export type GetAggregateOptions = {
   maxVersion?: number;
 };
 
+/**
+ * `getAggregate` returns the rebuilt aggregate only.
+ *
+ * The previous shape (which also included `events` and `lastEvent`) is
+ * available via `getEventsAndAggregate` / `getExistingEventsAndAggregate` for
+ * callers that need the underlying events. See the v3-to-v4 migration guide.
+ */
 export type AggregateGetter<
+  AGGREGATE extends Aggregate,
+  SHOULD_EXIST extends boolean = false,
+> = (
+  aggregateId: string,
+  options?: GetAggregateOptions,
+) => Promise<{
+  aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
+}>;
+
+/**
+ * Full-history aggregate getter — returns the rebuilt aggregate plus the
+ * events that produced it. This replaces the legacy `getAggregate` return
+ * shape.
+ */
+export type EventsAndAggregateGetter<
   EVENT_DETAIL extends EventDetail,
   AGGREGATE extends Aggregate,
   SHOULD_EXIST extends boolean = false,

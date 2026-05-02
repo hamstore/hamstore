@@ -18,6 +18,7 @@ import type {
   EventGrouper,
   SideEffectsSimulator,
   AggregateGetter,
+  EventsAndAggregateGetter,
   AggregateSimulator,
   Reducer,
 } from './types';
@@ -132,8 +133,14 @@ export class EventStore<
     aggregate?: $AGGREGATE,
   ) => AGGREGATE | undefined;
 
-  getAggregate: AggregateGetter<EVENT_DETAILS, AGGREGATE>;
-  getExistingAggregate: AggregateGetter<EVENT_DETAILS, AGGREGATE, true>;
+  getAggregate: AggregateGetter<AGGREGATE>;
+  getExistingAggregate: AggregateGetter<AGGREGATE, true>;
+  getEventsAndAggregate: EventsAndAggregateGetter<EVENT_DETAILS, AGGREGATE>;
+  getExistingEventsAndAggregate: EventsAndAggregateGetter<
+    EVENT_DETAILS,
+    AGGREGATE,
+    true
+  >;
   simulateAggregate: AggregateSimulator<$EVENT_DETAILS, AGGREGATE>;
   eventStorageAdapter?: EventStorageAdapter;
   getEventStorageAdapter: () => EventStorageAdapter;
@@ -241,7 +248,19 @@ export class EventStore<
     this.buildAggregate = (eventDetails, aggregate) =>
       eventDetails.reduce(this.reducer, aggregate) as AGGREGATE | undefined;
 
-    this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
+    /**
+     * Internal helper that loads events for an aggregate and reduces them.
+     * Used by both `getAggregate` (which discards events) and
+     * `getEventsAndAggregate` (which returns them).
+     */
+    const rebuildAggregate = async (
+      aggregateId: string,
+      maxVersion?: number,
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
       const { events } = await this.getEvents(aggregateId, { maxVersion });
 
       const aggregate = this.buildAggregate(
@@ -254,9 +273,40 @@ export class EventStore<
       return { aggregate, events, lastEvent };
     };
 
+    this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
+      const { aggregate } = await rebuildAggregate(aggregateId, maxVersion);
+
+      return { aggregate };
+    };
+
     this.getExistingAggregate = async (aggregateId, options) => {
-      const { aggregate, lastEvent, ...restAggregate } =
-        await this.getAggregate(aggregateId, options);
+      const { aggregate } = await this.getAggregate(aggregateId, options);
+
+      if (aggregate === undefined) {
+        throw new AggregateNotFoundError({
+          aggregateId,
+          eventStoreId: this.eventStoreId,
+        });
+      }
+
+      return { aggregate };
+    };
+
+    this.getEventsAndAggregate = async (
+      aggregateId,
+      { maxVersion } = {},
+    ) => {
+      const { aggregate, events, lastEvent } = await rebuildAggregate(
+        aggregateId,
+        maxVersion,
+      );
+
+      return { aggregate, events, lastEvent };
+    };
+
+    this.getExistingEventsAndAggregate = async (aggregateId, options) => {
+      const { aggregate, events, lastEvent } =
+        await this.getEventsAndAggregate(aggregateId, options);
 
       if (aggregate === undefined || lastEvent === undefined) {
         throw new AggregateNotFoundError({
@@ -265,7 +315,7 @@ export class EventStore<
         });
       }
 
-      return { aggregate, lastEvent, ...restAggregate };
+      return { aggregate, events, lastEvent };
     };
 
     this.simulateAggregate = (events, { simulationDate } = {}) => {
