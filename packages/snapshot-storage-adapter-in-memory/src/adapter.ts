@@ -67,6 +67,25 @@ const isCandidateForLatest = (
   return true;
 };
 
+const parsePageToken = (token: string | undefined): number => {
+  if (token === undefined) {
+    return 0;
+  }
+  if (!/^[0-9]+$/.test(token)) {
+    throw new Error(
+      `InMemorySnapshotStorageAdapter: invalid pageToken "${token}"`,
+    );
+  }
+  const parsed = Number(token);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new Error(
+      `InMemorySnapshotStorageAdapter: invalid pageToken "${token}"`,
+    );
+  }
+
+  return parsed;
+};
+
 const sortRows = (rows: StorageRow[], reverse: boolean): StorageRow[] => {
   const direction = reverse ? -1 : 1;
 
@@ -98,11 +117,10 @@ export class InMemorySnapshotStorageAdapter implements SnapshotStorageAdapter {
 
   constructor({
     initialSnapshots = [],
-  }: { initialSnapshots?: Array<{ eventStoreId: string } & Snapshot> } = {}) {
+  }: { initialSnapshots?: Snapshot[] } = {}) {
     this.store = new Map();
 
-    for (const { eventStoreId: _ignored, ...rest } of initialSnapshots) {
-      const snapshot = rest as Snapshot;
+    for (const snapshot of initialSnapshots) {
       this.putSync(snapshot);
     }
   }
@@ -210,8 +228,7 @@ export class InMemorySnapshotStorageAdapter implements SnapshotStorageAdapter {
       options.reverse === true,
     );
 
-    const start =
-      options.pageToken !== undefined ? Number(options.pageToken) : 0;
+    const start = parsePageToken(options.pageToken);
     const end =
       options.limit !== undefined ? start + options.limit : matching.length;
     const page = matching.slice(start, end);

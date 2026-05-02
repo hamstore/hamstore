@@ -241,6 +241,49 @@ describe('InMemorySnapshotStorageAdapter', () => {
     expect(inOther.snapshot).toBeUndefined();
   });
 
+  it.each(['not-a-number', '-1', '1.5', ''])(
+    'rejects invalid pageToken %p',
+    async invalidToken => {
+      const adapter = new InMemorySnapshotStorageAdapter();
+      await adapter.putSnapshot(
+        {
+          aggregate: { aggregateId: 'a1', version: 5 },
+          reducerVersion: reducerV1,
+          eventStoreId,
+          savedAt: new Date().toISOString(),
+        },
+        { eventStoreId },
+      );
+
+      await expect(
+        adapter.listSnapshots(
+          { eventStoreId },
+          { pageToken: invalidToken },
+        ),
+      ).rejects.toThrow(/invalid pageToken/);
+    },
+  );
+
+  it('preserves initialSnapshots eventStoreId on construction', async () => {
+    const adapter = new InMemorySnapshotStorageAdapter({
+      initialSnapshots: [
+        {
+          aggregate: { aggregateId: 'a1', version: 1 },
+          reducerVersion: reducerV1,
+          eventStoreId,
+          savedAt: new Date().toISOString(),
+        },
+      ],
+    });
+
+    const { snapshot } = await adapter.getLatestSnapshot('a1', {
+      eventStoreId,
+    });
+
+    expect(snapshot).toBeDefined();
+    expect(snapshot?.eventStoreId).toBe(eventStoreId);
+  });
+
   it('rejects putSnapshot when context eventStoreId mismatches snapshot', async () => {
     const adapter = new InMemorySnapshotStorageAdapter();
 

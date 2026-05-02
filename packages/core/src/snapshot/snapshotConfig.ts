@@ -114,4 +114,21 @@ export interface SnapshotConfig<AGGREGATE extends Aggregate = Aggregate> {
     | Promise<Snapshot<AGGREGATE> | undefined>
     | Snapshot<AGGREGATE>
     | undefined;
+
+  /**
+   * Optional. Invoked when a snapshot read or fire-and-forget save/prune
+   * operation throws. The EventStore swallows the error in both cases (reads
+   * fall back to events, save/prune is best-effort) — this hook lets you
+   * route those errors to your observability stack of choice. If not
+   * provided, errors are silently swallowed.
+   *
+   * `phase` distinguishes between the read path (`'read'`) and the
+   * background save/prune path (`'save'` / `'prune'`).
+   */
+  onSnapshotError?: (args: {
+    phase: 'read' | 'save' | 'prune';
+    aggregateId?: string;
+    eventStoreId: string;
+    error: unknown;
+  }) => void;
 }

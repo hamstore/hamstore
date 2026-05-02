@@ -92,6 +92,26 @@ describe('cleanUpOutdatedSnapshots', () => {
     });
   });
 
+  it.each([
+    ['batchSize', { batchSize: 0 }],
+    ['batchSize', { batchSize: -1 }],
+    ['batchSize', { batchSize: 1.5 }],
+    ['batchSize', { batchSize: Number.NaN }],
+    ['concurrency', { concurrency: 0 }],
+    ['concurrency', { concurrency: -2 }],
+    ['concurrency', { concurrency: 1.7 }],
+    ['concurrency', { concurrency: Number.NaN }],
+  ])(
+    'throws RangeError when %s is not a positive integer',
+    async (name, options) => {
+      const adapter = makeAdapter([{ snapshotKeys: [] }]);
+
+      await expect(() =>
+        cleanUpOutdatedSnapshots(adapter, eventStoreId, 'v0', options),
+      ).rejects.toThrow(new RegExp(`\`${name}\` must be a positive integer`));
+    },
+  );
+
   it('reports progress after each page', async () => {
     const page1Keys = [makeKey(1), makeKey(2)];
     const page2Keys = [makeKey(3)];

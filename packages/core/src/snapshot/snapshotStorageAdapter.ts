@@ -30,15 +30,37 @@ export type SnapshotKey = {
   reducerVersion: string;
 };
 
+/**
+ * Options for `listSnapshots`.
+ *
+ * **Required ordering:** results MUST be returned in a stable order such that
+ * for snapshots of the same `aggregateId`, items are sorted by
+ * `aggregateVersion` ascending, with ties broken by `reducerVersion`
+ * ascending (lexicographic). When `reverse: true`, the order is exactly
+ * reversed. Adapters MAY group items by `aggregateId` first; the EventStore
+ * does not rely on cross-aggregate ordering.
+ *
+ * `pageToken` is opaque to callers — re-pass the value returned in
+ * `nextPageToken` to fetch the next page.
+ */
 export type ListSnapshotsOptions = {
   /** Restrict to one aggregate. */
   aggregateId?: string;
   /** Restrict to one reducer version (used by cleanup of outdated reducers). */
   reducerVersion?: string;
+  /** Inclusive lower bound on `aggregate.version`. */
   minVersion?: number;
+  /** Inclusive upper bound on `aggregate.version`. */
   maxVersion?: number;
+  /** Maximum number of keys returned in this page. */
   limit?: number;
+  /**
+   * When `true`, returns results in reverse of the documented order
+   * (highest `aggregateVersion` first within each aggregate). Used by
+   * pruning to delete the oldest snapshots last.
+   */
   reverse?: boolean;
+  /** Opaque token from a previous `nextPageToken`. */
   pageToken?: string;
 };
 

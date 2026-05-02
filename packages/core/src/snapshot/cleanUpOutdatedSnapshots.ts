@@ -1,4 +1,38 @@
-import type { SnapshotStorageAdapter } from './snapshotStorageAdapter';
+import type {
+  SnapshotKey,
+  SnapshotStorageAdapter,
+} from './snapshotStorageAdapter';
+
+const requirePositiveInteger = (name: string, value: number): void => {
+  if (!Number.isInteger(value) || value < 1) {
+    throw new RangeError(
+      `cleanUpOutdatedSnapshots: \`${name}\` must be a positive integer (got ${String(value)})`,
+    );
+  }
+};
+
+const deleteKeysInParallel = async (
+  adapter: SnapshotStorageAdapter,
+  eventStoreId: string,
+  keys: SnapshotKey[],
+  concurrency: number,
+): Promise<void> => {
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(concurrency, keys.length) },
+    async () => {
+      while (cursor < keys.length) {
+        const index = cursor++;
+        const key = keys[index];
+        if (key === undefined) {
+          continue;
+        }
+        await adapter.deleteSnapshot(key, { eventStoreId });
+      }
+    },
+  );
+  await Promise.all(workers);
+};
 
 /**
  * Efficiently delete snapshots written under an outdated `reducerVersion`.
@@ -29,6 +63,9 @@ export const cleanUpOutdatedSnapshots = async (
 ): Promise<{ deletedCount: number }> => {
   const { batchSize = 100, concurrency = 16, onProgress } = options;
 
+  requirePositiveInteger('batchSize', batchSize);
+  requirePositiveInteger('concurrency', concurrency);
+
   let pageToken: string | undefined = undefined;
   let deletedCount = 0;
 
@@ -42,18 +79,12 @@ export const cleanUpOutdatedSnapshots = async (
       },
     );
 
-    let cursor = 0;
-    const workers = Array.from({ length: Math.min(concurrency, snapshotKeys.length) }, async () => {
-      while (cursor < snapshotKeys.length) {
-        const index = cursor++;
-        const key = snapshotKeys[index];
-        if (key === undefined) {
-          continue;
-        }
-        await adapter.deleteSnapshot(key, { eventStoreId });
-      }
-    });
-    await Promise.all(workers);
+    await deleteKeysInParallel(
+      adapter,
+      eventStoreId,
+      snapshotKeys,
+      concurrency,
+    );
 
     deletedCount += snapshotKeys.length;
     onProgress?.(deletedCount);

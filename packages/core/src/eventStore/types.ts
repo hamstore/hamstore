@@ -168,9 +168,12 @@ export type EventsAndAggregateGetter<
 ) => Promise<{
   aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
   events: EVENT_DETAIL[];
-  lastEvent: SHOULD_EXIST extends true
-    ? EVENT_DETAIL
-    : EVENT_DETAIL | undefined;
+  /**
+   * The last event read while rebuilding the aggregate, if any. May be
+   * `undefined` even in the existing variant when the aggregate was seeded
+   * entirely from a snapshot (e.g. `maxVersion === snapshot.aggregate.version`).
+   */
+  lastEvent: EVENT_DETAIL | undefined;
 }>;
 
 export type SimulationOptions = { simulationDate?: string };

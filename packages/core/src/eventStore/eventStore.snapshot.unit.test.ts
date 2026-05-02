@@ -239,7 +239,50 @@ describe('EventStore snapshot integration', () => {
       );
     });
 
-    it('falls back to events when snapshot read throws', async () => {
+    it('falls back to events when snapshot read throws and routes the error to onSnapshotError', async () => {
+      const adapter = makeSnapshotAdapter();
+      const readError = new Error('boom');
+      adapter.getLatestSnapshotMock.mockRejectedValue(readError);
+
+      const onSnapshotError = vi.fn();
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+          onSnapshotError,
+        },
+      });
+
+      const { aggregate } = await store.getAggregate(pikachuId);
+      expect(aggregate).toEqual(fullAggregate);
+      expect(onSnapshotError).toHaveBeenCalledWith({
+        phase: 'read',
+        aggregateId: pikachuId,
+        eventStoreId,
+        error: readError,
+      });
+    });
+
+    it('silently swallows snapshot read errors when onSnapshotError is not configured', async () => {
       const adapter = makeSnapshotAdapter();
       adapter.getLatestSnapshotMock.mockRejectedValue(new Error('boom'));
 
@@ -272,7 +315,7 @@ describe('EventStore snapshot integration', () => {
 
       const { aggregate } = await store.getAggregate(pikachuId);
       expect(aggregate).toEqual(fullAggregate);
-      expect(warnSpy).toHaveBeenCalled();
+      expect(warnSpy).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
     });
@@ -396,9 +439,12 @@ describe('EventStore snapshot integration', () => {
       expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
     });
 
-    it('does not propagate errors thrown during snapshot save', async () => {
+    it('does not propagate errors thrown during snapshot save and routes them to onSnapshotError', async () => {
       const adapter = makeSnapshotAdapter();
-      adapter.putSnapshotMock.mockRejectedValue(new Error('save fail'));
+      const saveError = new Error('save fail');
+      adapter.putSnapshotMock.mockRejectedValue(saveError);
+
+      const onSnapshotError = vi.fn();
 
       const getEventsMock = vi
         .fn()
@@ -423,18 +469,20 @@ describe('EventStore snapshot integration', () => {
         snapshotConfig: {
           currentReducerVersion: 'v1',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
+          onSnapshotError,
         },
       });
-
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const { aggregate } = await store.getAggregate(pikachuId);
       await vi.runAllTimersAsync();
 
       expect(aggregate).toEqual(fullAggregate);
-      expect(warnSpy).toHaveBeenCalled();
-
-      warnSpy.mockRestore();
+      expect(onSnapshotError).toHaveBeenCalledWith({
+        phase: 'save',
+        aggregateId: pikachuId,
+        eventStoreId,
+        error: saveError,
+      });
     });
 
     it('prunes previous snapshots after saving with default DELETE_PREVIOUS pruning', async () => {

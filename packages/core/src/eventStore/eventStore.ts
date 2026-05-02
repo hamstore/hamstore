@@ -434,11 +434,12 @@ export class EventStore<
           this.snapshotConfig,
         );
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[${this.eventStoreId}] snapshot read failed for aggregate "${aggregateId}", falling back to events:`,
+        this.snapshotConfig.onSnapshotError?.({
+          phase: 'read',
+          aggregateId,
+          eventStoreId: this.eventStoreId,
           error,
-        );
+        });
 
         return undefined;
       }
@@ -505,11 +506,12 @@ export class EventStore<
           newSnapshot,
         });
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[${this.eventStoreId}] snapshot save/prune failed:`,
+        this.snapshotConfig?.onSnapshotError?.({
+          phase: 'save',
+          aggregateId: args.aggregate.aggregateId,
+          eventStoreId: this.eventStoreId,
           error,
-        );
+        });
       }
     };
 
@@ -616,7 +618,7 @@ export class EventStore<
       const { aggregate, events, lastEvent } =
         await this.getEventsAndAggregate(aggregateId, options);
 
-      if (aggregate === undefined || lastEvent === undefined) {
+      if (aggregate === undefined) {
         throw new AggregateNotFoundError({
           aggregateId,
           eventStoreId: this.eventStoreId,
