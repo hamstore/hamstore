@@ -275,9 +275,9 @@ const { aggregate, events } =
 
 Useful when you want the speed benefit of snapshots and only care about the events that contributed to the current state since the cache.
 
-### `lastN: K` — at least the last K events
+### `lastN: K` — the last K versions
 
-Guarantees that at least the last `K` events of the aggregate's history — i.e. events from version `aggregate.version - K + 1` onward, up to `maxVersion` — appear in the returned `events` array. The snapshot picker is unconstrained; if the snapshot's seed sits past that floor (`snapshot.version >= aggregate.version - K + 1`), the missing earlier events are re-fetched in a second read:
+Returns every event of the aggregate whose version falls in the window `[max(1, aggregate.version - K + 1), aggregate.version]` (further clamped by `maxVersion`). When event versions are contiguous — the typical case — this is exactly the last `K` events; if the version space has holes (e.g. an aggregate whose event log was compacted), fewer than `K` events may be returned. The snapshot picker is unconstrained; if the snapshot's seed sits past the floor (`snapshot.version >= aggregate.version - K + 1`), the missing earlier events are re-fetched in a second read:
 
 ```ts
 const { aggregate, events, lastEvent } =
