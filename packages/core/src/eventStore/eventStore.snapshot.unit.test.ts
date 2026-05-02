@@ -282,12 +282,13 @@ describe('EventStore snapshot integration', () => {
       });
     });
 
-    it('getEventsAndAggregate ignores snapshots by default and returns the full event history', async () => {
+    it('getEventsAndAggregate by default returns the full event history (snapshot used to seed aggregate replay only)', async () => {
       const adapter = makeSnapshotAdapter();
       adapter.getLatestSnapshotMock.mockResolvedValue({
         snapshot: makeSnapshot(partialAggregate, 'v1'),
       });
 
+      // Snapshot covers events 1..2; events on top = event 3.
       const getEventsMock = vi
         .fn()
         .mockResolvedValue({ events: pikachuEventsMocks });
@@ -316,26 +317,29 @@ describe('EventStore snapshot integration', () => {
       const { aggregate, events } =
         await store.getEventsAndAggregate(pikachuId);
 
+      // Aggregate is correctly rebuilt from snapshot + post-snapshot events.
       expect(aggregate).toEqual(fullAggregate);
+      // Default mode returns the full event history regardless of the
+      // snapshot's coverage.
       expect(events).toEqual(pikachuEventsMocks);
-      // No snapshot eligible (snapshot.version must be < 1) → no events floor
-      // and no minVersion in the events query.
+      // Single fetch from version 1 (no minVersion in the query).
+      expect(getEventsMock).toHaveBeenCalledTimes(1);
       expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId },
         undefined,
       );
+      // Snapshot picker is unconstrained (no aggregateMaxVersion).
       expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId },
-        { aggregateMaxVersion: 0 },
+        {},
       );
     });
 
-    it('getEventsAndAggregate uses a snapshot bounded by fromVersion when set', async () => {
+    it('getEventsAndAggregate with fromVersion uses any snapshot whose seed is below fromVersion (single events fetch)', async () => {
       const adapter = makeSnapshotAdapter();
-      // Snapshot is at version 2 (= partialAggregate.version) — eligible
-      // because fromVersion-1 = 2.
+      // Snapshot at v2; aggregateMin = 3; fromVersion = 3; fetchMin = 3.
       adapter.getLatestSnapshotMock.mockResolvedValue({
         snapshot: makeSnapshot(partialAggregate, 'v1'),
       });
@@ -372,28 +376,32 @@ describe('EventStore snapshot integration', () => {
 
       expect(aggregate).toEqual(fullAggregate);
       expect(events).toEqual([pikachuLeveledUpEvent]);
+      // Snapshot picker is no longer constrained by `fromVersion`.
       expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId },
-        { aggregateMaxVersion: 2 },
+        {},
       );
       expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId },
-        { minVersion: partialAggregate.version + 1 },
+        { minVersion: 3 },
       );
     });
 
-    it('getEventsAndAggregate does not use a snapshot whose version >= fromVersion', async () => {
+    it('getEventsAndAggregate with fromVersion uses a snapshot whose version is at or above fromVersion (no replay of pre-fromVersion events)', async () => {
       const adapter = makeSnapshotAdapter();
-      // Snapshot is at version 3 — NOT eligible because fromVersion-1 = 2.
+      // Snapshot at v3 (= fullAggregate). With fromVersion = 2:
+      //   aggregateMin = 4 (no events to replay on top)
+      //   eventsMinVersion = 2 → fetchMin = min(4, 2) = 2
+      // Single fetch 2..end; aggregate = snapshot directly (no replay).
       adapter.getLatestSnapshotMock.mockResolvedValue({
-        snapshot: undefined,
+        snapshot: makeSnapshot(fullAggregate, 'v1'),
       });
 
-      const getEventsMock = vi
-        .fn()
-        .mockResolvedValue({ events: pikachuEventsMocks });
+      const getEventsMock = vi.fn().mockResolvedValue({
+        events: [pikachuCaughtEvent, pikachuLeveledUpEvent],
+      });
       const store = new EventStore({
         eventStoreId,
         eventTypes: [
@@ -418,15 +426,18 @@ describe('EventStore snapshot integration', () => {
 
       const { aggregate, events } = await store.getEventsAndAggregate(
         pikachuId,
-        { fromVersion: 3 },
+        { fromVersion: 2 },
       );
 
       expect(aggregate).toEqual(fullAggregate);
-      expect(events).toEqual([pikachuLeveledUpEvent]);
-      expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
+      expect(events).toEqual([pikachuCaughtEvent, pikachuLeveledUpEvent]);
+      // Single events fetch from fromVersion onward — the events the caller
+      // asked for, no extra read.
+      expect(getEventsMock).toHaveBeenCalledTimes(1);
+      expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId },
-        { aggregateMaxVersion: 2 },
+        { minVersion: 2 },
       );
     });
 

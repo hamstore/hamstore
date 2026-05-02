@@ -74,9 +74,11 @@ const { aggregate, events } =
   });
 ```
 
-When the EventStore has snapshots configured, `fromVersion` also bounds which
-snapshot may seed the aggregate: only snapshots with
-`aggregate.version < fromVersion` are eligible.
+When the EventStore has snapshots configured, `fromVersion` uses the latest
+applicable snapshot (subject to `maxVersion`) regardless of its position
+relative to `fromVersion`. Events are fetched in a single range starting at
+`min(snapshot.version + 1, fromVersion)` so the read covers both what's needed
+for aggregate replay and what the caller asked to receive.
 
 #### `fromLatestSnapshot: true` — events read on top of the latest snapshot
 

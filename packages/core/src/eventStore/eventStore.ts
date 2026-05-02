@@ -390,24 +390,35 @@ export class EventStore<
 
     /**
      * Internal: rebuilds an aggregate, transparently using snapshot storage if
-     * configured. Returns both the aggregate and the events read since the
-     * snapshot (so the caller can choose to expose them via
-     * `getEventsAndAggregate`).
+     * configured. Returns both the aggregate and the events read (so the
+     * caller can choose to expose them via `getEventsAndAggregate`).
      *
-     * `snapshotMaxVersion` bounds which snapshot may seed the aggregate (only
-     * snapshots with `aggregate.version <= snapshotMaxVersion` are eligible).
-     * Defaults to `maxVersion` (i.e. the same upper bound used for events).
-     * Set to a lower value (e.g. `0`) to opt out of snapshot seeding for this
-     * call — used by `getEventsAndAggregate` to honour `fromVersion`.
+     * `eventsMinVersion` lets the caller widen the events fetch beyond what
+     * the aggregate strictly needs:
+     *   - omitted: fetch only what's required to build the aggregate
+     *     (events with `version > snapshot.version`, or all events when no
+     *     snapshot is applicable). The returned `events` array is exactly
+     *     that minimal set.
+     *   - set to `N`: fetch from `min(aggregateMin, N)` so the returned
+     *     `events` array can include everything from `N` onward. The
+     *     aggregate is still built by replaying only events with
+     *     `version > snapshot.version` on top of the seed; events below the
+     *     seed's version are kept in the returned array but not replayed.
+     *
+     * The snapshot picker is unconstrained except by `maxVersion`. This lets
+     * `fromVersion` benefit from a snapshot whose version is *above*
+     * `fromVersion`: instead of falling back to "no snapshot" and replaying
+     * the whole history, we seed from the high snapshot and only fetch the
+     * gap of events the caller asked for.
      */
     const rebuildAggregate = async (
       aggregateId: string,
       {
         maxVersion,
-        snapshotMaxVersion = maxVersion,
+        eventsMinVersion,
       }: {
         maxVersion?: number;
-        snapshotMaxVersion?: number;
+        eventsMinVersion?: number;
       },
     ): Promise<{
       aggregate: AGGREGATE | undefined;
@@ -415,30 +426,39 @@ export class EventStore<
       lastEvent: EVENT_DETAILS | undefined;
       seedSnapshot: Snapshot<AGGREGATE> | undefined;
     }> => {
-      const seedSnapshot = await loadSeedSnapshot(
-        aggregateId,
-        snapshotMaxVersion,
-      );
+      const seedSnapshot = await loadSeedSnapshot(aggregateId, maxVersion);
+
+      const aggregateMin =
+        seedSnapshot !== undefined ? seedSnapshot.aggregate.version + 1 : 1;
+      const fetchMin =
+        eventsMinVersion !== undefined && eventsMinVersion < aggregateMin
+          ? eventsMinVersion
+          : aggregateMin;
 
       const eventsOptions: EventsQueryOptions = {};
       if (maxVersion !== undefined) {
         eventsOptions.maxVersion = maxVersion;
       }
-      if (seedSnapshot !== undefined) {
-        eventsOptions.minVersion = seedSnapshot.aggregate.version + 1;
+      if (fetchMin > 1) {
+        eventsOptions.minVersion = fetchMin;
       }
 
-      const { events } = await this.getEvents(
+      const { events: fetched } = await this.getEvents(
         aggregateId,
         Object.keys(eventsOptions).length > 0 ? eventsOptions : undefined,
       );
 
-      const aggregate = applyEventsOnSeed(events, seedSnapshot);
-      const lastEvent = events[events.length - 1];
+      const aggregateEvents =
+        seedSnapshot === undefined
+          ? fetched
+          : fetched.filter(e => e.version > seedSnapshot.aggregate.version);
 
-      tryPersistSnapshot(aggregate, seedSnapshot, events.length);
+      const aggregate = applyEventsOnSeed(aggregateEvents, seedSnapshot);
+      const lastEvent = fetched[fetched.length - 1];
 
-      return { aggregate, events, lastEvent, seedSnapshot };
+      tryPersistSnapshot(aggregate, seedSnapshot, aggregateEvents.length);
+
+      return { aggregate, events: fetched, lastEvent, seedSnapshot };
     };
 
     /**
@@ -719,9 +739,11 @@ export class EventStore<
     };
 
     /**
-     * Mode: `fromVersion` (default `1`, i.e. full history). Only snapshots
-     * whose `aggregate.version` is strictly below `fromVersion` may seed,
-     * so by default no seeding happens.
+     * Mode: `fromVersion` (default `1`, i.e. full history). The latest
+     * applicable snapshot is used regardless of its version; the fetch
+     * range is `min(snapshot.version + 1, fromVersion) .. maxVersion` so
+     * a single fetch covers both the events needed to bring the aggregate
+     * up to date and the events the caller wants returned.
      */
     const getEventsAndAggregateFromVersion = async (
       aggregateId: string,
@@ -733,14 +755,10 @@ export class EventStore<
       lastEvent: EVENT_DETAILS | undefined;
     }> => {
       const effectiveFromVersion = Math.max(fromVersion ?? 1, 1);
-      let snapshotMaxVersion = effectiveFromVersion - 1;
-      if (maxVersion !== undefined && maxVersion < snapshotMaxVersion) {
-        snapshotMaxVersion = maxVersion;
-      }
 
       const rebuilt = await rebuildAggregate(aggregateId, {
         maxVersion,
-        snapshotMaxVersion,
+        eventsMinVersion: effectiveFromVersion,
       });
 
       const events =

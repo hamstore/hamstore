@@ -110,8 +110,10 @@ export type GetAggregateOptions = {
  * of `fromVersion`, `fromLatestSnapshot` or `lastN` may be set; when none is
  * set, the returned `events` array is the full event history.
  *
- * - `fromVersion: N` — events with `version >= N`. Snapshot picker is
- *   constrained to snapshots whose `aggregate.version < N`.
+ * - `fromVersion: N` — events with `version >= N`. The latest applicable
+ *   snapshot is used regardless of its position relative to `N`; the events
+ *   fetch covers `[min(snapshot.version + 1, N), maxVersion]` in a single
+ *   range so both aggregate replay and event return are satisfied.
  * - `fromLatestSnapshot: true` — events read on top of the latest applicable
  *   snapshot. Falls back to the full history when no snapshot applies.
  * - `lastN: K` — guarantees at least the last `K` events of the aggregate's
