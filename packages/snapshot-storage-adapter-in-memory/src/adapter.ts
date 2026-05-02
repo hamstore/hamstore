@@ -237,6 +237,7 @@ export class InMemorySnapshotStorageAdapter implements SnapshotStorageAdapter {
       aggregateId: row.aggregate.aggregateId,
       aggregateVersion: row.aggregate.version,
       reducerVersion: row.reducerVersion,
+      savedAt: row.savedAt,
     }));
 
     return {

@@ -8,6 +8,7 @@ import type {
   EventStorageAdapter,
 } from '~/eventStorageAdapter';
 import {
+  compilePruningPolicy,
   compileSnapshotPolicy,
   UndefinedSnapshotStorageAdapterError,
 } from '~/snapshot';
@@ -515,43 +516,29 @@ export class EventStore<
       }
     };
 
-    const resolveKeepCount = (): number | undefined => {
-      if (this.snapshotConfig === undefined) {
-        return undefined;
-      }
-      const pruning = this.snapshotConfig.pruning ?? {
-        strategy: 'DELETE_PREVIOUS' as const,
-      };
-
-      if (pruning.strategy === 'NONE') {
-        return undefined;
-      }
-
-      const keepCount =
-        pruning.strategy === 'DELETE_PREVIOUS' ? 1 : pruning.n;
-
-      return keepCount < 1 ? undefined : keepCount;
-    };
-
     const pruneSnapshotsAfterSave = async (args: {
       aggregateId: string;
       newSnapshot: Snapshot<AGGREGATE>;
     }): Promise<void> => {
-      const keepCount = resolveKeepCount();
       if (
-        keepCount === undefined ||
         this.snapshotConfig === undefined ||
         this.snapshotStorageAdapter === undefined
       ) {
         return;
       }
+      const pruning = this.snapshotConfig.pruning ?? { strategy: 'NONE' };
+      if (pruning.strategy === 'NONE') {
+        return;
+      }
 
+      const shouldKeep = compilePruningPolicy(pruning);
       const adapter = this.snapshotStorageAdapter;
       const ctx = { eventStoreId: this.eventStoreId };
       const reducerVersion = this.snapshotConfig.currentReducerVersion;
+      const now = new Date(args.newSnapshot.savedAt);
 
       let pageToken: string | undefined = undefined;
-      let kept = 0;
+      let position = 0;
 
       do {
         const { snapshotKeys, nextPageToken } = await adapter.listSnapshots(
@@ -566,11 +553,13 @@ export class EventStore<
         );
 
         for (const key of snapshotKeys) {
-          if (kept < keepCount) {
-            kept += 1;
+          const ageMs = now.getTime() - new Date(key.savedAt).getTime();
+          if (shouldKeep({ key, position, ageMs, now })) {
+            position += 1;
             continue;
           }
           await adapter.deleteSnapshot(key, ctx);
+          position += 1;
         }
 
         pageToken = nextPageToken;

@@ -13,6 +13,7 @@ const makeKey = (aggregateVersion: number): SnapshotKey => ({
   aggregateId: `agg-${aggregateVersion}`,
   aggregateVersion,
   reducerVersion: 'v0',
+  savedAt: new Date(2024, 0, 1, 0, aggregateVersion).toISOString(),
 });
 
 const makeAdapter = (

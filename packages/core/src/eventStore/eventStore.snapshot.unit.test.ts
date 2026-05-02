@@ -485,12 +485,27 @@ describe('EventStore snapshot integration', () => {
       });
     });
 
-    it('prunes previous snapshots after saving with default DELETE_PREVIOUS pruning', async () => {
+    it('does not prune by default (pruning: NONE)', async () => {
       const adapter = makeSnapshotAdapter();
       const previousKeys = [
-        { aggregateId: pikachuId, aggregateVersion: 3, reducerVersion: 'v1' },
-        { aggregateId: pikachuId, aggregateVersion: 2, reducerVersion: 'v1' },
-        { aggregateId: pikachuId, aggregateVersion: 1, reducerVersion: 'v1' },
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 3,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 3).toISOString(),
+        },
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 2,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 2).toISOString(),
+        },
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 1,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 1).toISOString(),
+        },
       ];
       adapter.listSnapshotsMock.mockResolvedValue({
         snapshotKeys: previousKeys,
@@ -519,13 +534,75 @@ describe('EventStore snapshot integration', () => {
         snapshotConfig: {
           currentReducerVersion: 'v1',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
+          // pruning omitted ⇒ defaults to NONE
         },
       });
 
       await store.getAggregate(pikachuId);
       await vi.runAllTimersAsync();
 
-      // Default pruning keeps last 1; the rest should be deleted.
+      expect(adapter.putSnapshotMock).toHaveBeenCalledTimes(1);
+      expect(adapter.listSnapshotsMock).not.toHaveBeenCalled();
+      expect(adapter.deleteSnapshotMock).not.toHaveBeenCalled();
+    });
+
+    it('prunes previous snapshots when pruning is explicitly DELETE_PREVIOUS', async () => {
+      const adapter = makeSnapshotAdapter();
+      const previousKeys = [
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 3,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 3).toISOString(),
+        },
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 2,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 2).toISOString(),
+        },
+        {
+          aggregateId: pikachuId,
+          aggregateVersion: 1,
+          reducerVersion: 'v1',
+          savedAt: new Date(2024, 0, 1, 1).toISOString(),
+        },
+      ];
+      adapter.listSnapshotsMock.mockResolvedValue({
+        snapshotKeys: previousKeys,
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
+          pruning: { strategy: 'DELETE_PREVIOUS' },
+        },
+      });
+
+      await store.getAggregate(pikachuId);
+      await vi.runAllTimersAsync();
+
+      // DELETE_PREVIOUS keeps the newest (position 0) only.
       expect(adapter.deleteSnapshotMock).toHaveBeenCalledTimes(2);
       expect(adapter.deleteSnapshotMock).toHaveBeenCalledWith(previousKeys[1], {
         eventStoreId,

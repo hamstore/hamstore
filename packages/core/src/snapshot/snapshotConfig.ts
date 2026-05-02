@@ -1,6 +1,6 @@
 import type { Aggregate } from '~/aggregate';
 
-import type { Snapshot } from './snapshotStorageAdapter';
+import type { Snapshot, SnapshotKey } from './snapshotStorageAdapter';
 
 /**
  * Inputs passed to `shouldSaveSnapshot` callbacks (the policy decides whether
@@ -67,16 +67,46 @@ export type SnapshotPolicy<AGGREGATE extends Aggregate = Aggregate> =
     };
 
 /**
- * What to do with older snapshots after a new one is saved successfully.
+ * Inputs passed to a `CUSTOM` pruning callback for a single candidate
+ * snapshot key.
  *
- * - `NONE` — keep them all (useful if you query snapshots for audit/history).
+ * - `key` is the candidate snapshot's key (with `savedAt`).
+ * - `position` is the snapshot's 0-based index when sorted newest-first
+ *   within its aggregate (0 = newest, 1 = next-newest, …). The newly-saved
+ *   snapshot is always at `position: 0`.
+ * - `ageMs` is `now.getTime() - new Date(key.savedAt).getTime()`.
+ * - `now` is provided by the caller so policies can be deterministic in
+ *   tests.
+ */
+export type ShouldKeepSnapshotArgs = {
+  key: SnapshotKey;
+  position: number;
+  ageMs: number;
+  now: Date;
+};
+
+export type ShouldKeepSnapshot = (args: ShouldKeepSnapshotArgs) => boolean;
+
+/**
+ * What to do with older snapshots after a new one is saved successfully, or
+ * during an offline `pruneAggregateSnapshots` / `pruneEventStoreSnapshots`
+ * sweep.
+ *
+ * - `NONE` — keep them all (useful if you query snapshots for audit/history,
+ *   or if you want to prune offline rather than on the hot path).
  * - `DELETE_PREVIOUS` — keep only the latest snapshot per aggregate.
  * - `KEEP_LAST_N` — keep the latest `n` snapshots per aggregate.
+ * - `KEEP_NEWER_THAN_MS` — keep every snapshot whose `savedAt` is within
+ *   `ageMs` of "now" (rolling window). Older snapshots are pruned.
+ *   Snapshots written in the future (clock skew) are always kept.
+ * - `CUSTOM` — bring your own per-snapshot predicate.
  */
 export type PruningPolicy =
   | { strategy: 'NONE' }
   | { strategy: 'DELETE_PREVIOUS' }
-  | { strategy: 'KEEP_LAST_N'; n: number };
+  | { strategy: 'KEEP_LAST_N'; n: number }
+  | { strategy: 'KEEP_NEWER_THAN_MS'; ageMs: number }
+  | { strategy: 'CUSTOM'; shouldKeep: ShouldKeepSnapshot };
 
 export interface SnapshotConfig<AGGREGATE extends Aggregate = Aggregate> {
   /**
@@ -95,7 +125,20 @@ export interface SnapshotConfig<AGGREGATE extends Aggregate = Aggregate> {
   /** When to save snapshots. */
   policy: SnapshotPolicy<AGGREGATE>;
 
-  /** What to do with older snapshots after a successful save. Defaults to `DELETE_PREVIOUS`. */
+  /**
+   * What to do with older snapshots after a successful save. Defaults to
+   * `{ strategy: 'NONE' }` — i.e. *no inline pruning*. This keeps the read
+   * path lean (one `putSnapshot`, no `listSnapshots` / `deleteSnapshot`
+   * calls) at the cost of letting old snapshots accumulate.
+   *
+   * For low-traffic services / demos, `{ strategy: 'DELETE_PREVIOUS' }` is
+   * a reasonable inline default.
+   *
+   * For production / serverless, prefer the default and run pruning
+   * **offline** via `pruneAggregateSnapshots` / `pruneEventStoreSnapshots`
+   * (see `~/snapshot`). That keeps the hot path's adapter cost predictable
+   * (one `putSnapshot` per save) while still bounding storage.
+   */
   pruning?: PruningPolicy;
 
   /**

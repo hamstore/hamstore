@@ -23,11 +23,16 @@ export type Snapshot<AGGREGATE extends Aggregate = Aggregate> = {
  * Identifies a snapshot uniquely. Returned by `listSnapshots` so callers can
  * efficiently enumerate snapshots without loading payloads (used e.g. by the
  * `cleanUpOutdatedSnapshots` helper).
+ *
+ * `savedAt` is included so list-only pruning (e.g. `KEEP_NEWER_THAN_MS`) can
+ * filter without an extra `getSnapshot` round-trip per candidate.
  */
 export type SnapshotKey = {
   aggregateId: string;
   aggregateVersion: number;
   reducerVersion: string;
+  /** ISO-8601 timestamp the snapshot was written. */
+  savedAt: string;
 };
 
 /**
