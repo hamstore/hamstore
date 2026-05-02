@@ -13,6 +13,8 @@ import {
   UndefinedSnapshotStorageAdapterError,
 } from '~/snapshot';
 import type {
+  ShouldKeepSnapshot,
+  ShouldSaveSnapshot,
   Snapshot,
   SnapshotConfig,
   SnapshotStorageAdapter,
@@ -159,8 +161,35 @@ export class EventStore<
   getEventStorageAdapter: () => EventStorageAdapter;
 
   snapshotStorageAdapter?: SnapshotStorageAdapter;
-  snapshotConfig?: SnapshotConfig<$AGGREGATE>;
   getSnapshotStorageAdapter: () => SnapshotStorageAdapter;
+
+  /**
+   * Backing field for the `snapshotConfig` getter/setter. Underscored as a
+   * convention (no `private` keyword to avoid TS structural-compatibility
+   * issues across duplicated package copies). Should be considered internal.
+   */
+  _snapshotConfig?: SnapshotConfig<$AGGREGATE>;
+  /** Cached `compileSnapshotPolicy(policy)`; invalidated on config writes. */
+  _compiledShouldSaveSnapshot?: ShouldSaveSnapshot<$AGGREGATE>;
+  /** Cached `compilePruningPolicy(pruning)`; invalidated on config writes. */
+  _compiledShouldKeepSnapshot?: ShouldKeepSnapshot;
+
+  get snapshotConfig(): SnapshotConfig<$AGGREGATE> | undefined {
+    return this._snapshotConfig;
+  }
+
+  set snapshotConfig(config: SnapshotConfig<$AGGREGATE> | undefined) {
+    this._snapshotConfig = config;
+    this._compiledShouldSaveSnapshot =
+      config === undefined
+        ? undefined
+        : compileSnapshotPolicy(config.policy);
+    const pruning = config?.pruning;
+    this._compiledShouldKeepSnapshot =
+      pruning === undefined || pruning.strategy === 'NONE'
+        ? undefined
+        : compilePruningPolicy(pruning);
+  }
 
   constructor({
     eventStoreId,
@@ -465,7 +494,12 @@ export class EventStore<
         return false;
       }
 
-      return compileSnapshotPolicy(args.config.policy)({
+      const compiled = this._compiledShouldSaveSnapshot;
+      if (compiled === undefined) {
+        return false;
+      }
+
+      return compiled({
         aggregate: args.aggregate as unknown as $AGGREGATE,
         previousSnapshot: args.previousSnapshot as unknown as
           | Snapshot<$AGGREGATE>
@@ -526,12 +560,11 @@ export class EventStore<
       ) {
         return;
       }
-      const pruning = this.snapshotConfig.pruning ?? { strategy: 'NONE' };
-      if (pruning.strategy === 'NONE') {
+      const shouldKeep = this._compiledShouldKeepSnapshot;
+      if (shouldKeep === undefined) {
         return;
       }
 
-      const shouldKeep = compilePruningPolicy(pruning);
       const adapter = this.snapshotStorageAdapter;
       const ctx = { eventStoreId: this.eventStoreId };
       const reducerVersion = this.snapshotConfig.currentReducerVersion;
