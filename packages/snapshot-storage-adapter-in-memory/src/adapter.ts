@@ -135,7 +135,12 @@ export class InMemorySnapshotStorageAdapter implements SnapshotStorageAdapter {
     return bucket;
   }
 
-  private rowKey(snapshotKey: SnapshotKey): string {
+  private rowKey(
+    snapshotKey: Pick<
+      SnapshotKey,
+      'aggregateId' | 'aggregateVersion' | 'reducerVersion'
+    >,
+  ): string {
     return `${snapshotKey.aggregateId}#${String(snapshotKey.aggregateVersion).padStart(20, '0')}#${snapshotKey.reducerVersion}`;
   }
 

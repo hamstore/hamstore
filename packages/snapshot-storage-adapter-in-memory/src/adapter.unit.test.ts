@@ -32,6 +32,7 @@ describe('InMemorySnapshotStorageAdapter', () => {
         aggregateId: 'a1',
         aggregateVersion: 5,
         reducerVersion: reducerV1,
+        savedAt: snapshot.savedAt,
       },
       { eventStoreId },
     );
@@ -119,6 +120,7 @@ describe('InMemorySnapshotStorageAdapter', () => {
         aggregateId: 'a1',
         aggregateVersion: 5,
         reducerVersion: reducerV1,
+        savedAt: new Date().toISOString(),
       },
       { eventStoreId },
     );
@@ -137,6 +139,7 @@ describe('InMemorySnapshotStorageAdapter', () => {
         aggregateId: 'a1',
         aggregateVersion: 5,
         reducerVersion: reducerV1,
+        savedAt: new Date().toISOString(),
       },
       { eventStoreId },
     );
@@ -146,6 +149,7 @@ describe('InMemorySnapshotStorageAdapter', () => {
         aggregateId: 'a1',
         aggregateVersion: 5,
         reducerVersion: reducerV1,
+        savedAt: new Date().toISOString(),
       },
       { eventStoreId },
     );
@@ -161,6 +165,7 @@ describe('InMemorySnapshotStorageAdapter', () => {
           aggregateId: 'gone',
           aggregateVersion: 99,
           reducerVersion: reducerV1,
+          savedAt: new Date().toISOString(),
         },
         { eventStoreId },
       ),
