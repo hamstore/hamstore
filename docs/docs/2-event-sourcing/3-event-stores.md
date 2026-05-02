@@ -55,6 +55,8 @@ const pokemonsEventStore = new EventStore({
 - <code>reduce <i>(EventType[])</i></code>: A <a href="../aggregates-reducers">reducer function</a> that can be applied to the store event types
 - <code>onEventPushed <i>(?(pushEventResponse: PushEventResponse) => Promise&lt;void&gt;)</i></code>: To run a callback after events are pushed (input is exactly the return value of the <code>pushEvent</code> method)
 - <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="../fetching-events">fetching events</a>
+- <code>snapshotStorageAdapter <i>(?SnapshotStorageAdapter)</i></code>: See <a href="../../reacting-to-events/snapshots">snapshots</a>
+- <code>snapshotConfig <i>(?SnapshotConfig)</i></code>: See <a href="../../reacting-to-events/snapshots">snapshots</a>
 
 > ☝️ The return type of the `reducer` is used to infer the `Aggregate` type of the `EventStore`, so it is important to type it explicitely.
 
@@ -99,6 +101,17 @@ const eventStorageAdapter = pokemonsEventStore.eventStorageAdapter;
 
 > ☝️ The `eventStorageAdapter` is not read-only so you do not have to provide it right away.
 
+- <code>snapshotStorageAdapter <i>(?SnapshotStorageAdapter)</i></code>: See <a href="../../reacting-to-events/snapshots">snapshots</a>
+- <code>snapshotConfig <i>(?SnapshotConfig)</i></code>: See <a href="../../reacting-to-events/snapshots">snapshots</a>
+
+```ts
+const snapshotStorageAdapter = pokemonsEventStore.snapshotStorageAdapter;
+const snapshotConfig = pokemonsEventStore.snapshotConfig;
+// => both undefined (we did not provide them in this example)
+```
+
+> ☝️ Both fields are assignable in context. Re-assigning `snapshotConfig` recompiles the cached `shouldSaveSnapshot` / `shouldKeepSnapshot` predicates once.
+
 ---
 
 **Sync Methods:**
@@ -113,6 +126,8 @@ expect(() => pokemonsEventStore.getEventStorageAdapter()).toThrow(
 );
 // => true
 ```
+
+- <code>getSnapshotStorageAdapter <i>(() => SnapshotStorageAdapter)</i></code>: Returns the event store snapshot storage adapter if it exists. Throws an <code>UndefinedSnapshotStorageAdapterError</code> if it doesn't. See <a href="../../reacting-to-events/snapshots">snapshots</a>.
 
 - <code>buildAggregate <i>((eventDetails: EventDetail[], initialAggregate?: Aggregate) => Aggregate | undefined)</i></code>: Applies the event store reducer to a serie of events.
 
@@ -162,15 +177,13 @@ const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(
 );
 ```
 
-- <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and build it.
+- <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and builds it. When [snapshots](../3-reacting-to-events/5-snapshots.md) are configured, the aggregate is seeded from the latest applicable snapshot and only the events on top of it are loaded.
 
   `OptionsObj` contains the following properties:
   - <code>maxVersion <i>(?number)</i></code>: To retrieve aggregate below a certain version
 
   `ResponseObj` contains the following properties:
   - <code>aggregate <i>(?Aggregate)</i></code>: The aggregate (possibly <code>undefined</code>)
-  - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
-  - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
 
 ```ts
 const { aggregate: myPikachu } =
@@ -182,11 +195,9 @@ const { aggregate: pikachuBelowVersion5 } =
   await pokemonsEventStore.getAggregate(myPikachuId, {
     maxVersion: 5,
   });
-
-// 👇 Returns the events if you need them
-const { aggregate, events } =
-  await pokemonsEventStore.getAggregate(myPikachuId);
 ```
+
+> ☝️ If you also need the underlying events (e.g. to publish a state-carrying message or to count how many events contributed to the aggregate), use <code>getEventsAndAggregate</code> below — `getAggregate` only returns the rebuilt aggregate so that snapshot-based reads can skip materialising the full event history.
 
 - <code>getExistingAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregate</code> method, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
 
@@ -205,6 +216,41 @@ expect(async () =>
 
 const { aggregate } =
   await pokemonsEventStore.getExistingAggregate(aggregateId);
+// => 'aggregate' is always defined 🙌
+```
+
+- <code>getEventsAndAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate, builds it, and returns both. When [snapshots](../3-reacting-to-events/5-snapshots.md) are configured, the aggregate is still seeded from the latest applicable snapshot — only the returned `events` array is shaped by the options below.
+
+  `OptionsObj` contains <code>maxVersion <i>(?number)</i></code> plus exactly one (or none) of:
+  - <code>fromVersion <i>(?number)</i></code>: Filters the returned events to <code>version >= fromVersion</code>. The aggregate is unaffected.
+  - <code>fromLatestSnapshot <i>(?true)</i></code>: Returns only the events read on top of the latest snapshot (falls back to the full history if no snapshot applies).
+  - <code>lastN <i>(?number)</i></code>: Guarantees that at least the last <code>N</code> events appear in the returned array; the snapshot picker is unconstrained and any missing earlier events are re-fetched in a second read.
+
+  `ResponseObj` contains the following properties:
+  - <code>aggregate <i>(?Aggregate)</i></code>: The aggregate (possibly <code>undefined</code>)
+  - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
+  - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
+
+```ts
+// Default — full history.
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getEventsAndAggregate(myPikachuId);
+
+// Events from a known checkpoint.
+const { events } = await pokemonsEventStore.getEventsAndAggregate(myPikachuId, {
+  fromVersion: lastProcessedVersion + 1,
+});
+
+// At least the last 10 events.
+const { events: recent } =
+  await pokemonsEventStore.getEventsAndAggregate(myPikachuId, { lastN: 10 });
+```
+
+- <code>getExistingEventsAndAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getEventsAndAggregate</code>, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
+
+```ts
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getExistingEventsAndAggregate(aggregateId);
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
