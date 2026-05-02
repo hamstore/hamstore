@@ -261,7 +261,10 @@ export class EventStore<
       events: EVENT_DETAILS[];
       lastEvent: EVENT_DETAILS | undefined;
     }> => {
-      const { events } = await this.getEvents(aggregateId, { maxVersion });
+      const { events } = await this.getEvents(
+        aggregateId,
+        maxVersion !== undefined ? { maxVersion } : undefined,
+      );
 
       const aggregate = this.buildAggregate(
         events as unknown as $EVENT_DETAILS[],

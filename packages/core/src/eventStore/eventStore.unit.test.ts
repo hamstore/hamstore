@@ -88,7 +88,7 @@ describe('event store', () => {
       expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId: pokemonsEventStore.eventStoreId },
-        {},
+        undefined,
       );
       expect(response).toStrictEqual({
         aggregate: pikachuEventsMocks.reduce(
@@ -107,7 +107,7 @@ describe('event store', () => {
       expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId: pokemonsEventStore.eventStoreId },
-        {},
+        undefined,
       );
 
       expect(response).toStrictEqual({
@@ -141,7 +141,7 @@ describe('event store', () => {
       expect(getEventsMock).toHaveBeenCalledWith(
         pikachuId,
         { eventStoreId: pokemonsEventStore.eventStoreId },
-        {},
+        undefined,
       );
       expect(response).toStrictEqual({
         aggregate: pikachuEventsMocks.reduce(
