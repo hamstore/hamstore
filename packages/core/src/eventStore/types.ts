@@ -129,7 +129,9 @@ export type GetEventsAndAggregateOptions = {
  *
  * The previous shape (which also included `events` and `lastEvent`) is
  * available via `getEventsAndAggregate` / `getExistingEventsAndAggregate` for
- * callers that need the underlying events. See the v3-to-v4 migration guide.
+ * callers that need the underlying events. This split lets snapshot-backed
+ * reads avoid materialising a partial event list. See the v3-to-v4 migration
+ * guide.
  */
 export type AggregateGetter<
   AGGREGATE extends Aggregate,
@@ -143,13 +145,18 @@ export type AggregateGetter<
 
 /**
  * Full-history aggregate getter — returns the rebuilt aggregate plus the
- * events that produced it. This replaces the legacy `getAggregate` return
- * shape.
+ * events that produced it (replacing the legacy `getAggregate` return shape).
  *
- * By default (`fromVersion` unset / `1`), `events` is the complete event
- * history of the aggregate up to `maxVersion`. With `fromVersion: X`, only
- * events with `version >= X` are returned (the aggregate still reflects the
- * entire history up to `maxVersion`).
+ * By default (`fromVersion` unset or `1`), `events` is the complete event
+ * history of the aggregate up to `maxVersion`. Even when snapshots are
+ * configured, the default call returns the full history — snapshots are
+ * not used to seed the events array unless `fromVersion` is set.
+ *
+ * With `fromVersion: X`, only events with `version >= X` are returned (the
+ * aggregate still reflects the entire history up to `maxVersion`). When the
+ * EventStore has snapshots configured, `fromVersion` also bounds which
+ * snapshot may seed the aggregate: only snapshots whose
+ * `aggregate.version < fromVersion` are eligible.
  */
 export type EventsAndAggregateGetter<
   EVENT_DETAIL extends EventDetail,

@@ -1132,6 +1132,36 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.5.1)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1)
 
+  packages/snapshot-storage-adapter-in-memory:
+    devDependencies:
+      '@hamstore/core':
+        specifier: 'workspace:'
+        version: link:../core
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.5.2
+      dependency-cruiser:
+        specifier: ^17.0.1
+        version: 17.0.1
+      mockdate:
+        specifier: ^3.0.5
+        version: 3.0.5
+      oxfmt:
+        specifier: ^0.41.0
+        version: 0.41.0
+      oxlint:
+        specifier: ^1.56.0
+        version: 1.56.0
+      tsdown:
+        specifier: ^0.21.4
+        version: 0.21.4(typescript@5.9.2)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.5.2)(jiti@2.5.1)(terser@5.44.0)(tsx@4.21.0)(yaml@2.8.1)
+
 packages:
 
   2-thenable@1.0.0:

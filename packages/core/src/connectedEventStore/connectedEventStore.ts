@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
@@ -16,6 +17,10 @@ import type {
   SideEffectsSimulator,
 } from '~/eventStore';
 import type { EventStoreMessageChannel } from '~/messaging';
+import type {
+  SnapshotConfig,
+  SnapshotStorageAdapter,
+} from '~/snapshot';
 import type { $Contravariant } from '~/utils';
 
 import { publishPushedEvent } from './publishPushedEvent';
@@ -93,6 +98,7 @@ export class ConnectedEventStore<
   >;
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
+  getSnapshotStorageAdapter: () => SnapshotStorageAdapter;
 
   eventStore: EventStore<
     EVENT_STORE_ID,
@@ -131,6 +137,7 @@ export class ConnectedEventStore<
       eventStore.getExistingEventsAndAggregate;
     this.simulateAggregate = eventStore.simulateAggregate;
     this.getEventStorageAdapter = eventStore.getEventStorageAdapter;
+    this.getSnapshotStorageAdapter = eventStore.getSnapshotStorageAdapter;
 
     this.groupEvent = (...args) => {
       const groupedEvent = eventStore.groupEvent(...args);
@@ -178,5 +185,23 @@ export class ConnectedEventStore<
         props as unknown as { event: EVENT_DETAIL; nextAggregate?: AGGREGATE },
       );
     };
+  }
+
+  set snapshotStorageAdapter(
+    snapshotStorageAdapter: SnapshotStorageAdapter | undefined,
+  ) {
+    this.eventStore.snapshotStorageAdapter = snapshotStorageAdapter;
+  }
+
+  get snapshotStorageAdapter(): SnapshotStorageAdapter | undefined {
+    return this.eventStore.snapshotStorageAdapter;
+  }
+
+  set snapshotConfig(snapshotConfig: SnapshotConfig<$AGGREGATE> | undefined) {
+    this.eventStore.snapshotConfig = snapshotConfig;
+  }
+
+  get snapshotConfig(): SnapshotConfig<$AGGREGATE> | undefined {
+    return this.eventStore.snapshotConfig;
   }
 }
