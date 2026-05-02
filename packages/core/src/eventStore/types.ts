@@ -105,24 +105,26 @@ export type GetAggregateOptions = {
   maxVersion?: number;
 };
 
+/**
+ * Selects which events are returned by `getEventsAndAggregate`. Exactly one
+ * of `fromVersion`, `fromLatestSnapshot` or `lastN` may be set; when none is
+ * set, the returned `events` array is the full event history.
+ *
+ * - `fromVersion: N` — events with `version >= N`. Snapshot picker is
+ *   constrained to snapshots whose `aggregate.version < N`.
+ * - `fromLatestSnapshot: true` — events read on top of the latest applicable
+ *   snapshot. Falls back to the full history when no snapshot applies.
+ * - `lastN: K` — guarantees at least the last `K` events of the aggregate's
+ *   history (up to `maxVersion`); missing earlier events are re-fetched if
+ *   the snapshot covers them.
+ */
 export type GetEventsAndAggregateOptions = {
   maxVersion?: number;
-  /**
-   * Lowest event version that MUST appear in the returned `events` array.
-   * Defaults to `1` (i.e. the full event history).
-   *
-   * Used to support incremental projections / "events since checkpoint"
-   * patterns: a caller that has already processed events up to version
-   * `V` can ask for `fromVersion: V + 1` and receive only the new events,
-   * alongside the up-to-date aggregate.
-   *
-   * When the EventStore has snapshots configured, `fromVersion` also
-   * bounds which snapshot may seed the aggregate: only snapshots whose
-   * `aggregate.version < fromVersion` are eligible. Otherwise the full
-   * history is read.
-   */
-  fromVersion?: number;
-};
+} & (
+  | { fromVersion?: number; fromLatestSnapshot?: never; lastN?: never }
+  | { fromVersion?: never; fromLatestSnapshot: true; lastN?: never }
+  | { fromVersion?: never; fromLatestSnapshot?: never; lastN: number }
+);
 
 /**
  * `getAggregate` returns the rebuilt aggregate only.
@@ -147,16 +149,15 @@ export type AggregateGetter<
  * Full-history aggregate getter — returns the rebuilt aggregate plus the
  * events that produced it (replacing the legacy `getAggregate` return shape).
  *
- * By default (`fromVersion` unset or `1`), `events` is the complete event
- * history of the aggregate up to `maxVersion`. Even when snapshots are
- * configured, the default call returns the full history — snapshots are
- * not used to seed the events array unless `fromVersion` is set.
+ * By default the returned `events` array is the complete event history of
+ * the aggregate up to `maxVersion`. Even when snapshots are configured,
+ * the default call returns the full history — snapshots are not used to
+ * seed the events array unless one of the explicit modes is set.
  *
- * With `fromVersion: X`, only events with `version >= X` are returned (the
- * aggregate still reflects the entire history up to `maxVersion`). When the
- * EventStore has snapshots configured, `fromVersion` also bounds which
- * snapshot may seed the aggregate: only snapshots whose
- * `aggregate.version < fromVersion` are eligible.
+ * The events range can be narrowed via `fromVersion`, `fromLatestSnapshot`
+ * or `lastN` (mutually exclusive). See {@link GetEventsAndAggregateOptions}
+ * for the precise semantics. The aggregate always reflects the entire
+ * history up to `maxVersion`, regardless of which range is chosen.
  */
 export type EventsAndAggregateGetter<
   EVENT_DETAIL extends EventDetail,

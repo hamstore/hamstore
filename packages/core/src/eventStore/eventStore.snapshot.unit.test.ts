@@ -282,6 +282,426 @@ describe('EventStore snapshot integration', () => {
       });
     });
 
+    it('getEventsAndAggregate ignores snapshots by default and returns the full event history', async () => {
+      const adapter = makeSnapshotAdapter();
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: makeSnapshot(partialAggregate, 'v1'),
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } =
+        await store.getEventsAndAggregate(pikachuId);
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual(pikachuEventsMocks);
+      // No snapshot eligible (snapshot.version must be < 1) → no events floor
+      // and no minVersion in the events query.
+      expect(getEventsMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        undefined,
+      );
+      expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        { aggregateMaxVersion: 0 },
+      );
+    });
+
+    it('getEventsAndAggregate uses a snapshot bounded by fromVersion when set', async () => {
+      const adapter = makeSnapshotAdapter();
+      // Snapshot is at version 2 (= partialAggregate.version) — eligible
+      // because fromVersion-1 = 2.
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: makeSnapshot(partialAggregate, 'v1'),
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: [pikachuLeveledUpEvent] });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } = await store.getEventsAndAggregate(
+        pikachuId,
+        { fromVersion: 3 },
+      );
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([pikachuLeveledUpEvent]);
+      expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        { aggregateMaxVersion: 2 },
+      );
+      expect(getEventsMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        { minVersion: partialAggregate.version + 1 },
+      );
+    });
+
+    it('getEventsAndAggregate does not use a snapshot whose version >= fromVersion', async () => {
+      const adapter = makeSnapshotAdapter();
+      // Snapshot is at version 3 — NOT eligible because fromVersion-1 = 2.
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: undefined,
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } = await store.getEventsAndAggregate(
+        pikachuId,
+        { fromVersion: 3 },
+      );
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([pikachuLeveledUpEvent]);
+      expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        { aggregateMaxVersion: 2 },
+      );
+    });
+
+    it('getEventsAndAggregate with fromLatestSnapshot returns events on top of the latest snapshot', async () => {
+      const adapter = makeSnapshotAdapter();
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: makeSnapshot(partialAggregate, 'v1'),
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: [pikachuLeveledUpEvent] });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events, lastEvent } =
+        await store.getEventsAndAggregate(pikachuId, {
+          fromLatestSnapshot: true,
+        });
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([pikachuLeveledUpEvent]);
+      expect(lastEvent).toEqual(pikachuLeveledUpEvent);
+      expect(adapter.getLatestSnapshotMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        {},
+      );
+      expect(getEventsMock).toHaveBeenCalledWith(
+        pikachuId,
+        { eventStoreId },
+        { minVersion: partialAggregate.version + 1 },
+      );
+    });
+
+    it('getEventsAndAggregate with fromLatestSnapshot falls back to the full history when no snapshot is applicable', async () => {
+      const adapter = makeSnapshotAdapter();
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: undefined,
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } = await store.getEventsAndAggregate(
+        pikachuId,
+        { fromLatestSnapshot: true },
+      );
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual(pikachuEventsMocks);
+    });
+
+    it('getEventsAndAggregate with lastN returns at least the trailing N events when the snapshot covers the rest', async () => {
+      const adapter = makeSnapshotAdapter();
+      // Snapshot at version 2 covers events 1–2; tail read returns event 3.
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: makeSnapshot(partialAggregate, 'v1'),
+      });
+
+      const getEventsMock = vi.fn();
+      // First call: events on top of snapshot (snapshot.version+1 = 3).
+      getEventsMock.mockResolvedValueOnce({ events: [pikachuLeveledUpEvent] });
+      // Second call: missing earlier events (versions 2 only — event 1 is not
+      // needed because lastN=2 → desiredFloor = 3-2+1 = 2).
+      getEventsMock.mockResolvedValueOnce({ events: [pikachuCaughtEvent] });
+
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events, lastEvent } =
+        await store.getEventsAndAggregate(pikachuId, { lastN: 2 });
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([pikachuCaughtEvent, pikachuLeveledUpEvent]);
+      expect(lastEvent).toEqual(pikachuLeveledUpEvent);
+
+      // First call: tail read on top of snapshot.
+      expect(getEventsMock).toHaveBeenNthCalledWith(
+        1,
+        pikachuId,
+        { eventStoreId },
+        { minVersion: partialAggregate.version + 1 },
+      );
+      // Second call: backfill of events the snapshot covered.
+      expect(getEventsMock).toHaveBeenNthCalledWith(
+        2,
+        pikachuId,
+        { eventStoreId },
+        { minVersion: 2, maxVersion: partialAggregate.version },
+      );
+    });
+
+    it('getEventsAndAggregate with lastN does not refetch when the tail already contains N events', async () => {
+      const adapter = makeSnapshotAdapter();
+      // Snapshot at version 1 covers event 1; tail covers events 2–3 (2 events).
+      const snapshotAggregate = buildAggregate([pikachuAppearedEvent]);
+      adapter.getLatestSnapshotMock.mockResolvedValue({
+        snapshot: makeSnapshot(snapshotAggregate, 'v1'),
+      });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({
+          events: [pikachuCaughtEvent, pikachuLeveledUpEvent],
+        });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } = await store.getEventsAndAggregate(
+        pikachuId,
+        { lastN: 2 },
+      );
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([pikachuCaughtEvent, pikachuLeveledUpEvent]);
+      // Only one events call — no backfill needed.
+      expect(getEventsMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('getEventsAndAggregate with lastN larger than total events returns the full history', async () => {
+      const adapter = makeSnapshotAdapter();
+      adapter.getLatestSnapshotMock.mockResolvedValue({ snapshot: undefined });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events } = await store.getEventsAndAggregate(
+        pikachuId,
+        { lastN: 100 },
+      );
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual(pikachuEventsMocks);
+      expect(getEventsMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('getEventsAndAggregate with lastN: 0 returns no events but the full aggregate', async () => {
+      const adapter = makeSnapshotAdapter();
+      adapter.getLatestSnapshotMock.mockResolvedValue({ snapshot: undefined });
+
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes: [
+          pokemonAppearedEvent,
+          pokemonCaughtEvent,
+          pokemonLeveledUpEvent,
+        ],
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: vi.fn(),
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          policy: { strategy: 'NONE' },
+        },
+      });
+
+      const { aggregate, events, lastEvent } =
+        await store.getEventsAndAggregate(pikachuId, { lastN: 0 });
+
+      expect(aggregate).toEqual(fullAggregate);
+      expect(events).toEqual([]);
+      expect(lastEvent).toBeUndefined();
+    });
+
     it('silently swallows snapshot read errors when onSnapshotError is not configured', async () => {
       const adapter = makeSnapshotAdapter();
       adapter.getLatestSnapshotMock.mockRejectedValue(new Error('boom'));

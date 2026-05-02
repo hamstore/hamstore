@@ -393,17 +393,32 @@ export class EventStore<
      * configured. Returns both the aggregate and the events read since the
      * snapshot (so the caller can choose to expose them via
      * `getEventsAndAggregate`).
+     *
+     * `snapshotMaxVersion` bounds which snapshot may seed the aggregate (only
+     * snapshots with `aggregate.version <= snapshotMaxVersion` are eligible).
+     * Defaults to `maxVersion` (i.e. the same upper bound used for events).
+     * Set to a lower value (e.g. `0`) to opt out of snapshot seeding for this
+     * call — used by `getEventsAndAggregate` to honour `fromVersion`.
      */
     const rebuildAggregate = async (
       aggregateId: string,
-      maxVersion: number | undefined,
+      {
+        maxVersion,
+        snapshotMaxVersion = maxVersion,
+      }: {
+        maxVersion?: number;
+        snapshotMaxVersion?: number;
+      },
     ): Promise<{
       aggregate: AGGREGATE | undefined;
       events: EVENT_DETAILS[];
       lastEvent: EVENT_DETAILS | undefined;
       seedSnapshot: Snapshot<AGGREGATE> | undefined;
     }> => {
-      const seedSnapshot = await loadSeedSnapshot(aggregateId, maxVersion);
+      const seedSnapshot = await loadSeedSnapshot(
+        aggregateId,
+        snapshotMaxVersion,
+      );
 
       const eventsOptions: EventsQueryOptions = {};
       if (maxVersion !== undefined) {
@@ -427,6 +442,40 @@ export class EventStore<
     };
 
     /**
+     * Fetch the latest snapshot from the storage adapter and re-validate the
+     * version bound. The defense-in-depth filter ensures a misbehaving
+     * adapter that ignores `aggregateMaxVersion` cannot seed past the bound.
+     */
+    const fetchSnapshotWithinBound = async (
+      aggregateId: string,
+      maxVersion: number | undefined,
+    ): Promise<Snapshot<Aggregate> | undefined> => {
+      if (this.snapshotStorageAdapter === undefined) {
+        return undefined;
+      }
+
+      const { snapshot } =
+        await this.snapshotStorageAdapter.getLatestSnapshot(
+          aggregateId,
+          { eventStoreId: this.eventStoreId },
+          maxVersion !== undefined
+            ? { aggregateMaxVersion: maxVersion }
+            : {},
+        );
+
+      if (snapshot === undefined) {
+        return undefined;
+      }
+      if (
+        maxVersion !== undefined &&
+        snapshot.aggregate.version > maxVersion
+      ) {
+        return undefined;
+      }
+      return snapshot;
+    };
+
+    /**
      * Look up the latest applicable snapshot for the given aggregate. Returns
      * `undefined` if no snapshot is available, the snapshot is from a
      * different reducer version (and migration didn't yield one for the
@@ -446,15 +495,10 @@ export class EventStore<
       }
 
       try {
-        const { snapshot: rawSnapshot } =
-          await this.snapshotStorageAdapter.getLatestSnapshot(
-            aggregateId,
-            { eventStoreId: this.eventStoreId },
-            maxVersion !== undefined
-              ? { aggregateMaxVersion: maxVersion }
-              : {},
-          );
-
+        const rawSnapshot = await fetchSnapshotWithinBound(
+          aggregateId,
+          maxVersion,
+        );
         if (rawSnapshot === undefined) {
           return undefined;
         }
@@ -600,7 +644,7 @@ export class EventStore<
     };
 
     this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
-      const { aggregate } = await rebuildAggregate(aggregateId, maxVersion);
+      const { aggregate } = await rebuildAggregate(aggregateId, { maxVersion });
 
       return { aggregate };
     };
@@ -618,22 +662,132 @@ export class EventStore<
       return { aggregate };
     };
 
-    this.getEventsAndAggregate = async (
-      aggregateId,
-      { maxVersion, fromVersion } = {},
-    ) => {
-      const {
-        aggregate,
-        events: allEvents,
-      } = await rebuildAggregate(aggregateId, maxVersion);
+    /**
+     * Mode: `lastN`. Use whichever snapshot is latest (subject to maxVersion),
+     * then if the tail we read isn't enough to satisfy `lastN`, do a second
+     * read for the missing earlier events. Aggregate always reflects full
+     * history.
+     */
+    const getEventsAndAggregateLastN = async (
+      aggregateId: string,
+      lastN: number,
+      maxVersion: number | undefined,
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
+      if (lastN <= 0) {
+        const { aggregate } = await rebuildAggregate(aggregateId, {
+          maxVersion,
+        });
+        return { aggregate, events: [], lastEvent: undefined };
+      }
+
+      const rebuilt = await rebuildAggregate(aggregateId, { maxVersion });
+      const builtAggregate = rebuilt.aggregate;
+      if (builtAggregate === undefined) {
+        return { aggregate: undefined, events: [], lastEvent: undefined };
+      }
+
+      const desiredFloor = Math.max(1, builtAggregate.version - lastN + 1);
+      const tailEvents = rebuilt.events;
+      const seed = rebuilt.seedSnapshot;
+
+      // Tail already covers from desiredFloor when no snapshot was used or
+      // when the snapshot is at or below the desired floor.
+      if (seed === undefined || seed.aggregate.version + 1 <= desiredFloor) {
+        const trimmed = tailEvents.filter(e => e.version >= desiredFloor);
+        return {
+          aggregate: builtAggregate,
+          events: trimmed,
+          lastEvent: trimmed[trimmed.length - 1],
+        };
+      }
+
+      // Snapshot covered events past the desired floor — backfill them.
+      const { events: earlierEvents } = await this.getEvents(aggregateId, {
+        minVersion: desiredFloor,
+        maxVersion: seed.aggregate.version,
+      });
+      const combined = [...earlierEvents, ...tailEvents];
+      return {
+        aggregate: builtAggregate,
+        events: combined,
+        lastEvent: combined[combined.length - 1],
+      };
+    };
+
+    /**
+     * Mode: `fromVersion` (default `1`, i.e. full history). Only snapshots
+     * whose `aggregate.version` is strictly below `fromVersion` may seed,
+     * so by default no seeding happens.
+     */
+    const getEventsAndAggregateFromVersion = async (
+      aggregateId: string,
+      fromVersion: number | undefined,
+      maxVersion: number | undefined,
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
+      const effectiveFromVersion = Math.max(fromVersion ?? 1, 1);
+      let snapshotMaxVersion = effectiveFromVersion - 1;
+      if (maxVersion !== undefined && maxVersion < snapshotMaxVersion) {
+        snapshotMaxVersion = maxVersion;
+      }
+
+      const rebuilt = await rebuildAggregate(aggregateId, {
+        maxVersion,
+        snapshotMaxVersion,
+      });
 
       const events =
-        fromVersion !== undefined && fromVersion > 1
-          ? allEvents.filter(event => event.version >= fromVersion)
-          : allEvents;
-      const lastEvent = events[events.length - 1];
+        effectiveFromVersion > 1
+          ? rebuilt.events.filter(e => e.version >= effectiveFromVersion)
+          : rebuilt.events;
 
-      return { aggregate, events, lastEvent };
+      return {
+        aggregate: rebuilt.aggregate,
+        events,
+        lastEvent: events[events.length - 1],
+      };
+    };
+
+    this.getEventsAndAggregate = async (aggregateId, options = {}) => {
+      const { maxVersion } = options;
+
+      if ('lastN' in options && options.lastN !== undefined) {
+        return getEventsAndAggregateLastN(
+          aggregateId,
+          options.lastN,
+          maxVersion,
+        );
+      }
+
+      if (
+        'fromLatestSnapshot' in options &&
+        options.fromLatestSnapshot === true
+      ) {
+        // Use the latest snapshot for seeding (no version constraint); the
+        // events returned are exactly those read on top of it. Falls back to
+        // the full history when no snapshot is applicable.
+        const rebuilt = await rebuildAggregate(aggregateId, { maxVersion });
+        return {
+          aggregate: rebuilt.aggregate,
+          events: rebuilt.events,
+          lastEvent: rebuilt.events[rebuilt.events.length - 1],
+        };
+      }
+
+      const fromVersion =
+        'fromVersion' in options ? options.fromVersion : undefined;
+      return getEventsAndAggregateFromVersion(
+        aggregateId,
+        fromVersion,
+        maxVersion,
+      );
     };
 
     this.getExistingEventsAndAggregate = async (aggregateId, options) => {
