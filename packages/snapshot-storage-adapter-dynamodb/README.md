@@ -83,7 +83,12 @@ The `aggregateVersion` is zero-padded to a fixed width (20 characters) inside th
 | `eventStoreReducerVersion` | _S_  | Partition key.                         |
 | `aggregateSnapshotKey`     | _S_  | Sort key.                              |
 
-Projection type `ALL` is recommended so that `listSnapshots` can return full `SnapshotKey`s (including `savedAt`) without a follow-up `getSnapshot` call.
+**Projection requirement.** `listSnapshots({ reducerVersion })` reads `savedAt` and the main-table key attributes (PK, SK) from the GSI item to assemble each `SnapshotKey`. The main-table PK and SK are always projected into GSI items automatically, so the GSI only needs to additionally project `savedAt`. Either of the following is sufficient:
+
+- `Projection: ALL` — simplest; projects every attribute. Larger storage cost per row.
+- `Projection: INCLUDE [savedAt]` — minimal projection that the adapter requires. Recommended for tables with large aggregate payloads, since this avoids replicating the `aggregate` blob into the GSI.
+
+`Projection: KEYS_ONLY` is **not** sufficient — the adapter would return `SnapshotKey`s with `savedAt: undefined`, which breaks `KEEP_NEWER_THAN_MS`-style pruning policies and any caller that relies on `savedAt`.
 
 ### Consistency
 
