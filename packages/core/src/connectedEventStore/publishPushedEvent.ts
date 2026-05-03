@@ -7,7 +7,7 @@ import {
   StateCarryingMessageChannel,
 } from '~/messaging';
 
-import type { AnyConnectedEventStore } from './types';
+import type { AnyConnectedEventStore } from './generics';
 
 export const publishPushedEvent = async <
   CONNECTED_EVENT_STORE extends AnyConnectedEventStore,

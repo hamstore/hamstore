@@ -9,8 +9,6 @@ import type {
 } from '~/eventStore';
 import type { EventStoreMessageChannel } from '~/messaging';
 
-import type { ConnectedEventStore } from './connectedEventStore';
-
 /**
  * Inner `EventStore` shape used by `ConnectedEventStore` for its
  * `MESSAGE_CHANNEL` constraint, `eventStore` field and constructor parameter.
@@ -88,22 +86,3 @@ export type LooseGroupEvent<
 > = (
   ...args: Parameters<EventGrouper<E, $E, A, $A & Aggregate>>
 ) => GroupedEvent<E, A>;
-
-/**
- * Variant of `ConnectedEventStore` that accepts both `requirePrevAggregate=true`
- * and `requirePrevAggregate=false` event stores. Mirrors `AnyEventStore` and is
- * used as the constraint for `publishPushedEvent` so it can be called with a
- * connected store in either mode.
- */
-export type AnyConnectedEventStore = ConnectedEventStore<
-  string,
-  import('~/event/eventType').EventType[],
-  EventDetail,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
-  Reducer<Aggregate, EventDetail>,
-  Aggregate,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
-  boolean
->;
