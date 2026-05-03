@@ -268,8 +268,17 @@ export class EventStore<
          */
       ) as Promise<{ events: EVENT_DETAILS[] }>;
 
-    const assertPrevAggregateProvided = (prevAggregate: unknown): void => {
-      if (this.requirePrevAggregate && prevAggregate === undefined) {
+    const assertPrevAggregateProvided = (
+      eventDetail: { version?: number },
+      prevAggregate: unknown,
+    ): void => {
+      // Initial events (version === 1) can compute `nextAggregate` without a
+      // `prevAggregate`, so they are exempt from the strict-mode check.
+      if (
+        this.requirePrevAggregate &&
+        prevAggregate === undefined &&
+        eventDetail.version !== 1
+      ) {
         throw new MissingPrevAggregateError({
           eventStoreId: this.eventStoreId,
         });
@@ -286,7 +295,7 @@ export class EventStore<
       eventDetail,
       { prevAggregate, force = false, validate = 'auto' } = {},
     ) => {
-      assertPrevAggregateProvided(prevAggregate);
+      assertPrevAggregateProvided(eventDetail, prevAggregate);
 
       await resolveEventValidation(
         this.eventTypes,
@@ -335,7 +344,7 @@ export class EventStore<
       eventDetail,
       { prevAggregate, validate } = {},
     ) => {
-      assertPrevAggregateProvided(prevAggregate);
+      assertPrevAggregateProvided(eventDetail, prevAggregate);
 
       const groupedEvent = this.getEventStorageAdapter().groupEvent(
         eventDetail,
