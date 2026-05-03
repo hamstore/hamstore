@@ -1,5 +1,5 @@
 import type {
-  EventStore,
+  AnyEventStore,
   EventStoreEventTypes,
   EventStoreId,
 } from '~/eventStore';
@@ -13,7 +13,7 @@ import type { AggregateExistsMessageChannel } from './aggregateExistsMessageChan
 import type { NotificationMessageChannel } from './notificationMessageChannel';
 import type { StateCarryingMessageChannel } from './stateCarryingMessageChannel';
 
-export type EventStoreMessageChannel<EVENT_STORE extends EventStore> =
+export type EventStoreMessageChannel<EVENT_STORE extends AnyEventStore> =
   | AggregateExistsMessageChannel<EVENT_STORE>
   | NotificationMessageChannel<EVENT_STORE>
   | StateCarryingMessageChannel<EVENT_STORE>;

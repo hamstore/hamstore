@@ -1,4 +1,5 @@
 import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 import type { $Contravariant } from '~/utils';
 
 import type { EventStoreNotificationMessage } from '../generics';
@@ -10,7 +11,7 @@ import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 
 export class NotificationMessageChannel<
-  EVENT_STORE extends EventStore = EventStore,
+  EVENT_STORE extends AnyEventStore = EventStore,
 > {
   // Mainly for type discrimination
   messageType: 'notification';
