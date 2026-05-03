@@ -216,7 +216,7 @@ const { aggregate } =
 
   `ResponseObj` contains the following properties:
   - <code>event <i>(EventDetail)</i></code>: The complete event (includes the <code>timestamp</code>)
-  - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, if the <code>prevAggregate</code> option was provided, or when using a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a> connected to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>
+  - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, or if the <code>prevAggregate</code> option was provided.
 
 ```ts
 const { event: completeEvent, nextAggregate } =
