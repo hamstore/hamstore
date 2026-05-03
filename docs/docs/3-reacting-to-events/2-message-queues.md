@@ -30,6 +30,12 @@ await appMessageQueue.publishMessage({
 // Similar for AggregateExistsMessageQueue and StateCarryingMessageQueue
 ```
 
+:::tip Pairing a `StateCarryingMessageQueue` with a `ConnectedEventStore`
+
+When you wrap an `EventStore` in a [`ConnectedEventStore`](./connected-event-store.md) that publishes to a `StateCarryingMessageQueue`, every published message has to carry the aggregate at the new version. If you call `pushEvent` (or `groupEvent`) on a non-initial event without passing `prevAggregate`, the connected store will perform an extra `getAggregate` round-trip behind the scenes to compute it before publishing. **Pass `prevAggregate` explicitly to skip that fetch.**
+
+:::
+
 Similarly to event stores, `MessageQueue` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageQueueAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
