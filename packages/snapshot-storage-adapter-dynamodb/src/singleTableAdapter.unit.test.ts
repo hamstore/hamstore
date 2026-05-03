@@ -424,6 +424,38 @@ describe('DynamoDBSingleTableSnapshotStorageAdapter', () => {
       );
     });
 
+    it('parses SnapshotKeys from GSI items projecting only PK, SK, and savedAt', async () => {
+      // Simulate a `Projection: INCLUDE [savedAt]` GSI: items contain only
+      // the main-table PK + SK (always projected) and `savedAt`. No
+      // `aggregate` blob, no separate `aggregateVersion` / `reducerVersion`
+      // top-level attributes. The adapter should still produce well-formed
+      // SnapshotKeys without requiring a follow-up `getSnapshot` call.
+      const minimalGsiItem = marshall(
+        {
+          [SNAPSHOT_TABLE_PK]: `${eventStoreId}#a1`,
+          [SNAPSHOT_TABLE_SK]: `${padVersion(7)}#${reducerV1}`,
+          [SNAPSHOT_TABLE_SAVED_AT_KEY]: '2024-01-01T00:00:00.000Z',
+        },
+        MARSHALL_OPTIONS,
+      );
+
+      dynamoDBClientMock.on(QueryCommand).resolves({ Items: [minimalGsiItem] });
+
+      const { snapshotKeys } = await adapter.listSnapshots(
+        { eventStoreId },
+        { reducerVersion: reducerV1 },
+      );
+
+      expect(snapshotKeys).toEqual([
+        {
+          aggregateId: 'a1',
+          aggregateVersion: 7,
+          reducerVersion: reducerV1,
+          savedAt: '2024-01-01T00:00:00.000Z',
+        },
+      ]);
+    });
+
     it('passes reverse and limit through', async () => {
       await adapter.listSnapshots(
         { eventStoreId },

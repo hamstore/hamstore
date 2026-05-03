@@ -52,3 +52,45 @@ export const gsiSortKey = (
   aggregateId: string,
   aggregateVersion: number,
 ): string => `${aggregateId}#${padVersion(aggregateVersion)}`;
+
+/**
+ * Strip the `<eventStoreId>#` prefix from a main-table PK value to recover
+ * the bare `aggregateId`. Mirrors the `unprefixAggregateId` helper in
+ * `event-storage-adapter-dynamodb`.
+ */
+export const aggregateIdFromPartitionKey = (
+  eventStoreId: string,
+  partitionKeyValue: string,
+): string =>
+  partitionKeyValue.startsWith(`${eventStoreId}#`)
+    ? partitionKeyValue.slice(eventStoreId.length + 1)
+    : partitionKeyValue;
+
+/**
+ * Parse the main-table SK back into its `aggregateVersion` and `reducerVersion`
+ * components. Inverse of `sortKey`. Throws on malformed inputs (in practice
+ * this would only be a programmer error or upstream data corruption — fresh
+ * adapter installs always produce well-formed SKs).
+ */
+export const parseSortKey = (
+  sortKeyValue: string,
+): { aggregateVersion: number; reducerVersion: string } => {
+  const separatorIndex = sortKeyValue.indexOf('#');
+  if (separatorIndex === -1) {
+    throw new Error(
+      `DynamoDBSingleTableSnapshotStorageAdapter: malformed snapshotKey ${JSON.stringify(sortKeyValue)} (missing '#' separator)`,
+    );
+  }
+
+  const aggregateVersion = Number(sortKeyValue.slice(0, separatorIndex));
+  if (!Number.isInteger(aggregateVersion)) {
+    throw new Error(
+      `DynamoDBSingleTableSnapshotStorageAdapter: malformed snapshotKey ${JSON.stringify(sortKeyValue)} (non-integer version prefix)`,
+    );
+  }
+
+  return {
+    aggregateVersion,
+    reducerVersion: sortKeyValue.slice(separatorIndex + 1),
+  };
+};

@@ -32,8 +32,10 @@ import {
   SNAPSHOT_TABLE_SK,
 } from './constants';
 import {
+  aggregateIdFromPartitionKey,
   gsiPartitionKey,
   gsiSortKey,
+  parseSortKey,
   partitionKey,
   sortKey,
   sortKeyMaxForVersion,
@@ -91,14 +93,32 @@ const itemToSnapshot = (item: Record<string, unknown>): Snapshot => {
   };
 };
 
-const itemToSnapshotKey = (item: Record<string, unknown>): SnapshotKey => {
-  const stored = item as StoredSnapshotItem;
+/**
+ * Build a `SnapshotKey` from a stored item. Reads only key attributes (PK,
+ * SK, `savedAt`) — not the `aggregate` blob — so cleanup/pruning sweeps do
+ * not pay the RCU/network cost of large aggregate payloads, and the
+ * `snapshotsByReducerVersion` GSI only needs to project `savedAt` (the main
+ * table's PK and SK are always projected into a GSI item automatically).
+ */
+const itemToSnapshotKey = (
+  eventStoreId: string,
+  item: Record<string, unknown>,
+): SnapshotKey => {
+  const partitionKeyValue = item[SNAPSHOT_TABLE_PK] as string;
+  const sortKeyValue = item[SNAPSHOT_TABLE_SK] as string;
+  const savedAt = item[SNAPSHOT_TABLE_SAVED_AT_KEY] as string;
+
+  const aggregateId = aggregateIdFromPartitionKey(
+    eventStoreId,
+    partitionKeyValue,
+  );
+  const { aggregateVersion, reducerVersion } = parseSortKey(sortKeyValue);
 
   return {
-    aggregateId: stored[SNAPSHOT_TABLE_AGGREGATE_KEY].aggregateId,
-    aggregateVersion: stored[SNAPSHOT_TABLE_AGGREGATE_VERSION_KEY],
-    reducerVersion: stored[SNAPSHOT_TABLE_REDUCER_VERSION_KEY],
-    savedAt: stored[SNAPSHOT_TABLE_SAVED_AT_KEY],
+    aggregateId,
+    aggregateVersion,
+    reducerVersion,
+    savedAt,
   };
 };
 
@@ -303,7 +323,7 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
       const items = result.Items ?? [];
       const snapshotKeys = items
         .map(item => unmarshall(item))
-        .map(itemToSnapshotKey);
+        .map(item => itemToSnapshotKey(eventStoreId, item));
 
       const nextPageToken = encodePageToken(result.LastEvaluatedKey, {
         aggregateId,
