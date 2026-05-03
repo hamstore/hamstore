@@ -8,6 +8,7 @@ import type {
   AggregateSimulator,
   EventGrouper,
   EventPusher,
+  AggregateAndEventsGetter,
   EventsGetter,
   EventStore,
   OnEventPushed,
@@ -82,8 +83,14 @@ export class ConnectedEventStore<
     events: $EVENT_DETAIL[],
     aggregate?: $AGGREGATE,
   ) => AGGREGATE | undefined;
-  getAggregate: AggregateGetter<EVENT_DETAIL, AGGREGATE>;
-  getExistingAggregate: AggregateGetter<EVENT_DETAIL, AGGREGATE, true>;
+  getAggregate: AggregateGetter<AGGREGATE>;
+  getExistingAggregate: AggregateGetter<AGGREGATE, true>;
+  getAggregateAndEvents: AggregateAndEventsGetter<EVENT_DETAIL, AGGREGATE>;
+  getExistingAggregateAndEvents: AggregateAndEventsGetter<
+    EVENT_DETAIL,
+    AGGREGATE,
+    true
+  >;
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
 
@@ -119,6 +126,9 @@ export class ConnectedEventStore<
     this.buildAggregate = eventStore.buildAggregate;
     this.getAggregate = eventStore.getAggregate;
     this.getExistingAggregate = eventStore.getExistingAggregate;
+    this.getAggregateAndEvents = eventStore.getAggregateAndEvents;
+    this.getExistingAggregateAndEvents =
+      eventStore.getExistingAggregateAndEvents;
     this.simulateAggregate = eventStore.simulateAggregate;
     this.getEventStorageAdapter = eventStore.getEventStorageAdapter;
 

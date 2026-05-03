@@ -105,13 +105,59 @@ export type GetAggregateOptions = {
   maxVersion?: number;
 };
 
+export type GetAggregateAndEventsOptions = {
+  maxVersion?: number;
+  /**
+   * Lowest event version that MUST appear in the returned `events` array.
+   * Defaults to `1` (i.e. the full event history).
+   *
+   * Used to support incremental projections / "events since checkpoint"
+   * patterns: a caller that has already processed events up to version
+   * `V` can ask for `fromVersion: V + 1` and receive only the new events,
+   * alongside the up-to-date aggregate.
+   *
+   * When the EventStore has snapshots configured, `fromVersion` also
+   * bounds which snapshot may seed the aggregate: only snapshots whose
+   * `aggregate.version < fromVersion` are eligible. Otherwise the full
+   * history is read.
+   */
+  fromVersion?: number;
+};
+
+/**
+ * `getAggregate` returns the rebuilt aggregate only.
+ *
+ * The previous shape (which also included `events` and `lastEvent`) is
+ * available via `getAggregateAndEvents` / `getExistingAggregateAndEvents` for
+ * callers that need the underlying events. See the v3-to-v4 migration guide.
+ */
 export type AggregateGetter<
-  EVENT_DETAIL extends EventDetail,
   AGGREGATE extends Aggregate,
   SHOULD_EXIST extends boolean = false,
 > = (
   aggregateId: string,
   options?: GetAggregateOptions,
+) => Promise<{
+  aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
+}>;
+
+/**
+ * Full-history aggregate getter — returns the rebuilt aggregate plus the
+ * events that produced it. This replaces the legacy `getAggregate` return
+ * shape.
+ *
+ * By default (`fromVersion` unset / `1`), `events` is the complete event
+ * history of the aggregate up to `maxVersion`. With `fromVersion: X`, only
+ * events with `version >= X` are returned (the aggregate still reflects the
+ * entire history up to `maxVersion`).
+ */
+export type AggregateAndEventsGetter<
+  EVENT_DETAIL extends EventDetail,
+  AGGREGATE extends Aggregate,
+  SHOULD_EXIST extends boolean = false,
+> = (
+  aggregateId: string,
+  options?: GetAggregateAndEventsOptions,
 ) => Promise<{
   aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
   events: EVENT_DETAIL[];

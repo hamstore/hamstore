@@ -162,15 +162,13 @@ const { events: onlyLastEvent } = await pokemonsEventStore.getEvents(
 );
 ```
 
-- <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and build it.
+- <code>getAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate and builds it.
 
   `OptionsObj` contains the following properties:
   - <code>maxVersion <i>(?number)</i></code>: To retrieve aggregate below a certain version
 
   `ResponseObj` contains the following properties:
   - <code>aggregate <i>(?Aggregate)</i></code>: The aggregate (possibly <code>undefined</code>)
-  - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
-  - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
 
 ```ts
 const { aggregate: myPikachu } =
@@ -182,11 +180,9 @@ const { aggregate: pikachuBelowVersion5 } =
   await pokemonsEventStore.getAggregate(myPikachuId, {
     maxVersion: 5,
   });
-
-// 👇 Returns the events if you need them
-const { aggregate, events } =
-  await pokemonsEventStore.getAggregate(myPikachuId);
 ```
+
+> ☝ If you also need the underlying events (e.g. to publish a state-carrying message or to count how many events contributed to the aggregate), use <code>getAggregateAndEvents</code> below.
 
 - <code>getExistingAggregate <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregate</code> method, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
 
@@ -205,6 +201,35 @@ expect(async () =>
 
 const { aggregate } =
   await pokemonsEventStore.getExistingAggregate(aggregateId);
+// => 'aggregate' is always defined 🙌
+```
+
+- <code>getAggregateAndEvents <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate, builds it, and returns both.
+
+  `OptionsObj` contains <code>maxVersion <i>(?number)</i></code> plus optionally:
+  - <code>fromVersion <i>(?number)</i></code>: Filters the returned events to <code>version >= fromVersion</code>. The aggregate is unaffected.
+
+  `ResponseObj` contains the following properties:
+  - <code>aggregate <i>(?Aggregate)</i></code>: The aggregate (possibly <code>undefined</code>)
+  - <code>events <i>(EventDetail[])</i></code>: The aggregate events (possibly empty)
+  - <code>lastEvent <i>(?EventDetail)</i></code>: The last event (possibly <code>undefined</code>)
+
+```ts
+// Default — full history.
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getAggregateAndEvents(myPikachuId);
+
+// Events from a known checkpoint.
+const { events } = await pokemonsEventStore.getAggregateAndEvents(myPikachuId, {
+  fromVersion: lastProcessedVersion + 1,
+});
+```
+
+- <code>getExistingAggregateAndEvents <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Same as <code>getAggregateAndEvents</code>, but ensures that the aggregate exists. Throws an <code>AggregateNotFoundError</code> if no event is found for this <code>aggregateId</code>.
+
+```ts
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getExistingAggregateAndEvents(aggregateId);
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
