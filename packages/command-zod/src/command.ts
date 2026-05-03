@@ -12,6 +12,12 @@ type inferZodType<T extends ZodType> = T extends z3.ZodTypeAny
   ? z3.infer<T>
   : z4.infer<T>;
 
+// Local polyfill so consumers on TypeScript < 5.4 (which doesn't ship a
+// built-in `NoInfer`) can still consume the published `.d.ts`. On TS 5.4+
+// this shadows the global with an equivalent definition.
+// eslint-disable-next-line @typescript-eslint/no-shadow
+type NoInfer<T> = [T][T extends unknown ? 0 : never];
+
 export class ZodCommand<
   COMMAND_ID extends string = string,
   EVENT_STORES extends EventStore[] = EventStore[],
@@ -26,7 +32,14 @@ export class ZodCommand<
     INPUT_SCHEMA extends ZodType ? inferZodType<INPUT_SCHEMA> : never
   >,
   OUTPUT_SCHEMA extends ZodType | undefined = ZodType | undefined,
-  OUTPUT = $Contravariant<
+  // OUTPUT is constrained so handlers can't disagree with `outputSchema`
+  // (the castore-dev/castore#194 bug). When no `outputSchema` is provided
+  // the constraint is `unknown`, so `OUTPUT` can still be inferred from
+  // the handler's return type — preserving the common "trust the handler"
+  // pattern.
+  OUTPUT extends OUTPUT_SCHEMA extends ZodType
+    ? inferZodType<OUTPUT_SCHEMA>
+    : unknown = $Contravariant<
     OUTPUT_SCHEMA,
     ZodType,
     OUTPUT_SCHEMA extends ZodType ? inferZodType<OUTPUT_SCHEMA> : never
@@ -58,7 +71,7 @@ export class ZodCommand<
     eventAlreadyExistsRetries?: number;
     onEventAlreadyExists?: OnEventAlreadyExistsCallback;
     handler: (
-      input: INPUT,
+      input: NoInfer<INPUT>,
       eventStores: $EVENT_STORES,
       ...context: CONTEXT
     ) => Promise<OUTPUT>;
