@@ -186,10 +186,7 @@ export class ConnectedEventStore<
 
       await publishPushedEvent(
         this,
-        props as unknown as {
-          event: EVENT_DETAIL;
-          nextAggregate?: AGGREGATE;
-        },
+        props as unknown as { event: EVENT_DETAIL; nextAggregate?: AGGREGATE },
       );
     };
   }
