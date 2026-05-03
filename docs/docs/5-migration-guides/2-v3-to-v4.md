@@ -57,12 +57,15 @@ const { aggregate, events, lastEvent } =
 
 Their return shape is identical to the old `getAggregate` / `getExistingAggregate`.
 
-`getAggregateAndEvents` accepts an additional `fromVersion` option that filters
-the returned `events` array to versions `>= fromVersion`. The `aggregate` still
-reflects the full history (or `maxVersion` if set). This is intended for
-incremental projection / "events since checkpoint" patterns, e.g. a read-side
-projection that has already processed events up to version `V` and wants to
-catch up:
+`getAggregateAndEvents` accepts three mutually exclusive options for selecting
+which events the call returns. The `aggregate` always reflects the full history
+(or `maxVersion` if set), regardless of which mode is used.
+
+#### `fromVersion: N` — events from a known checkpoint
+
+Filters the returned `events` array to `version >= N`. Intended for incremental
+projection / "events since checkpoint" patterns, e.g. a read-side projection
+that has already processed events up to version `V` and wants to catch up:
 
 ```ts
 const { aggregate, events } =
@@ -70,6 +73,45 @@ const { aggregate, events } =
     fromVersion: lastProcessedVersion + 1,
   });
 ```
+
+When the EventStore has snapshots configured, `fromVersion` uses the latest
+applicable snapshot (subject to `maxVersion`) regardless of its position
+relative to `fromVersion`. Events are fetched in a single range starting at
+`min(snapshot.version + 1, fromVersion)` so the read covers both what's needed
+for aggregate replay and what the caller asked to receive.
+
+#### `fromLatestSnapshot: true` — events read on top of the latest snapshot
+
+Use the latest available snapshot to seed the aggregate, and return only the
+events read on top of it. Falls back to the full history if no snapshot is
+applicable. Useful when you want the speed benefit of snapshots and only care
+about the events that contributed to the current state since the cache:
+
+```ts
+const { aggregate, events } =
+  await pokemonsEventStore.getAggregateAndEvents(pikachuId, {
+    fromLatestSnapshot: true,
+  });
+```
+
+#### `lastN: K` — at least the last K events
+
+Guarantees that at least the last `K` events of the aggregate's history (up to
+`maxVersion`) appear in the returned `events` array. The snapshot picker is
+unconstrained; if the snapshot already covers more than `aggregate.version - K`
+events, the missing earlier events are re-fetched in a second read. Useful when
+the caller wants a recent slice (e.g. to render a "recent activity" panel) but
+doesn't need the full history:
+
+```ts
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getAggregateAndEvents(pikachuId, {
+    lastN: 10,
+  });
+```
+
+The three options are mutually exclusive at the type level — passing more than
+one is a TypeScript error.
 
 ### `AggregateGetter` type
 

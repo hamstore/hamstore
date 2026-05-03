@@ -3,7 +3,22 @@ import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
 import { GroupedEvent } from '~/event/groupedEvent';
-import type { EventStorageAdapter } from '~/eventStorageAdapter';
+import type {
+  EventsQueryOptions,
+  EventStorageAdapter,
+} from '~/eventStorageAdapter';
+import {
+  compilePruningPolicy,
+  compileSnapshotPolicy,
+  UndefinedSnapshotStorageAdapterError,
+} from '~/snapshot';
+import type {
+  ShouldKeepSnapshot,
+  ShouldSaveSnapshot,
+  Snapshot,
+  SnapshotConfig,
+  SnapshotStorageAdapter,
+} from '~/snapshot';
 import type { $Contravariant } from '~/utils';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
@@ -19,6 +34,7 @@ import type {
   SideEffectsSimulator,
   AggregateGetter,
   AggregateAndEventsGetter,
+  GetAggregateAndEventsOptions,
   AggregateSimulator,
   Reducer,
 } from './types';
@@ -145,6 +161,37 @@ export class EventStore<
   eventStorageAdapter?: EventStorageAdapter;
   getEventStorageAdapter: () => EventStorageAdapter;
 
+  snapshotStorageAdapter?: SnapshotStorageAdapter;
+  getSnapshotStorageAdapter: () => SnapshotStorageAdapter;
+
+  /**
+   * Backing field for the `snapshotConfig` getter/setter. Underscored as a
+   * convention (no `private` keyword to avoid TS structural-compatibility
+   * issues across duplicated package copies). Should be considered internal.
+   */
+  _snapshotConfig?: SnapshotConfig<$AGGREGATE>;
+  /** Cached `compileSnapshotPolicy(policy)`; invalidated on config writes. */
+  _compiledShouldSaveSnapshot?: ShouldSaveSnapshot<$AGGREGATE>;
+  /** Cached `compilePruningPolicy(pruning)`; invalidated on config writes. */
+  _compiledShouldKeepSnapshot?: ShouldKeepSnapshot;
+
+  get snapshotConfig(): SnapshotConfig<$AGGREGATE> | undefined {
+    return this._snapshotConfig;
+  }
+
+  set snapshotConfig(config: SnapshotConfig<$AGGREGATE> | undefined) {
+    this._snapshotConfig = config;
+    this._compiledShouldSaveSnapshot =
+      config === undefined
+        ? undefined
+        : compileSnapshotPolicy(config.policy);
+    const pruning = config?.pruning;
+    this._compiledShouldKeepSnapshot =
+      pruning === undefined || pruning.strategy === 'NONE'
+        ? undefined
+        : compilePruningPolicy(pruning);
+  }
+
   constructor({
     eventStoreId,
     eventTypes,
@@ -155,6 +202,8 @@ export class EventStore<
     }),
     onEventPushed,
     eventStorageAdapter,
+    snapshotStorageAdapter,
+    snapshotConfig,
   }: {
     eventStoreId: EVENT_STORE_ID;
     eventTypes: EVENT_TYPES;
@@ -162,6 +211,8 @@ export class EventStore<
     simulateSideEffect?: SideEffectsSimulator<EVENT_DETAILS, $EVENT_DETAILS>;
     onEventPushed?: OnEventPushed<$EVENT_DETAILS, $AGGREGATE>;
     eventStorageAdapter?: EventStorageAdapter;
+    snapshotStorageAdapter?: SnapshotStorageAdapter;
+    snapshotConfig?: SnapshotConfig<$AGGREGATE>;
   }) {
     this.eventStoreId = eventStoreId;
     this.eventTypes = eventTypes;
@@ -169,6 +220,8 @@ export class EventStore<
     this.simulateSideEffect = simulateSideEffect;
     this.onEventPushed = onEventPushed;
     this.eventStorageAdapter = eventStorageAdapter;
+    this.snapshotStorageAdapter = snapshotStorageAdapter;
+    this.snapshotConfig = snapshotConfig;
 
     this.getEventStorageAdapter = () => {
       if (this.eventStorageAdapter === undefined) {
@@ -178,6 +231,16 @@ export class EventStore<
       }
 
       return this.eventStorageAdapter;
+    };
+
+    this.getSnapshotStorageAdapter = () => {
+      if (this.snapshotStorageAdapter === undefined) {
+        throw new UndefinedSnapshotStorageAdapterError({
+          eventStoreId: this.eventStoreId,
+        });
+      }
+
+      return this.snapshotStorageAdapter;
     };
 
     this.getEvents = (aggregateId, queryOptions) =>
@@ -249,35 +312,360 @@ export class EventStore<
       eventDetails.reduce(this.reducer, aggregate) as AGGREGATE | undefined;
 
     /**
-     * Internal helper that loads events for an aggregate and reduces them.
-     * Used by both `getAggregate` (which discards events) and
-     * `getAggregateAndEvents` (which returns them).
+     * Apply newly-loaded events on top of a seed snapshot (if any) and return
+     * the resulting aggregate. Falls back to the seed when the events stream
+     * is empty.
+     */
+    const applyEventsOnSeed = (
+      events: EVENT_DETAILS[],
+      seedSnapshot: Snapshot<AGGREGATE> | undefined,
+    ): AGGREGATE | undefined => {
+      const seedAggregate = seedSnapshot?.aggregate as $AGGREGATE | undefined;
+
+      const aggregate = this.buildAggregate(
+        events as unknown as $EVENT_DETAILS[],
+        seedAggregate,
+      );
+
+      if (aggregate === undefined && seedAggregate !== undefined) {
+        return seedAggregate as unknown as AGGREGATE;
+      }
+
+      return aggregate;
+    };
+
+    /**
+     * Fire-and-forget snapshot save when configured. Intentionally void; any
+     * error inside `maybePersistSnapshot` is swallowed there.
+     */
+    const tryPersistSnapshot = (
+      aggregate: AGGREGATE | undefined,
+      previousSnapshot: Snapshot<AGGREGATE> | undefined,
+      newEventCount: number,
+    ): void => {
+      if (
+        aggregate === undefined ||
+        this.snapshotConfig === undefined ||
+        this.snapshotStorageAdapter === undefined
+      ) {
+        return;
+      }
+
+      void maybePersistSnapshot({
+        aggregate,
+        previousSnapshot,
+        newEventCount,
+      });
+    };
+
+    /**
+     * If the loaded snapshot already matches the current reducer version,
+     * return it unchanged. Otherwise call the configured migrator and return
+     * the migrated snapshot if it now matches; else `undefined`.
+     */
+    const reconcileSnapshotReducerVersion = async (
+      snapshot: Snapshot<AGGREGATE>,
+      config: SnapshotConfig<$AGGREGATE>,
+    ): Promise<Snapshot<AGGREGATE> | undefined> => {
+      if (snapshot.reducerVersion === config.currentReducerVersion) {
+        return snapshot;
+      }
+
+      const migrator = config.migrateSnapshotReducerVersion;
+      if (migrator === undefined) {
+        return undefined;
+      }
+
+      const migrated = await migrator(
+        snapshot as unknown as Snapshot<$AGGREGATE>,
+      );
+      if (
+        migrated === undefined ||
+        migrated.reducerVersion !== config.currentReducerVersion
+      ) {
+        return undefined;
+      }
+
+      return migrated as unknown as Snapshot<AGGREGATE>;
+    };
+
+    /**
+     * Internal: rebuilds an aggregate, transparently using snapshot storage if
+     * configured. Returns both the aggregate and the events read (so the
+     * caller can choose to expose them via `getAggregateAndEvents`).
+     *
+     * `eventsMinVersion` lets the caller widen the events fetch beyond what
+     * the aggregate strictly needs:
+     *   - omitted: fetch only what's required to build the aggregate
+     *     (events with `version > snapshot.version`, or all events when no
+     *     snapshot is applicable). The returned `events` array is exactly
+     *     that minimal set.
+     *   - set to `N`: fetch from `min(aggregateMin, N)` so the returned
+     *     `events` array can include everything from `N` onward. The
+     *     aggregate is still built by replaying only events with
+     *     `version > snapshot.version` on top of the seed; events below the
+     *     seed's version are kept in the returned array but not replayed.
+     *
+     * The snapshot picker is unconstrained except by `maxVersion`. This lets
+     * `fromVersion` benefit from a snapshot whose version is *above*
+     * `fromVersion`: instead of falling back to "no snapshot" and replaying
+     * the whole history, we seed from the high snapshot and only fetch the
+     * gap of events the caller asked for.
      */
     const rebuildAggregate = async (
       aggregateId: string,
-      maxVersion?: number,
+      {
+        maxVersion,
+        eventsMinVersion,
+      }: {
+        maxVersion?: number;
+        eventsMinVersion?: number;
+      },
     ): Promise<{
       aggregate: AGGREGATE | undefined;
       events: EVENT_DETAILS[];
       lastEvent: EVENT_DETAILS | undefined;
+      seedSnapshot: Snapshot<AGGREGATE> | undefined;
     }> => {
-      const { events } = await this.getEvents(
+      const seedSnapshot = await loadSeedSnapshot(aggregateId, maxVersion);
+
+      const aggregateMin =
+        seedSnapshot !== undefined ? seedSnapshot.aggregate.version + 1 : 1;
+      const fetchMin =
+        eventsMinVersion !== undefined && eventsMinVersion < aggregateMin
+          ? eventsMinVersion
+          : aggregateMin;
+
+      const eventsOptions: EventsQueryOptions = {};
+      if (maxVersion !== undefined) {
+        eventsOptions.maxVersion = maxVersion;
+      }
+      if (fetchMin > 1) {
+        eventsOptions.minVersion = fetchMin;
+      }
+
+      const { events: fetched } = await this.getEvents(
         aggregateId,
-        maxVersion !== undefined ? { maxVersion } : undefined,
+        Object.keys(eventsOptions).length > 0 ? eventsOptions : undefined,
       );
 
-      const aggregate = this.buildAggregate(
-        events as unknown as $EVENT_DETAILS[],
-        undefined,
-      );
+      const aggregateEvents =
+        seedSnapshot === undefined
+          ? fetched
+          : fetched.filter(e => e.version > seedSnapshot.aggregate.version);
 
-      const lastEvent = events[events.length - 1];
+      const aggregate = applyEventsOnSeed(aggregateEvents, seedSnapshot);
+      const lastEvent = fetched[fetched.length - 1];
 
-      return { aggregate, events, lastEvent };
+      tryPersistSnapshot(aggregate, seedSnapshot, aggregateEvents.length);
+
+      return { aggregate, events: fetched, lastEvent, seedSnapshot };
+    };
+
+    /**
+     * Fetch the latest snapshot from the storage adapter and re-validate the
+     * version bound. The defense-in-depth filter ensures a misbehaving
+     * adapter that ignores `aggregateMaxVersion` cannot seed past the bound.
+     */
+    const fetchSnapshotWithinBound = async (
+      aggregateId: string,
+      maxVersion: number | undefined,
+    ): Promise<Snapshot<Aggregate> | undefined> => {
+      if (this.snapshotStorageAdapter === undefined) {
+        return undefined;
+      }
+
+      const { snapshot } =
+        await this.snapshotStorageAdapter.getLatestSnapshot(
+          aggregateId,
+          { eventStoreId: this.eventStoreId },
+          maxVersion !== undefined
+            ? { aggregateMaxVersion: maxVersion }
+            : {},
+        );
+
+      if (snapshot === undefined) {
+        return undefined;
+      }
+      if (
+        maxVersion !== undefined &&
+        snapshot.aggregate.version > maxVersion
+      ) {
+        return undefined;
+      }
+      return snapshot;
+    };
+
+    /**
+     * Look up the latest applicable snapshot for the given aggregate. Returns
+     * `undefined` if no snapshot is available, the snapshot is from a
+     * different reducer version (and migration didn't yield one for the
+     * current reducer), or the storage adapter errors. Errors during snapshot
+     * lookup are logged and treated as "no snapshot" so reads remain
+     * resilient.
+     */
+    const loadSeedSnapshot = async (
+      aggregateId: string,
+      maxVersion: number | undefined,
+    ): Promise<Snapshot<AGGREGATE> | undefined> => {
+      if (
+        this.snapshotConfig === undefined ||
+        this.snapshotStorageAdapter === undefined
+      ) {
+        return undefined;
+      }
+
+      try {
+        const rawSnapshot = await fetchSnapshotWithinBound(
+          aggregateId,
+          maxVersion,
+        );
+        if (rawSnapshot === undefined) {
+          return undefined;
+        }
+
+        return await reconcileSnapshotReducerVersion(
+          rawSnapshot as Snapshot<AGGREGATE>,
+          this.snapshotConfig,
+        );
+      } catch (error) {
+        this.snapshotConfig.onSnapshotError?.({
+          phase: 'read',
+          aggregateId,
+          eventStoreId: this.eventStoreId,
+          error,
+        });
+
+        return undefined;
+      }
+    };
+
+    /**
+     * Decide whether to save a snapshot, save it, and prune older snapshots
+     * according to the configured pruning policy. Always called in a
+     * "fire-and-forget" fashion by the read path, so all errors are caught
+     * here and never propagate.
+     */
+    const shouldPersistNewSnapshot = (args: {
+      aggregate: AGGREGATE;
+      previousSnapshot: Snapshot<AGGREGATE> | undefined;
+      newEventCount: number;
+      config: SnapshotConfig<$AGGREGATE>;
+    }): boolean => {
+      if (
+        args.aggregate.version <= 0 ||
+        args.previousSnapshot?.aggregate.version === args.aggregate.version
+      ) {
+        return false;
+      }
+
+      const shouldSaveSnapshot = this._compiledShouldSaveSnapshot;
+      if (shouldSaveSnapshot === undefined) {
+        return false;
+      }
+
+      return shouldSaveSnapshot({
+        aggregate: args.aggregate as unknown as $AGGREGATE,
+        previousSnapshot: args.previousSnapshot as unknown as
+          | Snapshot<$AGGREGATE>
+          | undefined,
+        newEventCount: args.newEventCount,
+        now: new Date(),
+      });
+    };
+
+    const maybePersistSnapshot = async (args: {
+      aggregate: AGGREGATE;
+      previousSnapshot: Snapshot<AGGREGATE> | undefined;
+      newEventCount: number;
+    }): Promise<void> => {
+      try {
+        const config = this.snapshotConfig;
+        const adapter = this.snapshotStorageAdapter;
+        if (config === undefined || adapter === undefined) {
+          return;
+        }
+
+        if (!shouldPersistNewSnapshot({ ...args, config })) {
+          return;
+        }
+
+        const newSnapshot: Snapshot<AGGREGATE> = {
+          aggregate: args.aggregate,
+          reducerVersion: config.currentReducerVersion,
+          eventStoreId: this.eventStoreId,
+          savedAt: new Date().toISOString(),
+        };
+
+        await adapter.putSnapshot(newSnapshot, {
+          eventStoreId: this.eventStoreId,
+        });
+
+        await pruneSnapshotsAfterSave({
+          aggregateId: args.aggregate.aggregateId,
+          newSnapshot,
+        });
+      } catch (error) {
+        this.snapshotConfig?.onSnapshotError?.({
+          phase: 'save',
+          aggregateId: args.aggregate.aggregateId,
+          eventStoreId: this.eventStoreId,
+          error,
+        });
+      }
+    };
+
+    const pruneSnapshotsAfterSave = async (args: {
+      aggregateId: string;
+      newSnapshot: Snapshot<AGGREGATE>;
+    }): Promise<void> => {
+      if (
+        this.snapshotConfig === undefined ||
+        this.snapshotStorageAdapter === undefined
+      ) {
+        return;
+      }
+      const shouldKeep = this._compiledShouldKeepSnapshot;
+      if (shouldKeep === undefined) {
+        return;
+      }
+
+      const adapter = this.snapshotStorageAdapter;
+      const ctx = { eventStoreId: this.eventStoreId };
+      const reducerVersion = this.snapshotConfig.currentReducerVersion;
+      const now = new Date(args.newSnapshot.savedAt);
+
+      let pageToken: string | undefined = undefined;
+      let position = 0;
+
+      do {
+        const { snapshotKeys, nextPageToken } = await adapter.listSnapshots(
+          ctx,
+          {
+            aggregateId: args.aggregateId,
+            reducerVersion,
+            reverse: true,
+            maxVersion: args.newSnapshot.aggregate.version,
+            pageToken,
+          },
+        );
+
+        for (const key of snapshotKeys) {
+          const ageMs = now.getTime() - new Date(key.savedAt).getTime();
+          if (shouldKeep({ key, position, ageMs, now })) {
+            position += 1;
+            continue;
+          }
+          await adapter.deleteSnapshot(key, ctx);
+          position += 1;
+        }
+
+        pageToken = nextPageToken;
+      } while (pageToken !== undefined);
     };
 
     this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
-      const { aggregate } = await rebuildAggregate(aggregateId, maxVersion);
+      const { aggregate } = await rebuildAggregate(aggregateId, { maxVersion });
 
       return { aggregate };
     };
@@ -295,29 +683,160 @@ export class EventStore<
       return { aggregate };
     };
 
-    this.getAggregateAndEvents = async (
-      aggregateId,
-      { maxVersion, fromVersion } = {},
-    ) => {
-      const {
-        aggregate,
-        events: allEvents,
-      } = await rebuildAggregate(aggregateId, maxVersion);
+    /**
+     * Mode: `lastN`. Use whichever snapshot is latest (subject to maxVersion),
+     * then if the tail we read isn't enough to satisfy `lastN`, do a second
+     * read for the missing earlier events. Aggregate always reflects full
+     * history.
+     */
+    const getAggregateAndEventsLastN = async (
+      aggregateId: string,
+      lastN: number,
+      maxVersion: number | undefined,
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
+      if (lastN <= 0) {
+        const { aggregate } = await rebuildAggregate(aggregateId, {
+          maxVersion,
+        });
+        return { aggregate, events: [], lastEvent: undefined };
+      }
 
-      const events =
-        fromVersion !== undefined && fromVersion > 1
-          ? allEvents.filter(event => event.version >= fromVersion)
-          : allEvents;
-      const lastEvent = events[events.length - 1];
+      const rebuilt = await rebuildAggregate(aggregateId, { maxVersion });
+      const builtAggregate = rebuilt.aggregate;
+      if (builtAggregate === undefined) {
+        return { aggregate: undefined, events: [], lastEvent: undefined };
+      }
 
-      return { aggregate, events, lastEvent };
+      const desiredFloor = Math.max(1, builtAggregate.version - lastN + 1);
+      const tailEvents = rebuilt.events;
+      const seed = rebuilt.seedSnapshot;
+
+      // Tail already covers from desiredFloor when no snapshot was used or
+      // when the snapshot is at or below the desired floor.
+      if (seed === undefined || seed.aggregate.version + 1 <= desiredFloor) {
+        const trimmed = tailEvents.filter(e => e.version >= desiredFloor);
+        return {
+          aggregate: builtAggregate,
+          events: trimmed,
+          lastEvent: trimmed[trimmed.length - 1],
+        };
+      }
+
+      // Snapshot covered events past the desired floor — backfill them.
+      const { events: earlierEvents } = await this.getEvents(aggregateId, {
+        minVersion: desiredFloor,
+        maxVersion: seed.aggregate.version,
+      });
+      const combined = [...earlierEvents, ...tailEvents];
+      return {
+        aggregate: builtAggregate,
+        events: combined,
+        lastEvent: combined[combined.length - 1],
+      };
     };
 
-    this.getExistingAggregateAndEvents = async (aggregateId, options) => {
-      const { aggregate, events, lastEvent } =
-        await this.getAggregateAndEvents(aggregateId, options);
+    /**
+     * Mode: `fromVersion` (default `1`, i.e. full history). The latest
+     * applicable snapshot is used regardless of its version; the fetch
+     * range is `min(snapshot.version + 1, fromVersion) .. maxVersion` so
+     * a single fetch covers both the events needed to bring the aggregate
+     * up to date and the events the caller wants returned.
+     */
+    const getAggregateAndEventsFromVersion = async (
+      aggregateId: string,
+      fromVersion: number | undefined,
+      maxVersion: number | undefined,
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
+      const effectiveFromVersion = Math.max(fromVersion ?? 1, 1);
 
-      if (aggregate === undefined || lastEvent === undefined) {
+      const rebuilt = await rebuildAggregate(aggregateId, {
+        maxVersion,
+        eventsMinVersion: effectiveFromVersion,
+      });
+
+      const events =
+        effectiveFromVersion > 1
+          ? rebuilt.events.filter(e => e.version >= effectiveFromVersion)
+          : rebuilt.events;
+
+      return {
+        aggregate: rebuilt.aggregate,
+        events,
+        lastEvent: events[events.length - 1],
+      };
+    };
+
+    /**
+     * Internal implementation with a uniform "lastEvent may be undefined"
+     * return type. The public `getAggregateAndEvents` signature narrows
+     * `lastEvent` to `EVENT_DETAIL` for `getExistingAggregateAndEvents` calls
+     * that use no event-filtering option (default reads always materialise the
+     * full history, so the events array is non-empty for an existing
+     * aggregate). The cast on assignment bridges the two views.
+     */
+    const getAggregateAndEventsImpl = async (
+      aggregateId: string,
+      options: GetAggregateAndEventsOptions = {},
+    ): Promise<{
+      aggregate: AGGREGATE | undefined;
+      events: EVENT_DETAILS[];
+      lastEvent: EVENT_DETAILS | undefined;
+    }> => {
+      const { maxVersion } = options;
+
+      if ('lastN' in options && options.lastN !== undefined) {
+        return getAggregateAndEventsLastN(
+          aggregateId,
+          options.lastN,
+          maxVersion,
+        );
+      }
+
+      if (
+        'fromLatestSnapshot' in options &&
+        options.fromLatestSnapshot === true
+      ) {
+        // Use the latest snapshot for seeding (no version constraint); the
+        // events returned are exactly those read on top of it. Falls back to
+        // the full history when no snapshot is applicable.
+        const rebuilt = await rebuildAggregate(aggregateId, { maxVersion });
+        return {
+          aggregate: rebuilt.aggregate,
+          events: rebuilt.events,
+          lastEvent: rebuilt.events[rebuilt.events.length - 1],
+        };
+      }
+
+      const fromVersion =
+        'fromVersion' in options ? options.fromVersion : undefined;
+      return getAggregateAndEventsFromVersion(
+        aggregateId,
+        fromVersion,
+        maxVersion,
+      );
+    };
+
+    this.getAggregateAndEvents =
+      getAggregateAndEventsImpl as AggregateAndEventsGetter<
+        EVENT_DETAILS,
+        AGGREGATE
+      >;
+
+    this.getExistingAggregateAndEvents = (async (aggregateId, options) => {
+      const { aggregate, events, lastEvent } = await getAggregateAndEventsImpl(
+        aggregateId,
+        options,
+      );
+
+      if (aggregate === undefined) {
         throw new AggregateNotFoundError({
           aggregateId,
           eventStoreId: this.eventStoreId,
@@ -325,7 +844,7 @@ export class EventStore<
       }
 
       return { aggregate, events, lastEvent };
-    };
+    }) as AggregateAndEventsGetter<EVENT_DETAILS, AGGREGATE, true>;
 
     this.simulateAggregate = (events, { simulationDate } = {}) => {
       let eventsWithSideEffects = Object.values(
