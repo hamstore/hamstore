@@ -152,9 +152,11 @@ const assertPushEventOutputForInitialEvent: A.Equals<
 > = 1;
 assertPushEventOutputForInitialEvent;
 
-// When the event store is constructed with `requirePrevAggregate: true`, the
-// `pushEvent` and `groupEvent` methods always require a non-undefined
-// `prevAggregate` and always return a defined `nextAggregate`.
+// When the event store is constructed with `requirePrevAggregate: true`,
+// `pushEvent` and `groupEvent` always return a defined `nextAggregate`. They
+// require a non-undefined `prevAggregate` for non-initial events, but still
+// accept event literals with `version: 1` without one (since initial
+// aggregates can be derived from the event alone).
 const strictPokemonsEventStore = new EventStore({
   eventStoreId: 'POKEMONS',
   eventTypes: [pokemonAppearedEvent, pokemonCaughtEvent, pokemonLeveledUpEvent],
@@ -179,6 +181,31 @@ const assertStrictGroupEventInput2: A.Equals<
   { prevAggregate: PokemonAggregate }
 > = 1;
 assertStrictGroupEventInput2;
+
+// Strict mode still allows initial events to be pushed without `prevAggregate`.
+const pushStrictInitialEvent = () =>
+  strictPokemonsEventStore.pushEvent({
+    aggregateId: pikachuId,
+    version: 1,
+    type: 'POKEMON_APPEARED',
+    payload: { name: 'Pikachu', level: 42 },
+  });
+
+const assertStrictPushInitialEventOutput: A.Equals<
+  Awaited<ReturnType<typeof pushStrictInitialEvent>>,
+  { event: PokemonEventDetails; nextAggregate: PokemonAggregate }
+> = 1;
+assertStrictPushInitialEventOutput;
+
+// Same for `groupEvent`.
+const groupStrictInitialEvent = () =>
+  strictPokemonsEventStore.groupEvent({
+    aggregateId: pikachuId,
+    version: 1,
+    type: 'POKEMON_APPEARED',
+    payload: { name: 'Pikachu', level: 42 },
+  });
+groupStrictInitialEvent;
 
 // --- GROUP EVENT ---
 

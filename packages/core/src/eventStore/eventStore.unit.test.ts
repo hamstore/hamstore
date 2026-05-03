@@ -455,5 +455,27 @@ describe('event store', () => {
         }),
       ).resolves.toBeDefined();
     });
+
+    it('does not throw on initial events (version === 1) without prevAggregate', async () => {
+      pushEventMock.mockResolvedValue({ event: pikachuAppearedEvent });
+
+      // The narrowest overload of `pushEvent` for an initial event requires
+      // `version: 1` as a literal type, so we cast the function to the
+      // non-strict signature here to exercise the runtime allowance.
+      const looseStrictPushEvent =
+        strictPokemonsEventStore.pushEvent as unknown as typeof pokemonsEventStore.pushEvent;
+
+      const result = await looseStrictPushEvent(pikachuAppearedEvent);
+
+      expect(result.event).toStrictEqual(pikachuAppearedEvent);
+      expect(result.nextAggregate).toBeDefined();
+    });
+
+    it('groupEvent does not throw on initial events (version === 1) without prevAggregate', () => {
+      const looseStrictGroupEvent =
+        strictPokemonsEventStore.groupEvent as unknown as typeof pokemonsEventStore.groupEvent;
+
+      expect(() => looseStrictGroupEvent(pikachuAppearedEvent)).not.toThrow();
+    });
   });
 });

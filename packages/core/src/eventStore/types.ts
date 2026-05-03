@@ -38,8 +38,9 @@ export type EventsGetter<EVENT_DETAIL extends EventDetail> = (
  * `Parameters<...>` and `ReturnType<...>` resolve to the previous (broader)
  * shapes and existing type assertions keep passing.
  *
- * When `REQUIRES_PREV_AGGREGATE` is `true`, the type collapses to a single
- * signature that requires `prevAggregate` and always returns `nextAggregate`.
+ * When `REQUIRES_PREV_AGGREGATE` is `true`, the catch-all third overload is
+ * dropped: callers must either provide a non-undefined `prevAggregate` or use
+ * a `version: 1` event literal. Either way `nextAggregate` is always defined.
  */
 export type EventPusher<
   EVENT_DETAILS extends EventDetail,
@@ -48,12 +49,20 @@ export type EventPusher<
   $AGGREGATE extends Aggregate,
   REQUIRES_PREV_AGGREGATE extends boolean = false,
 > = REQUIRES_PREV_AGGREGATE extends true
-  ? (
-      event: $EVENT_DETAILS extends EventDetail
-        ? OptionalTimestamp<$EVENT_DETAILS>
-        : $EVENT_DETAILS,
-      options: { prevAggregate: $AGGREGATE; force?: boolean },
-    ) => Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>
+  ? {
+      (
+        event: ($EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS) & { version: 1 },
+        options?: { prevAggregate?: undefined; force?: boolean },
+      ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
+      (
+        event: $EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS,
+        options: { prevAggregate: $AGGREGATE; force?: boolean },
+      ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
+    }
   : {
       (
         event: $EVENT_DETAILS extends EventDetail
@@ -81,8 +90,9 @@ export type AggregateIdsLister = (
 
 /**
  * Mirror of `EventPusher` for `groupEvent`: when `REQUIRES_PREV_AGGREGATE` is
- * `true`, the call-site MUST pass a non-undefined `prevAggregate`. Default
- * mode keeps the original (optional) signature.
+ * `true`, the call-site MUST either pass a non-undefined `prevAggregate` or
+ * use a `version: 1` event literal. Default mode keeps the original (optional)
+ * signature available as a catch-all.
  */
 export type EventGrouper<
   EVENT_DETAILS extends EventDetail,
@@ -91,12 +101,20 @@ export type EventGrouper<
   $AGGREGATE,
   REQUIRES_PREV_AGGREGATE extends boolean = false,
 > = REQUIRES_PREV_AGGREGATE extends true
-  ? (
-      event: $EVENT_DETAILS extends EventDetail
-        ? OptionalTimestamp<$EVENT_DETAILS>
-        : $EVENT_DETAILS,
-      options: { prevAggregate: $AGGREGATE },
-    ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>
+  ? {
+      (
+        event: ($EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS) & { version: 1 },
+        options?: { prevAggregate?: undefined },
+      ): GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+      (
+        event: $EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS,
+        options: { prevAggregate: $AGGREGATE },
+      ): GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+    }
   : (
       event: $EVENT_DETAILS extends EventDetail
         ? OptionalTimestamp<$EVENT_DETAILS>

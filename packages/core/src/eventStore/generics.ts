@@ -2,7 +2,7 @@ import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType } from '~/event/eventType';
 
-import { EventStore } from './eventStore';
+import type { EventStore } from './eventStore';
 import type { Reducer } from './types';
 
 /**

@@ -152,7 +152,7 @@ export class ConnectedEventStore<
         eventInput,
         options,
       );
-      await publishPushedEvent(this as unknown as ConnectedEventStore, response);
+      await publishPushedEvent(this, response);
 
       return response;
     };
@@ -185,8 +185,11 @@ export class ConnectedEventStore<
       }
 
       await publishPushedEvent(
-        this as unknown as ConnectedEventStore,
-        props as unknown as { event: EVENT_DETAIL; nextAggregate?: AGGREGATE },
+        this,
+        props as unknown as {
+          event: EVENT_DETAIL;
+          nextAggregate?: AGGREGATE;
+        },
       );
     };
   }
