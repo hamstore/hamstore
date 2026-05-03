@@ -30,6 +30,12 @@ await appMessageQueue.publishMessage({
 // Similar for AggregateExistsMessageQueue and StateCarryingMessageQueue
 ```
 
+:::tip Pairing a `StateCarryingMessageQueue` with a `ConnectedEventStore`
+
+When you wrap an `EventStore` in a [`ConnectedEventStore`](./connected-event-store.md) that publishes to a `StateCarryingMessageQueue`, every published message has to carry the aggregate at the new version. If you call `pushEvent` (or `groupEvent`) on a non-initial event without passing `prevAggregate`, the connected store will perform an extra `getAggregate` round-trip behind the scenes to compute it before publishing. **Pass `prevAggregate` explicitly to skip that fetch.**
+
+:::
+
 Similarly to event stores, `MessageQueue` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageQueueAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
@@ -122,7 +128,7 @@ The following methods interact with the messaging solution of your application t
   - <code>replay <i>(?boolean = false)</i></code>: Signals that the event is not happening in real-time, e.g. in maintenance or migration operations. This information can be used downstream to react appropriately. Check the implementation of you adapter for more details.
 
 - <code>publishMessages <i>((messages: Message[], opt?: OptionsObj) => Promise&lt;void&gt;)</i></code>: Publish several <code>Messages</code> (of the appropriate type) to the message queue. Options are similar to the <code>publishMessage</code> options.
-- <code>getAggregateAndPublishMessage <i>((message: NotificationMessage) => Promise&lt;void&gt;)</i></code>: <i>(StateCarryingMessageQueues only)</i> Append the matching aggregate (with correct version) to a <code>NotificationMessage</code> and turn it into a <code>StateCarryingMessage</code> before publishing it to the message queue. Uses the message queue event stores: Make sure that they have correct adapters set up.
+- <code>getAggregateAndPublishMessage <i>((message: NotificationMessage) => Promise&lt;void&gt;)</i></code>: <i>(StateCarryingMessageQueues only)</i> Append the matching aggregate (with correct version) to a <code>NotificationMessage</code> and turn it into a <code>StateCarryingMessage</code> before publishing it to the message queue. Uses the message queue event stores: Make sure that they have correct adapters set up. This method is also invoked automatically by a <a href="./connected-event-store">ConnectedEventStore</a> publishing to this queue when <code>pushEvent</code> is called without <code>prevAggregate</code> on a non-initial event — pass <code>prevAggregate</code> explicitly to skip the extra <code>getAggregate</code> round-trip.
 
 ---
 
