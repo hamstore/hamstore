@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
 import type { GroupedEvent } from '~/event/groupedEvent';
@@ -28,6 +29,8 @@ export type EventsGetter<EVENT_DETAIL extends EventDetail> = (
   options?: EventsQueryOptions,
 ) => Promise<{ events: EVENT_DETAIL[] }>;
 
+export type ValidateEventDetail = boolean | 'auto';
+
 /**
  * The set of overloads of `pushEvent` that statically guarantee a non-undefined
  * `nextAggregate`:
@@ -54,13 +57,21 @@ export type EventPusher<
         event: ($EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS) & { version: 1 },
-        options?: { prevAggregate?: undefined; force?: boolean },
+        options?: {
+          prevAggregate?: undefined;
+          force?: boolean;
+          validate?: ValidateEventDetail;
+        },
       ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
       (
         event: $EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS,
-        options: { prevAggregate: $AGGREGATE; force?: boolean },
+        options: {
+          prevAggregate: $AGGREGATE;
+          force?: boolean;
+          validate?: ValidateEventDetail;
+        },
       ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
     }
   : {
@@ -68,19 +79,31 @@ export type EventPusher<
         event: $EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS,
-        options: { prevAggregate: $AGGREGATE; force?: boolean },
+        options: {
+          prevAggregate: $AGGREGATE;
+          force?: boolean;
+          validate?: ValidateEventDetail;
+        },
       ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
       (
         event: ($EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS) & { version: 1 },
-        options?: { prevAggregate?: undefined; force?: boolean },
+        options?: {
+          prevAggregate?: undefined;
+          force?: boolean;
+          validate?: ValidateEventDetail;
+        },
       ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
       (
         event: $EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS,
-        options?: { prevAggregate?: $AGGREGATE; force?: boolean },
+        options?: {
+          prevAggregate?: $AGGREGATE;
+          force?: boolean;
+          validate?: ValidateEventDetail;
+        },
       ): Promise<{ event: EVENT_DETAILS; nextAggregate?: AGGREGATE }>;
     };
 
@@ -106,20 +129,26 @@ export type EventGrouper<
         event: ($EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS) & { version: 1 },
-        options?: { prevAggregate?: undefined },
+        options?: {
+          prevAggregate?: undefined;
+          validate?: ValidateEventDetail;
+        },
       ): GroupedEvent<EVENT_DETAILS, AGGREGATE>;
       (
         event: $EVENT_DETAILS extends EventDetail
           ? OptionalTimestamp<$EVENT_DETAILS>
           : $EVENT_DETAILS,
-        options: { prevAggregate: $AGGREGATE },
+        options: {
+          prevAggregate: $AGGREGATE;
+          validate?: ValidateEventDetail;
+        },
       ): GroupedEvent<EVENT_DETAILS, AGGREGATE>;
     }
   : (
       event: $EVENT_DETAILS extends EventDetail
         ? OptionalTimestamp<$EVENT_DETAILS>
         : $EVENT_DETAILS,
-      options?: { prevAggregate?: $AGGREGATE },
+      options?: { prevAggregate?: $AGGREGATE; validate?: ValidateEventDetail },
     ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>;
 
 export type EventGroupPusher = <

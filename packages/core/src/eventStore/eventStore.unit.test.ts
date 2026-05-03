@@ -1,7 +1,11 @@
 /* eslint-disable max-lines */
+import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
+import { EventType } from '~/event/eventType';
 import { GroupedEvent } from '~/event/groupedEvent';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
+import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
+import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
 import { MissingPrevAggregateError } from './errors/missingPrevAggregate';
 import { EventStore } from './eventStore';
 import {
@@ -361,6 +365,309 @@ describe('event store', () => {
           pikachuCaughtEvent,
         ]),
       );
+    });
+  });
+
+  describe('validate (pushEvent)', () => {
+    type AppearedDetail = EventDetail<'POKEMON_APPEARED', { name: string; level: number }>;
+
+    const pokemonAppearedWithParser = new EventType<
+      'POKEMON_APPEARED',
+      { name: string; level: number }
+    >({
+      type: 'POKEMON_APPEARED',
+      parseEventDetail: candidate => {
+        const payload = candidate.payload as
+          | { name: string; level: number }
+          | undefined;
+        if (payload != null && typeof payload.name === 'string') {
+          return {
+            isValid: true as const,
+            parsedEventDetail: candidate as AppearedDetail,
+          };
+        }
+        return {
+          isValid: false as const,
+          parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
+        };
+      },
+    });
+
+    const pokemonCaughtNoParser = new EventType({ type: 'POKEMON_CAUGHT' });
+
+    const pokemonLeveledUpNoParser = new EventType({
+      type: 'POKEMON_LEVELED_UP',
+    });
+
+    const validatingEventStore = new EventStore({
+      eventStoreId: 'VALIDATING_POKEMONS',
+      eventTypes: [
+        pokemonAppearedWithParser,
+        pokemonCaughtNoParser,
+        pokemonLeveledUpNoParser,
+      ],
+      reducer: pokemonsReducer,
+      eventStorageAdapter: eventStorageAdapterMock,
+    });
+
+    beforeEach(() => {
+      pushEventMock.mockReset();
+    });
+
+    it('validates a valid event with validate=true', async () => {
+      pushEventMock.mockResolvedValue({ event: pikachuAppearedEvent });
+
+      const response = await validatingEventStore.pushEvent(
+        pikachuAppearedEvent,
+        { validate: true },
+      );
+
+      expect(pushEventMock).toHaveBeenCalledTimes(1);
+      expect(response.event).toStrictEqual(pikachuAppearedEvent);
+    });
+
+    it('rejects an invalid event with validate=true', async () => {
+      const invalidEvent = {
+        ...pikachuAppearedEvent,
+        payload: { name: 123 },
+      };
+
+      await expect(
+        validatingEventStore.pushEvent(
+          invalidEvent as unknown as PokemonEventDetails,
+          { validate: true },
+        ),
+      ).rejects.toThrow('Invalid payload');
+
+      expect(pushEventMock).not.toHaveBeenCalled();
+    });
+
+    it('skips validation entirely with validate=false', async () => {
+      const invalidEvent = {
+        ...pikachuAppearedEvent,
+        payload: { name: 123 },
+      };
+
+      pushEventMock.mockResolvedValue({ event: invalidEvent });
+
+      await validatingEventStore.pushEvent(
+        invalidEvent as unknown as PokemonEventDetails,
+        { validate: false },
+      );
+
+      expect(pushEventMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('validates with validate=auto (default) when parser exists', async () => {
+      const invalidEvent = {
+        ...pikachuAppearedEvent,
+        payload: { name: 123 },
+      };
+
+      await expect(
+        validatingEventStore.pushEvent(
+          invalidEvent as unknown as PokemonEventDetails,
+        ),
+      ).rejects.toThrow('Invalid payload');
+    });
+
+    it('silently skips with validate=auto when no parser is defined', async () => {
+      pushEventMock.mockResolvedValue({ event: pikachuCaughtEvent });
+
+      const response = await validatingEventStore.pushEvent(
+        pikachuCaughtEvent,
+      );
+
+      expect(pushEventMock).toHaveBeenCalledTimes(1);
+      expect(response.event).toStrictEqual(pikachuCaughtEvent);
+    });
+
+    it('throws EventDetailParserNotDefinedError with validate=true when no parser is defined', async () => {
+      await expect(
+        validatingEventStore.pushEvent(pikachuCaughtEvent, {
+          validate: true,
+        }),
+      ).rejects.toThrow(EventDetailParserNotDefinedError);
+    });
+
+    it('throws EventDetailTypeDoesNotExistError with validate=true for unknown event type', async () => {
+      const unknownEvent = {
+        ...pikachuAppearedEvent,
+        type: 'UNKNOWN_TYPE',
+      };
+
+      await expect(
+        validatingEventStore.pushEvent(
+          unknownEvent as unknown as PokemonEventDetails,
+          { validate: true },
+        ),
+      ).rejects.toThrow(EventDetailTypeDoesNotExistError);
+    });
+
+    it('silently skips with validate=auto for unknown event type', async () => {
+      const unknownEvent = {
+        ...pikachuAppearedEvent,
+        type: 'UNKNOWN_TYPE',
+      };
+
+      pushEventMock.mockResolvedValue({ event: unknownEvent });
+
+      await validatingEventStore.pushEvent(
+        unknownEvent as unknown as PokemonEventDetails,
+      );
+
+      expect(pushEventMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('validate (groupEvent)', () => {
+    beforeEach(() => {
+      groupEventMock.mockImplementation(
+        (event: OptionalTimestamp<EventDetail>) =>
+          new GroupedEvent({
+            event,
+            eventStorageAdapter: eventStorageAdapterMock,
+          }),
+      );
+    });
+
+    it('passes validate option through to GroupedEvent', () => {
+      const groupedEvent = pokemonsEventStore.groupEvent(
+        pikachuLeveledUpEvent,
+        { validate: true },
+      );
+
+      expect(groupedEvent.validate).toStrictEqual(true);
+    });
+
+    it('does not set validate when not provided', () => {
+      const groupedEvent =
+        pokemonsEventStore.groupEvent(pikachuLeveledUpEvent);
+
+      expect(groupedEvent.validate).toBeUndefined();
+    });
+  });
+
+  describe('validate (pushEventGroup)', () => {
+    type AppearedDetail = EventDetail<'POKEMON_APPEARED', { name: string; level: number }>;
+
+    const pokemonAppearedWithParser = new EventType<
+      'POKEMON_APPEARED',
+      { name: string; level: number }
+    >({
+      type: 'POKEMON_APPEARED',
+      parseEventDetail: candidate => {
+        const payload = candidate.payload as
+          | { name: string; level: number }
+          | undefined;
+        if (payload != null && typeof payload.name === 'string') {
+          return {
+            isValid: true as const,
+            parsedEventDetail: candidate as AppearedDetail,
+          };
+        }
+        return {
+          isValid: false as const,
+          parsingErrors: [new Error('Invalid payload')] as [Error, ...Error[]],
+        };
+      },
+    });
+
+    const pokemonCaughtNoParser = new EventType({ type: 'POKEMON_CAUGHT' });
+
+    const pokemonLeveledUpNoParser = new EventType({
+      type: 'POKEMON_LEVELED_UP',
+    });
+
+    const validatingEventStore = new EventStore({
+      eventStoreId: 'VALIDATING_POKEMONS',
+      eventTypes: [
+        pokemonAppearedWithParser,
+        pokemonCaughtNoParser,
+        pokemonLeveledUpNoParser,
+      ],
+      reducer: pokemonsReducer,
+      eventStorageAdapter: eventStorageAdapterMock,
+    });
+
+    beforeEach(() => {
+      pushEventGroupMock.mockReset();
+    });
+
+    it('rejects grouped event with invalid payload when validate is set', async () => {
+      const invalidEvent = {
+        ...pikachuAppearedEvent,
+        payload: { name: 123 },
+      };
+
+      const groupedEvent1 = new GroupedEvent({
+        event: invalidEvent,
+        eventStore: validatingEventStore,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+      groupedEvent1.validate = true;
+
+      const groupedEvent2 = new GroupedEvent({
+        event: pikachuCaughtEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+
+      await expect(
+        EventStore.pushEventGroup(groupedEvent1, groupedEvent2),
+      ).rejects.toThrow('Invalid payload');
+
+      expect(pushEventGroupMock).not.toHaveBeenCalled();
+    });
+
+    it('throws when validate=true but no eventStore is assigned', async () => {
+      const groupedEvent1 = new GroupedEvent({
+        event: pikachuAppearedEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+      groupedEvent1.validate = true;
+
+      const groupedEvent2 = new GroupedEvent({
+        event: pikachuCaughtEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+
+      await expect(
+        EventStore.pushEventGroup(groupedEvent1, groupedEvent2),
+      ).rejects.toThrow(
+        'Cannot validate grouped event: no eventStore is assigned',
+      );
+
+      expect(pushEventGroupMock).not.toHaveBeenCalled();
+    });
+
+    it('allows grouped event with validate=false even if payload is invalid', async () => {
+      const invalidEvent = {
+        ...pikachuAppearedEvent,
+        payload: { name: 123 },
+      };
+
+      pushEventGroupMock.mockResolvedValue({
+        eventGroup: [
+          { event: invalidEvent },
+          { event: pikachuCaughtEvent },
+        ],
+      });
+
+      const groupedEvent1 = new GroupedEvent({
+        event: invalidEvent,
+        eventStore: validatingEventStore,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+      groupedEvent1.validate = false;
+
+      const groupedEvent2 = new GroupedEvent({
+        event: pikachuCaughtEvent,
+        eventStorageAdapter: eventStorageAdapterMock,
+      });
+
+      await EventStore.pushEventGroup(groupedEvent1, groupedEvent2);
+
+      expect(pushEventGroupMock).toHaveBeenCalledTimes(1);
     });
   });
 

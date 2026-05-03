@@ -7,6 +7,8 @@ import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
+import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
+import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
 import { MissingPrevAggregateError } from './errors/missingPrevAggregate';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import type {
@@ -21,7 +23,46 @@ import type {
   AggregateGetter,
   AggregateSimulator,
   Reducer,
+  ValidateEventDetail,
 } from './types';
+
+const resolveEventValidation = async (
+  candidateEventTypes: EventType[],
+  eventDetail: EventDetail,
+  validate: ValidateEventDetail,
+): Promise<void> => {
+  if (validate === false) {
+    return;
+  }
+
+  const eventType = candidateEventTypes.find(
+    ({ type }) => type === eventDetail.type,
+  );
+
+  if (eventType === undefined) {
+    if (validate === true) {
+      throw new EventDetailTypeDoesNotExistError({
+        type: eventDetail.type,
+        allowedTypes: candidateEventTypes.map(({ type }) => type),
+      });
+    }
+    return;
+  }
+
+  if (eventType.parseEventDetail === undefined) {
+    if (validate === true) {
+      throw new EventDetailParserNotDefinedError(eventDetail.type);
+    }
+    return;
+  }
+
+  const result = await eventType.parseEventDetail(eventDetail);
+
+  if (!result.isValid) {
+    const messages = result.parsingErrors.map(e => e.message);
+    throw new Error(messages.join('; '));
+  }
+};
 
 export class EventStore<
   EVENT_STORE_ID extends string = string,
@@ -60,6 +101,30 @@ export class EventStore<
     ) as { force?: boolean };
 
     const [groupedEventsHead] = groupedEvents;
+
+    // Validate all grouped events that have validation configured
+    await Promise.all(
+      groupedEvents.map(async groupedEvent => {
+        const validate = groupedEvent.validate ?? 'auto';
+        if (validate === false) {
+          return;
+        }
+        if (groupedEvent.eventStore === undefined) {
+          if (validate === true) {
+            throw new Error(
+              'Cannot validate grouped event: no eventStore is assigned. Use eventStore.groupEvent() to create grouped events with validation.',
+            );
+          }
+          return;
+        }
+
+        await resolveEventValidation(
+          groupedEvent.eventStore.eventTypes,
+          groupedEvent.event as EventDetail,
+          validate,
+        );
+      }),
+    );
 
     const { eventGroup: eventGroupWithoutAggregates } =
       await groupedEventsHead.eventStorageAdapter.pushEventGroup(
@@ -228,9 +293,15 @@ export class EventStore<
 
     const pushEvent: LoosePushEvent = async (
       eventDetail,
-      { prevAggregate, force = false } = {},
+      { prevAggregate, force = false, validate = 'auto' } = {},
     ) => {
       assertPrevAggregateProvided(eventDetail, prevAggregate);
+
+      await resolveEventValidation(
+        this.eventTypes,
+        eventDetail as EventDetail,
+        validate,
+      );
 
       const { event } = (await this.getEventStorageAdapter().pushEvent(
         eventDetail,
@@ -271,13 +342,17 @@ export class EventStore<
 
     const groupEvent: LooseGroupEvent = (
       eventDetail,
-      { prevAggregate } = {},
+      { prevAggregate, validate } = {},
     ) => {
       assertPrevAggregateProvided(eventDetail, prevAggregate);
 
       const groupedEvent = this.getEventStorageAdapter().groupEvent(
         eventDetail,
       ) as GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+
+      if (validate !== undefined) {
+        groupedEvent.validate = validate;
+      }
 
       groupedEvent.eventStore = this;
       groupedEvent.context = { eventStoreId: this.eventStoreId };

@@ -6,6 +6,7 @@ import type { EventDetail, OptionalTimestamp } from '~/event/eventDetail';
 import type { EventTypeDetail } from '~/event/eventType';
 import type { GroupedEvent } from '~/event/groupedEvent';
 import type { EventsQueryOptions } from '~/eventStorageAdapter';
+import type { ValidateEventDetail } from '~/eventStore/types';
 import {
   EventStore,
   EventStoreAggregate,
@@ -110,7 +111,7 @@ assertPushEventInput1;
 
 const assertPushEventInput2: A.Equals<
   Parameters<typeof pokemonsEventStore.pushEvent>[1],
-  { prevAggregate?: PokemonAggregate | undefined; force?: boolean } | undefined
+  { prevAggregate?: PokemonAggregate | undefined; force?: boolean; validate?: ValidateEventDetail } | undefined
 > = 1;
 assertPushEventInput2;
 
@@ -166,7 +167,11 @@ const strictPokemonsEventStore = new EventStore({
 
 const assertStrictPushEventInput2: A.Equals<
   Parameters<typeof strictPokemonsEventStore.pushEvent>[1],
-  { prevAggregate: PokemonAggregate; force?: boolean }
+  {
+    prevAggregate: PokemonAggregate;
+    force?: boolean;
+    validate?: ValidateEventDetail;
+  }
 > = 1;
 assertStrictPushEventInput2;
 
@@ -178,7 +183,7 @@ assertStrictPushEventOutput;
 
 const assertStrictGroupEventInput2: A.Equals<
   Parameters<typeof strictPokemonsEventStore.groupEvent>[1],
-  { prevAggregate: PokemonAggregate }
+  { prevAggregate: PokemonAggregate; validate?: ValidateEventDetail }
 > = 1;
 assertStrictGroupEventInput2;
 
@@ -219,7 +224,7 @@ assertGroupEventInput1;
 
 const assertGroupEventInput2: A.Equals<
   Parameters<typeof pokemonsEventStore.groupEvent>[1],
-  { prevAggregate?: PokemonAggregate | undefined } | undefined
+  { prevAggregate?: PokemonAggregate | undefined; validate?: ValidateEventDetail } | undefined
 > = 1;
 assertGroupEventInput2;
 

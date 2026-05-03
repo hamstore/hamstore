@@ -1,6 +1,11 @@
 export type { Aggregate } from './aggregate';
 export { EventType } from './event/eventType';
-export type { EventTypeDetail, EventTypeDetails } from './event/eventType';
+export type {
+  EventTypeDetail,
+  EventTypeDetails,
+  ParsedEventDetail,
+  EventDetailParser,
+} from './event/eventType';
 export { GroupedEvent } from './event/groupedEvent';
 export { __REPLAYED__, __AGGREGATE_EXISTS__ } from './event/reservedEventTypes';
 export type { EventDetail, OptionalTimestamp } from './event/eventDetail';
@@ -14,6 +19,8 @@ export type {
 } from './eventStorageAdapter';
 export {
   AggregateNotFoundError,
+  EventDetailParserNotDefinedError,
+  EventDetailTypeDoesNotExistError,
   isEventAlreadyExistsError,
   eventAlreadyExistsErrorCode,
   EventStore,
@@ -23,6 +30,7 @@ export type {
   UndefinedEventStorageAdapterError,
   GetAggregateOptions,
   SimulationOptions,
+  ValidateEventDetail,
   EventStoreId,
   EventStoreEventTypes,
   EventStoreEventDetails,

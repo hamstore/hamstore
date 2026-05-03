@@ -4,6 +4,7 @@ import type {
   EventStoreContext,
 } from '~/eventStorageAdapter';
 import type { AnyEventStore } from '~/eventStore/generics';
+import type { ValidateEventDetail } from '~/eventStore/types';
 
 import type { EventDetail, OptionalTimestamp } from './eventDetail';
 
@@ -21,6 +22,7 @@ export class GroupedEvent<
 
   eventStorageAdapter: EventStorageAdapter;
   eventStore?: AnyEventStore;
+  validate?: ValidateEventDetail;
 
   constructor({
     event,
