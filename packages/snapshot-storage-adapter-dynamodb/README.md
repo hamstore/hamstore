@@ -94,8 +94,10 @@ Projection type `ALL` is recommended so that `listSnapshots` can return full `Sn
 ### Constraints
 
 - `listSnapshots` requires either `aggregateId` or `reducerVersion` to be set. The adapter does not perform full-table scans; the EventStore never asks it to. Calling `listSnapshots` with neither filter throws.
-- `reducerVersion` strings should use printable ASCII characters. The SK range queries rely on a `\uFFFF` terminator that sorts higher than any reasonable reducer-version string.
-- `aggregateId` and `reducerVersion` must not contain the literal `'#'` character (it is used as a separator inside the composite keys). The same restriction applies to the [DynamoDB event storage adapter](../event-storage-adapter-dynamodb/README.md).
+- `eventStoreId`, `aggregateId`, and `reducerVersion` must not contain the literal `'#'` character (it is used as a separator inside the composite keys). The same restriction applies to the [DynamoDB event storage adapter](../event-storage-adapter-dynamodb/README.md).
+- `reducerVersion` must not contain the literal `'\uFFFF'` (U+FFFF) character. The SK range queries rely on a `'\uFFFF'` terminator as the upper bound; a `reducerVersion` containing it would extend past the bound and could be misclassified by `<= :maxSk` predicates. Other Unicode characters — including emoji and any non-BMP code points — are safe, since their UTF-16 surrogate code units (0xD800–0xDFFF) sort strictly below 0xFFFF.
+
+Both `'#'` and `'\uFFFF'` are enforced at write/query time: `putSnapshot`, `getLatestSnapshot`, and `listSnapshots` throw if any of these constraints is violated.
 
 ## 📝 Examples
 
