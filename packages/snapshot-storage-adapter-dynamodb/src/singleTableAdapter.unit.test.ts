@@ -284,6 +284,41 @@ describe('DynamoDBSingleTableSnapshotStorageAdapter', () => {
       };
       expect(secondInput.ExclusiveStartKey).toEqual(lastEvaluatedKey);
     });
+
+    it('paginates indefinitely until LastEvaluatedKey is undefined', async () => {
+      // Issue many empty pages followed by a match, to confirm the adapter
+      // does not bound the loop and silently miss matches.
+      const snapshot = makeSnapshot('a1', 100, reducerV2);
+      const emptyPageKey = (i: number) =>
+        marshall(
+          {
+            [SNAPSHOT_TABLE_PK]: `${eventStoreId}#a1`,
+            [SNAPSHOT_TABLE_SK]: `${padVersion(1000 - i)}#${reducerV1}`,
+          },
+          MARSHALL_OPTIONS,
+        );
+
+      const numEmptyPages = 64;
+      let mock = dynamoDBClientMock.on(QueryCommand);
+      for (let i = 0; i < numEmptyPages; i += 1) {
+        mock = mock.resolvesOnce({
+          Items: [],
+          LastEvaluatedKey: emptyPageKey(i),
+        });
+      }
+      mock.resolves({
+        Items: [marshall(buildStoredItem(snapshot), MARSHALL_OPTIONS)],
+      });
+
+      const result = await adapter.getLatestSnapshot(
+        'a1',
+        { eventStoreId },
+        { reducerVersion: reducerV2 },
+      );
+
+      expect(result.snapshot).toEqual(snapshot);
+      expect(dynamoDBClientMock.calls()).toHaveLength(numEmptyPages + 1);
+    });
   });
 
   describe('deleteSnapshot', () => {
@@ -454,6 +489,79 @@ describe('DynamoDBSingleTableSnapshotStorageAdapter', () => {
       ).rejects.toThrow(/invalid pageToken/);
     });
 
+    it('preserves applied filter options across paginated calls via the pageToken', async () => {
+      const snapshot = makeSnapshot('a1', 4, reducerV1);
+      const lastEvaluatedKey = marshall(
+        {
+          [SNAPSHOT_TABLE_PK]: `${eventStoreId}#a1`,
+          [SNAPSHOT_TABLE_SK]: `${padVersion(4)}#${reducerV1}`,
+        },
+        MARSHALL_OPTIONS,
+      );
+
+      dynamoDBClientMock.on(QueryCommand).resolves({
+        Items: [marshall(buildStoredItem(snapshot), MARSHALL_OPTIONS)],
+        LastEvaluatedKey: lastEvaluatedKey,
+      });
+
+      const { nextPageToken } = await adapter.listSnapshots(
+        { eventStoreId },
+        { aggregateId: 'a1', minVersion: 2, maxVersion: 9, limit: 7, reverse: true },
+      );
+
+      // Caller passes only the pageToken on the next call; the filter options
+      // should be carried forward from the token, not lost.
+      await adapter.listSnapshots(
+        { eventStoreId },
+        { pageToken: nextPageToken },
+      );
+
+      const secondInput = dynamoDBClientMock.call(1).args[0].input as {
+        KeyConditionExpression: string;
+        ExpressionAttributeValues: Record<string, unknown>;
+        Limit: number;
+        ScanIndexForward: boolean;
+        ExclusiveStartKey: Record<string, unknown>;
+      };
+      expect(secondInput.KeyConditionExpression).toBe(
+        '#pk = :pk AND #sk BETWEEN :minSk AND :maxSk',
+      );
+      expect(secondInput.Limit).toBe(7);
+      expect(secondInput.ScanIndexForward).toBe(false);
+      expect(secondInput.ExclusiveStartKey).toEqual(lastEvaluatedKey);
+    });
+
+    it('lets caller-passed options override token-stored options', async () => {
+      const lastEvaluatedKey = marshall(
+        {
+          [SNAPSHOT_TABLE_PK]: `${eventStoreId}#a1`,
+          [SNAPSHOT_TABLE_SK]: `${padVersion(4)}#${reducerV1}`,
+        },
+        MARSHALL_OPTIONS,
+      );
+
+      dynamoDBClientMock.on(QueryCommand).resolves({
+        Items: [],
+        LastEvaluatedKey: lastEvaluatedKey,
+      });
+
+      const { nextPageToken } = await adapter.listSnapshots(
+        { eventStoreId },
+        { aggregateId: 'a1', limit: 7 },
+      );
+
+      // Override `limit` on the next call. Caller value wins.
+      await adapter.listSnapshots(
+        { eventStoreId },
+        { pageToken: nextPageToken, limit: 3 },
+      );
+
+      const secondInput = dynamoDBClientMock.call(1).args[0].input as {
+        Limit: number;
+      };
+      expect(secondInput.Limit).toBe(3);
+    });
+
     it('adds a FilterExpression on the main table when reducerVersion is also provided', async () => {
       await adapter.listSnapshots(
         { eventStoreId },
@@ -472,6 +580,45 @@ describe('DynamoDBSingleTableSnapshotStorageAdapter', () => {
       expect(input.ExpressionAttributeNames).toMatchObject({
         '#reducerVersion': SNAPSHOT_TABLE_REDUCER_VERSION_KEY,
       });
+    });
+  });
+
+  describe('composite-key validation', () => {
+    it('rejects a putSnapshot whose reducerVersion contains "#"', async () => {
+      const snapshot = makeSnapshot('a1', 1, 'rv#bad');
+
+      await expect(
+        adapter.putSnapshot(snapshot, { eventStoreId }),
+      ).rejects.toThrow(/reducerVersion/);
+      expect(dynamoDBClientMock.calls()).toHaveLength(0);
+    });
+
+    it('rejects a putSnapshot whose reducerVersion contains "\\uFFFF"', async () => {
+      const snapshot = makeSnapshot('a1', 1, 'rv\uffff');
+
+      await expect(
+        adapter.putSnapshot(snapshot, { eventStoreId }),
+      ).rejects.toThrow(/reducerVersion/);
+      expect(dynamoDBClientMock.calls()).toHaveLength(0);
+    });
+
+    it('rejects a putSnapshot whose aggregateId contains "#"', async () => {
+      const snapshot = makeSnapshot('a#1', 1, reducerV1);
+
+      await expect(
+        adapter.putSnapshot(snapshot, { eventStoreId }),
+      ).rejects.toThrow(/aggregateId/);
+      expect(dynamoDBClientMock.calls()).toHaveLength(0);
+    });
+
+    it('rejects a listSnapshots filter whose reducerVersion contains "#"', async () => {
+      await expect(
+        adapter.listSnapshots(
+          { eventStoreId },
+          { reducerVersion: 'rv#bad' },
+        ),
+      ).rejects.toThrow(/reducerVersion/);
+      expect(dynamoDBClientMock.calls()).toHaveLength(0);
     });
   });
 

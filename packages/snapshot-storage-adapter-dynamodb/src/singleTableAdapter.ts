@@ -39,7 +39,15 @@ import {
   sortKeyMaxForVersion,
   sortKeyMinForVersion,
 } from './utils/keys';
-import { decodePageToken, encodePageToken } from './utils/pageToken';
+import {
+  encodePageToken,
+  parseAppliedListSnapshotsOptions,
+} from './utils/pageToken';
+import {
+  assertValidAggregateId,
+  assertValidEventStoreId,
+  assertValidReducerVersion,
+} from './utils/validate';
 
 type StoredSnapshotItem = {
   [SNAPSHOT_TABLE_PK]: string;
@@ -113,16 +121,17 @@ const itemToSnapshotKey = (item: Record<string, unknown>): SnapshotKey => {
  * `pruneEventStoreSnapshots`) is O(M) in the number of matching snapshots
  * rather than O(table size).
  *
- * **Constraints**
+ * **Constraints** (enforced at write/query time)
  *
  * - `listSnapshots` requires either `aggregateId` or `reducerVersion` to be
  *   set. The adapter does not perform full-table scans; the EventStore never
  *   asks it to.
- * - `reducerVersion` strings should use printable ASCII characters. The SK
- *   range queries rely on a `\uFFFF` terminator that sorts higher than any
- *   reasonable reducer-version string.
- * - Aggregate ids and reducer versions must not contain the literal `'#'`
- *   character (it is used as a separator inside the composite keys).
+ * - `eventStoreId`, `aggregateId`, and `reducerVersion` must not contain the
+ *   literal `'#'` character (separator inside the composite keys).
+ * - `reducerVersion` must not contain the literal `'\uFFFF'` character (the
+ *   upper-bound terminator used by `sortKeyMaxForVersion`). Non-BMP
+ *   characters are safe — their UTF-16 surrogate code units all lie strictly
+ *   below `\uFFFF`.
  */
 export class DynamoDBSingleTableSnapshotStorageAdapter
   implements SnapshotStorageAdapter
@@ -155,6 +164,12 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
       { eventStoreId },
       options = {},
     ) => {
+      assertValidEventStoreId(eventStoreId);
+      assertValidAggregateId(aggregateId);
+      if (options.reducerVersion !== undefined) {
+        assertValidReducerVersion(options.reducerVersion);
+      }
+
       const baseInput = this.buildLatestSnapshotQueryInput(
         eventStoreId,
         aggregateId,
@@ -198,6 +213,9 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
           `Snapshot eventStoreId "${snapshot.eventStoreId}" does not match context "${eventStoreId}"`,
         );
       }
+      assertValidEventStoreId(eventStoreId);
+      assertValidAggregateId(snapshot.aggregate.aggregateId);
+      assertValidReducerVersion(snapshot.reducerVersion);
 
       await this.dynamoDBClient.send(
         new PutItemCommand({
@@ -231,8 +249,16 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
     // eslint-disable-next-line complexity
     this.listSnapshots = async (
       { eventStoreId },
-      options = {},
+      { pageToken: inputPageToken, ...inputOptions } = {},
     ): Promise<ListSnapshotsOutput> => {
+      assertValidEventStoreId(eventStoreId);
+      if (inputOptions.aggregateId !== undefined) {
+        assertValidAggregateId(inputOptions.aggregateId);
+      }
+      if (inputOptions.reducerVersion !== undefined) {
+        assertValidReducerVersion(inputOptions.reducerVersion);
+      }
+
       const {
         aggregateId,
         reducerVersion,
@@ -240,8 +266,11 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
         maxVersion,
         limit,
         reverse,
-        pageToken,
-      } = options;
+        exclusiveStartKey,
+      } = parseAppliedListSnapshotsOptions({
+        inputOptions,
+        inputPageToken,
+      });
 
       if (aggregateId === undefined && reducerVersion === undefined) {
         throw new Error(
@@ -263,7 +292,6 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
             { reducerVersion, minVersion, maxVersion, limit, reverse },
           );
 
-      const exclusiveStartKey = decodePageToken(pageToken);
       if (exclusiveStartKey !== undefined) {
         queryInput.ExclusiveStartKey = exclusiveStartKey;
       }
@@ -277,7 +305,14 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
         .map(item => unmarshall(item))
         .map(itemToSnapshotKey);
 
-      const nextPageToken = encodePageToken(result.LastEvaluatedKey);
+      const nextPageToken = encodePageToken(result.LastEvaluatedKey, {
+        aggregateId,
+        reducerVersion,
+        minVersion,
+        maxVersion,
+        limit,
+        reverse,
+      });
 
       return {
         snapshotKeys,
@@ -341,10 +376,17 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
   private async queryLatestSnapshot(
     baseInput: QueryCommandInput,
   ): Promise<{ snapshot: Snapshot | undefined }> {
+    // Iterate until DynamoDB stops paginating. We loop only when a
+    // `FilterExpression` rejects every item on a page (i.e. when callers
+    // request `getLatestSnapshot` with a `reducerVersion` filter); without a
+    // filter, the first page returns `Limit: 1` and the loop exits after one
+    // iteration. Each page is bounded by DynamoDB's 1MB hard cap, so the
+    // worst-case latency is O(matching aggregate's snapshot rows under
+    // other reducer versions).
     let exclusiveStartKey: Record<string, AttributeValue> | undefined =
       undefined;
-    // Bound the loop conservatively to protect against runaway queries.
-    for (let attempt = 0; attempt < 32; attempt += 1) {
+
+    do {
       const result = (await this.dynamoDBClient.send(
         new QueryCommand({
           ...baseInput,
@@ -359,11 +401,8 @@ export class DynamoDBSingleTableSnapshotStorageAdapter
         return { snapshot: itemToSnapshot(unmarshall(firstItem)) };
       }
 
-      if (result.LastEvaluatedKey === undefined) {
-        return { snapshot: undefined };
-      }
       exclusiveStartKey = result.LastEvaluatedKey;
-    }
+    } while (exclusiveStartKey !== undefined);
 
     return { snapshot: undefined };
   }

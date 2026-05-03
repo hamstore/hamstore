@@ -31,9 +31,12 @@ export const sortKeyMinForVersion = (aggregateVersion: number): string =>
 
 /**
  * Upper-bound helper for SK queries. `aggregateVersion <= V` translates to
- * `SK <= sortKeyMaxForVersion(V)`. We use the U+FFFF terminator, which sorts
- * higher than any UTF-8 string a sane `reducerVersion` would contain (reducer
- * versions are typically content hashes or simple ASCII strings).
+ * `SK <= sortKeyMaxForVersion(V)`. We use the `\uFFFF` terminator: in JS
+ * (UTF-16) every code unit lies in `[0, 0xFFFF]`, surrogate pairs encoding
+ * non-BMP characters use code units in `[0xD800, 0xDFFF]` (all strictly
+ * below `0xFFFF`), so any string that does not literally contain `\uFFFF`
+ * sorts strictly below `<padded-V>#\uFFFF`. `assertValidReducerVersion`
+ * rejects literal `\uFFFF` at write time as defense-in-depth.
  */
 export const sortKeyMaxForVersion = (aggregateVersion: number): string =>
   `${padVersion(aggregateVersion)}#\uffff`;
