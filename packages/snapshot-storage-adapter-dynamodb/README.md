@@ -214,7 +214,7 @@ resource "aws_dynamodb_table" "pokemons-snapshots-table" {
 
 Required IAM permissions for each operation:
 
-- `getLatestSnapshot` (+ `EventStore.getAggregate` / `getEventsAndAggregate` when a snapshot adapter is configured): `dynamodb:Query` on the table.
+- `getLatestSnapshot` (+ `EventStore.getAggregate` / `getAggregateAndEvents` when a snapshot adapter is configured): `dynamodb:Query` on the table.
 - `getSnapshot`: `dynamodb:GetItem` on the table.
 - `putSnapshot` (+ inline snapshot saves): `dynamodb:PutItem` on the table.
 - `deleteSnapshot` (+ inline pruning, `cleanUpOutdatedSnapshots`, `pruneAggregateSnapshots`, `pruneEventStoreSnapshots`): `dynamodb:DeleteItem` on the table.
