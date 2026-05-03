@@ -1,5 +1,5 @@
 import type {
-  EventStore,
+  AnyEventStore,
   EventStoreId,
   EventStoreEventDetails,
   EventStoreAggregate,
@@ -11,16 +11,16 @@ import type {
   StateCarryingMessage,
 } from './message';
 
-export type EventStoreAggregateExistsMessage<EVENT_STORES extends EventStore> =
+export type EventStoreAggregateExistsMessage<EVENT_STORES extends AnyEventStore> =
   EVENT_STORES extends infer EVENT_STORE
-    ? EVENT_STORE extends EventStore
+    ? EVENT_STORE extends AnyEventStore
       ? AggregateExistsMessage<EventStoreId<EVENT_STORE>>
       : never
     : never;
 
-export type EventStoreNotificationMessage<EVENT_STORES extends EventStore> =
+export type EventStoreNotificationMessage<EVENT_STORES extends AnyEventStore> =
   EVENT_STORES extends infer EVENT_STORE
-    ? EVENT_STORE extends EventStore
+    ? EVENT_STORE extends AnyEventStore
       ? NotificationMessage<
           EventStoreId<EVENT_STORE>,
           EventStoreEventDetails<EVENT_STORE>
@@ -28,9 +28,9 @@ export type EventStoreNotificationMessage<EVENT_STORES extends EventStore> =
       : never
     : never;
 
-export type EventStoreStateCarryingMessage<EVENT_STORES extends EventStore> =
+export type EventStoreStateCarryingMessage<EVENT_STORES extends AnyEventStore> =
   EVENT_STORES extends infer EVENT_STORE
-    ? EVENT_STORE extends EventStore
+    ? EVENT_STORE extends AnyEventStore
       ? StateCarryingMessage<
           EventStoreId<EVENT_STORE>,
           EventStoreEventDetails<EVENT_STORE>,

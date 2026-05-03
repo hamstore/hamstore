@@ -55,6 +55,7 @@ const pokemonsEventStore = new EventStore({
 - <code>reduce <i>(EventType[])</i></code>: A <a href="../aggregates-reducers">reducer function</a> that can be applied to the store event types
 - <code>onEventPushed <i>(?(pushEventResponse: PushEventResponse) => Promise&lt;void&gt;)</i></code>: To run a callback after events are pushed (input is exactly the return value of the <code>pushEvent</code> method)
 - <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="../fetching-events">fetching events</a>
+- <code>requirePrevAggregate <i>(?boolean = false)</i></code>: When set to <code>true</code>, the <code>pushEvent</code> and <code>groupEvent</code> methods require a non-undefined <code>prevAggregate</code> for non-initial events. Calling them without one throws a <code>MissingPrevAggregateError</code>. The TypeScript types are also tightened so callers must provide it (and the returned <code>nextAggregate</code> is always defined). Especially useful when paired with a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore</a> publishing to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>.
 
 > ☝️ The return type of the `reducer` is used to infer the `Aggregate` type of the `EventStore`, so it is important to type it explicitely.
 
@@ -216,7 +217,7 @@ const { aggregate } =
 
   `ResponseObj` contains the following properties:
   - <code>event <i>(EventDetail)</i></code>: The complete event (includes the <code>timestamp</code>)
-  - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, if the <code>prevAggregate</code> option was provided, or when using a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a> connected to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>
+  - <code>nextAggregate <i>(?Aggregate)</i></code>: The aggregate at the new version, i.e. after having pushed the event. Returned only if the event is an initial event, if the <code>prevAggregate</code> option was provided, or when using a <a href="../../reacting-to-events/connected-event-store">ConnectedEventStore class</a> connected to a <a href="../../reacting-to-events/messages">state-carrying message bus or queue</a>. The TypeScript types reflect this: when the call-site provides a non-undefined <code>prevAggregate</code> or uses an event literal with <code>version: 1</code>, <code>nextAggregate</code> is statically guaranteed to be defined. When the event store is constructed with <code>requirePrevAggregate: true</code>, <code>nextAggregate</code> is always defined.
 
 ```ts
 const { event: completeEvent, nextAggregate } =

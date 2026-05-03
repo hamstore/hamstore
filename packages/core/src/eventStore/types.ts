@@ -28,33 +28,81 @@ export type EventsGetter<EVENT_DETAIL extends EventDetail> = (
   options?: EventsQueryOptions,
 ) => Promise<{ events: EVENT_DETAIL[] }>;
 
+/**
+ * The set of overloads of `pushEvent` that statically guarantee a non-undefined
+ * `nextAggregate`:
+ * - call-site provides a non-undefined `prevAggregate`, OR
+ * - call-site uses an event literal with `version: 1` (i.e. an initial event).
+ *
+ * The third overload preserves the original call signature, so
+ * `Parameters<...>` and `ReturnType<...>` resolve to the previous (broader)
+ * shapes and existing type assertions keep passing.
+ *
+ * When `REQUIRES_PREV_AGGREGATE` is `true`, the type collapses to a single
+ * signature that requires `prevAggregate` and always returns `nextAggregate`.
+ */
 export type EventPusher<
   EVENT_DETAILS extends EventDetail,
   $EVENT_DETAILS extends EventDetail,
   AGGREGATE extends Aggregate,
   $AGGREGATE extends Aggregate,
-> = (
-  event: $EVENT_DETAILS extends EventDetail
-    ? OptionalTimestamp<$EVENT_DETAILS>
-    : $EVENT_DETAILS,
-  options?: { prevAggregate?: $AGGREGATE; force?: boolean },
-) => Promise<{ event: EVENT_DETAILS; nextAggregate?: AGGREGATE }>;
+  REQUIRES_PREV_AGGREGATE extends boolean = false,
+> = REQUIRES_PREV_AGGREGATE extends true
+  ? (
+      event: $EVENT_DETAILS extends EventDetail
+        ? OptionalTimestamp<$EVENT_DETAILS>
+        : $EVENT_DETAILS,
+      options: { prevAggregate: $AGGREGATE; force?: boolean },
+    ) => Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>
+  : {
+      (
+        event: $EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS,
+        options: { prevAggregate: $AGGREGATE; force?: boolean },
+      ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
+      (
+        event: ($EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS) & { version: 1 },
+        options?: { prevAggregate?: undefined; force?: boolean },
+      ): Promise<{ event: EVENT_DETAILS; nextAggregate: AGGREGATE }>;
+      (
+        event: $EVENT_DETAILS extends EventDetail
+          ? OptionalTimestamp<$EVENT_DETAILS>
+          : $EVENT_DETAILS,
+        options?: { prevAggregate?: $AGGREGATE; force?: boolean },
+      ): Promise<{ event: EVENT_DETAILS; nextAggregate?: AGGREGATE }>;
+    };
 
 export type AggregateIdsLister = (
   listAggregateOptions?: ListAggregateIdsOptions,
 ) => Promise<ListAggregateIdsOutput>;
 
+/**
+ * Mirror of `EventPusher` for `groupEvent`: when `REQUIRES_PREV_AGGREGATE` is
+ * `true`, the call-site MUST pass a non-undefined `prevAggregate`. Default
+ * mode keeps the original (optional) signature.
+ */
 export type EventGrouper<
   EVENT_DETAILS extends EventDetail,
   $EVENT_DETAILS,
   AGGREGATE extends Aggregate,
   $AGGREGATE,
-> = (
-  event: $EVENT_DETAILS extends EventDetail
-    ? OptionalTimestamp<$EVENT_DETAILS>
-    : $EVENT_DETAILS,
-  options?: { prevAggregate?: $AGGREGATE },
-) => GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+  REQUIRES_PREV_AGGREGATE extends boolean = false,
+> = REQUIRES_PREV_AGGREGATE extends true
+  ? (
+      event: $EVENT_DETAILS extends EventDetail
+        ? OptionalTimestamp<$EVENT_DETAILS>
+        : $EVENT_DETAILS,
+      options: { prevAggregate: $AGGREGATE },
+    ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>
+  : (
+      event: $EVENT_DETAILS extends EventDetail
+        ? OptionalTimestamp<$EVENT_DETAILS>
+        : $EVENT_DETAILS,
+      options?: { prevAggregate?: $AGGREGATE },
+    ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>;
 
 export type EventGroupPusher = <
   GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]] = [

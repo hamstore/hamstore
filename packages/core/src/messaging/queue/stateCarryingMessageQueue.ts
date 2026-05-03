@@ -1,10 +1,11 @@
 import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 
 import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 import { StateCarryingMessageChannel } from '../channel/stateCarryingMessageChannel';
 
 export class StateCarryingMessageQueue<
-  EVENT_STORE extends EventStore = EventStore,
+  EVENT_STORE extends AnyEventStore = EventStore,
 > extends StateCarryingMessageChannel<EVENT_STORE> {
   constructor({
     messageQueueId,

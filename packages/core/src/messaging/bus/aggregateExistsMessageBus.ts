@@ -1,10 +1,11 @@
 import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 
 import { AggregateExistsMessageChannel } from '../channel/aggregateExistsMessageChannel';
 import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 
 export class AggregateExistsMessageBus<
-  EVENT_STORE extends EventStore = EventStore,
+  EVENT_STORE extends AnyEventStore = EventStore,
 > extends AggregateExistsMessageChannel<EVENT_STORE> {
   constructor({
     messageQueueId,

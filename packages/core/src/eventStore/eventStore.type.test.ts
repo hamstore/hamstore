@@ -22,6 +22,7 @@ import {
   PokemonEventDetails,
   pikachuAppearedEvent,
   pikachuCaughtEvent,
+  pikachuId,
 } from './eventStore.fixtures.test';
 
 // --- EXTENDS ---
@@ -121,6 +122,63 @@ const assertPushEventOutput: A.Equals<
   }>
 > = 1;
 assertPushEventOutput;
+
+// When `prevAggregate` is provided as a non-undefined value, the resulting
+// `nextAggregate` is statically guaranteed to be defined.
+const pushEventWithPrevAggregate = () =>
+  pokemonsEventStore.pushEvent(pikachuCaughtEvent, {
+    prevAggregate: {} as PokemonAggregate,
+  });
+
+const assertPushEventOutputWithPrevAggregate: A.Equals<
+  Awaited<ReturnType<typeof pushEventWithPrevAggregate>>,
+  { event: PokemonEventDetails; nextAggregate: PokemonAggregate }
+> = 1;
+assertPushEventOutputWithPrevAggregate;
+
+// When the event literal has `version: 1` (an initial event), the resulting
+// `nextAggregate` is statically guaranteed to be defined as well.
+const pushInitialEvent = () =>
+  pokemonsEventStore.pushEvent({
+    aggregateId: pikachuId,
+    version: 1,
+    type: 'POKEMON_APPEARED',
+    payload: { name: 'Pikachu', level: 42 },
+  });
+
+const assertPushEventOutputForInitialEvent: A.Equals<
+  Awaited<ReturnType<typeof pushInitialEvent>>,
+  { event: PokemonEventDetails; nextAggregate: PokemonAggregate }
+> = 1;
+assertPushEventOutputForInitialEvent;
+
+// When the event store is constructed with `requirePrevAggregate: true`, the
+// `pushEvent` and `groupEvent` methods always require a non-undefined
+// `prevAggregate` and always return a defined `nextAggregate`.
+const strictPokemonsEventStore = new EventStore({
+  eventStoreId: 'POKEMONS',
+  eventTypes: [pokemonAppearedEvent, pokemonCaughtEvent, pokemonLeveledUpEvent],
+  reducer: (a: PokemonAggregate, _e: PokemonEventDetails) => a,
+  requirePrevAggregate: true,
+});
+
+const assertStrictPushEventInput2: A.Equals<
+  Parameters<typeof strictPokemonsEventStore.pushEvent>[1],
+  { prevAggregate: PokemonAggregate; force?: boolean }
+> = 1;
+assertStrictPushEventInput2;
+
+const assertStrictPushEventOutput: A.Equals<
+  ReturnType<typeof strictPokemonsEventStore.pushEvent>,
+  Promise<{ event: PokemonEventDetails; nextAggregate: PokemonAggregate }>
+> = 1;
+assertStrictPushEventOutput;
+
+const assertStrictGroupEventInput2: A.Equals<
+  Parameters<typeof strictPokemonsEventStore.groupEvent>[1],
+  { prevAggregate: PokemonAggregate }
+> = 1;
+assertStrictGroupEventInput2;
 
 // --- GROUP EVENT ---
 

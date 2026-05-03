@@ -2,6 +2,7 @@
 import { GroupedEvent } from '~/event/groupedEvent';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
+import { MissingPrevAggregateError } from './errors/missingPrevAggregate';
 import { EventStore } from './eventStore';
 import {
   PokemonAggregate,
@@ -52,6 +53,7 @@ describe('event store', () => {
         'getAggregate',
         'getExistingAggregate',
         'simulateAggregate',
+        'requirePrevAggregate',
       ]),
     );
 
@@ -391,6 +393,67 @@ describe('event store', () => {
       );
 
       expect(response).toStrictEqual({ aggregateIds: [pikachuId] });
+    });
+  });
+
+  describe('requirePrevAggregate', () => {
+    const strictPokemonsEventStore = new EventStore({
+      eventStoreId: 'STRICT_POKEMONS',
+      eventTypes: pokemonsEventStore.eventTypes,
+      reducer: pokemonsReducer,
+      eventStorageAdapter: eventStorageAdapterMock,
+      requirePrevAggregate: true,
+    });
+
+    it('exposes requirePrevAggregate=true on the instance', () => {
+      expect(strictPokemonsEventStore.requirePrevAggregate).toBe(true);
+    });
+
+    it('throws MissingPrevAggregateError when pushEvent is called without prevAggregate', async () => {
+      pushEventMock.mockResolvedValue({ event: pikachuLeveledUpEvent });
+
+      await expect(() =>
+        strictPokemonsEventStore.pushEvent(
+          pikachuLeveledUpEvent as Parameters<
+            typeof strictPokemonsEventStore.pushEvent
+          >[0],
+          {} as Parameters<typeof strictPokemonsEventStore.pushEvent>[1],
+        ),
+      ).rejects.toThrow(
+        new MissingPrevAggregateError({
+          eventStoreId: strictPokemonsEventStore.eventStoreId,
+        }),
+      );
+    });
+
+    it('throws MissingPrevAggregateError when groupEvent is called without prevAggregate', () => {
+      expect(() =>
+        strictPokemonsEventStore.groupEvent(
+          pikachuLeveledUpEvent as Parameters<
+            typeof strictPokemonsEventStore.groupEvent
+          >[0],
+          {} as Parameters<typeof strictPokemonsEventStore.groupEvent>[1],
+        ),
+      ).toThrow(
+        new MissingPrevAggregateError({
+          eventStoreId: strictPokemonsEventStore.eventStoreId,
+        }),
+      );
+    });
+
+    it('does not throw when prevAggregate is provided', async () => {
+      pushEventMock.mockResolvedValue({ event: pikachuLeveledUpEvent });
+
+      const prevAggregate = pokemonsEventStore.buildAggregate([
+        pikachuAppearedEvent,
+        pikachuCaughtEvent,
+      ]) as PokemonAggregate;
+
+      await expect(
+        strictPokemonsEventStore.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate,
+        }),
+      ).resolves.toBeDefined();
     });
   });
 });

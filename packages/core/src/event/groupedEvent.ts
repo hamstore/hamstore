@@ -3,7 +3,7 @@ import type {
   EventStorageAdapter,
   EventStoreContext,
 } from '~/eventStorageAdapter';
-import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 
 import type { EventDetail, OptionalTimestamp } from './eventDetail';
 
@@ -20,7 +20,7 @@ export class GroupedEvent<
   prevAggregate?: AGGREGATE;
 
   eventStorageAdapter: EventStorageAdapter;
-  eventStore?: EventStore;
+  eventStore?: AnyEventStore;
 
   constructor({
     event,
@@ -32,7 +32,7 @@ export class GroupedEvent<
     event: OptionalTimestamp<EVENT_DETAILS>;
     context?: EventStoreContext;
     prevAggregate?: AGGREGATE;
-    eventStore?: EventStore;
+    eventStore?: AnyEventStore;
     eventStorageAdapter: EventStorageAdapter;
   }) {
     this.event = event;
