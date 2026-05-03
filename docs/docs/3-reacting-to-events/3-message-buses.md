@@ -30,6 +30,12 @@ await appMessageBus.publishMessage({
 // Similar for AggregateExistsMessageBus and StateCarryingMessageBus
 ```
 
+:::tip
+
+When using a `StateCarryingMessageBus` together with a [`ConnectedEventStore`](./4-connected-event-store.md), we recommend constructing the inner event store with `requirePrevAggregate: true` (see [Event Stores](../2-event-sourcing/3-event-stores.md)). The connected store needs the aggregate to enrich every published `StateCarryingMessage`; if the call-site already provided `prevAggregate`, the connected store can derive it directly and skip the extra `getAggregate` round-trip it would otherwise have to perform. As a side effect, `nextAggregate` is also always returned to the caller of `pushEvent`.
+
+:::
+
 Similarly to event stores, `MessageBus` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageBusAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
