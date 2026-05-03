@@ -105,7 +105,7 @@ export type GetAggregateOptions = {
   maxVersion?: number;
 };
 
-export type GetEventsAndAggregateOptions = {
+export type GetAggregateAndEventsOptions = {
   maxVersion?: number;
   /**
    * Lowest event version that MUST appear in the returned `events` array.
@@ -128,7 +128,7 @@ export type GetEventsAndAggregateOptions = {
  * `getAggregate` returns the rebuilt aggregate only.
  *
  * The previous shape (which also included `events` and `lastEvent`) is
- * available via `getEventsAndAggregate` / `getExistingEventsAndAggregate` for
+ * available via `getAggregateAndEvents` / `getExistingAggregateAndEvents` for
  * callers that need the underlying events. See the v3-to-v4 migration guide.
  */
 export type AggregateGetter<
@@ -151,13 +151,13 @@ export type AggregateGetter<
  * events with `version >= X` are returned (the aggregate still reflects the
  * entire history up to `maxVersion`).
  */
-export type EventsAndAggregateGetter<
+export type AggregateAndEventsGetter<
   EVENT_DETAIL extends EventDetail,
   AGGREGATE extends Aggregate,
   SHOULD_EXIST extends boolean = false,
 > = (
   aggregateId: string,
-  options?: GetEventsAndAggregateOptions,
+  options?: GetAggregateAndEventsOptions,
 ) => Promise<{
   aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
   events: EVENT_DETAIL[];

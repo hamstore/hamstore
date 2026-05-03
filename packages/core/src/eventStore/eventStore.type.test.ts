@@ -11,7 +11,7 @@ import {
   EventStoreAggregate,
   EventStoreEventDetails,
   GetAggregateOptions,
-  GetEventsAndAggregateOptions,
+  GetAggregateAndEventsOptions,
 } from '~/eventStore';
 
 import {
@@ -98,21 +98,21 @@ assertGetAggregateOutput;
 
 // --- GET EVENTS AND AGGREGATE ---
 
-const assertGetEventsAndAggregateInput: A.Equals<
-  Parameters<typeof pokemonsEventStore.getEventsAndAggregate>,
-  [aggregateId: string, options?: GetEventsAndAggregateOptions]
+const assertGetAggregateAndEventsInput: A.Equals<
+  Parameters<typeof pokemonsEventStore.getAggregateAndEvents>,
+  [aggregateId: string, options?: GetAggregateAndEventsOptions]
 > = 1;
-assertGetEventsAndAggregateInput;
+assertGetAggregateAndEventsInput;
 
-const assertGetEventsAndAggregateOutput: A.Equals<
-  ReturnType<typeof pokemonsEventStore.getEventsAndAggregate>,
+const assertGetAggregateAndEventsOutput: A.Equals<
+  ReturnType<typeof pokemonsEventStore.getAggregateAndEvents>,
   Promise<{
     aggregate: PokemonAggregate | undefined;
     events: PokemonEventDetails[];
     lastEvent: PokemonEventDetails | undefined;
   }>
 > = 1;
-assertGetEventsAndAggregateOutput;
+assertGetAggregateAndEventsOutput;
 
 // --- PUSH EVENTS ---
 
