@@ -55,8 +55,8 @@ describe('event store', () => {
         'buildAggregate',
         'getAggregate',
         'getExistingAggregate',
-        'getEventsAndAggregate',
-        'getExistingEventsAndAggregate',
+        'getAggregateAndEvents',
+        'getExistingAggregateAndEvents',
         'simulateAggregate',
       ]),
     );
@@ -136,10 +136,10 @@ describe('event store', () => {
     });
   });
 
-  describe('getEventsAndAggregate', () => {
+  describe('getAggregateAndEvents', () => {
     it('returns the rebuilt aggregate alongside its events', async () => {
       const response =
-        await pokemonsEventStore.getEventsAndAggregate(pikachuId);
+        await pokemonsEventStore.getAggregateAndEvents(pikachuId);
 
       expect(getEventsMock).toHaveBeenCalledTimes(1);
       expect(getEventsMock).toHaveBeenCalledWith(
@@ -158,7 +158,7 @@ describe('event store', () => {
     });
 
     it('returns events filtered by fromVersion (aggregate still reflects full history)', async () => {
-      const response = await pokemonsEventStore.getEventsAndAggregate(
+      const response = await pokemonsEventStore.getAggregateAndEvents(
         pikachuId,
         { fromVersion: 2 },
       );
@@ -176,7 +176,7 @@ describe('event store', () => {
     });
 
     it('treats fromVersion <= 1 the same as undefined', async () => {
-      const response = await pokemonsEventStore.getEventsAndAggregate(
+      const response = await pokemonsEventStore.getAggregateAndEvents(
         pikachuId,
         { fromVersion: 1 },
       );
@@ -185,10 +185,10 @@ describe('event store', () => {
     });
   });
 
-  describe('getExistingEventsAndAggregate', () => {
+  describe('getExistingAggregateAndEvents', () => {
     it('returns aggregate + events when it exists', async () => {
       const response =
-        await pokemonsEventStore.getExistingEventsAndAggregate(pikachuId);
+        await pokemonsEventStore.getExistingAggregateAndEvents(pikachuId);
 
       expect(response).toStrictEqual({
         aggregate: pikachuEventsMocks.reduce(
@@ -204,7 +204,7 @@ describe('event store', () => {
       getEventsMock.mockResolvedValue({ events: [] });
 
       await expect(() =>
-        pokemonsEventStore.getExistingEventsAndAggregate(pikachuId),
+        pokemonsEventStore.getExistingAggregateAndEvents(pikachuId),
       ).rejects.toThrow(
         new AggregateNotFoundError({
           eventStoreId: pokemonsEventStore.eventStoreId,

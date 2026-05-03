@@ -20,7 +20,7 @@ import type {
   EventGrouper,
   SideEffectsSimulator,
   AggregateGetter,
-  EventsAndAggregateGetter,
+  AggregateAndEventsGetter,
   AggregateSimulator,
   Reducer,
   ValidateEventDetail,
@@ -200,8 +200,8 @@ export class EventStore<
 
   getAggregate: AggregateGetter<AGGREGATE>;
   getExistingAggregate: AggregateGetter<AGGREGATE, true>;
-  getEventsAndAggregate: EventsAndAggregateGetter<EVENT_DETAILS, AGGREGATE>;
-  getExistingEventsAndAggregate: EventsAndAggregateGetter<
+  getAggregateAndEvents: AggregateAndEventsGetter<EVENT_DETAILS, AGGREGATE>;
+  getExistingAggregateAndEvents: AggregateAndEventsGetter<
     EVENT_DETAILS,
     AGGREGATE,
     true
@@ -326,7 +326,7 @@ export class EventStore<
     /**
      * Internal helper that loads events for an aggregate and reduces them.
      * Used by both `getAggregate` (which discards events) and
-     * `getEventsAndAggregate` (which returns them).
+     * `getAggregateAndEvents` (which returns them).
      */
     const rebuildAggregate = async (
       aggregateId: string,
@@ -370,7 +370,7 @@ export class EventStore<
       return { aggregate };
     };
 
-    this.getEventsAndAggregate = async (
+    this.getAggregateAndEvents = async (
       aggregateId,
       { maxVersion, fromVersion } = {},
     ) => {
@@ -388,9 +388,9 @@ export class EventStore<
       return { aggregate, events, lastEvent };
     };
 
-    this.getExistingEventsAndAggregate = async (aggregateId, options) => {
+    this.getExistingAggregateAndEvents = async (aggregateId, options) => {
       const { aggregate, events, lastEvent } =
-        await this.getEventsAndAggregate(aggregateId, options);
+        await this.getAggregateAndEvents(aggregateId, options);
 
       if (aggregate === undefined || lastEvent === undefined) {
         throw new AggregateNotFoundError({
