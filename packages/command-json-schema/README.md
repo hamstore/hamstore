@@ -1,5 +1,8 @@
 # JSON Schema Command
 
+> [!NOTE]
+> This package provides type inference only and does **not** perform runtime validation of command inputs or outputs. If you need runtime validation, consider using [`@hamstore/command-standard-schema`](../command-standard-schema), which supports validation via the [Standard Schema](https://standardschema.dev/) interface (compatible with Zod, Valibot, ArkType, and more).
+
 DRY Hamstore [`Command`](https://hamstore.github.io/hamstore/docs/event-sourcing/pushing-events/) definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts).
 
 ## 📥 Installation

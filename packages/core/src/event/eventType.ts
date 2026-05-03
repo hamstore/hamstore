@@ -1,6 +1,28 @@
 import type { EventDetail } from './eventDetail';
 import { reservedEventTypes } from './reservedEventTypes';
 
+export type ParsedEventDetail<T> =
+  | {
+      isValid: true;
+      parsedEventDetail: T;
+      parsingErrors?: never;
+    }
+  | {
+      isValid: false;
+      parsedEventDetail?: never;
+      parsingErrors: [Error, ...Error[]];
+    };
+
+export type EventDetailParser<
+  TYPE extends string = string,
+  PAYLOAD = unknown,
+  METADATA = unknown,
+> = (
+  candidate: EventDetail,
+) =>
+  | ParsedEventDetail<EventDetail<TYPE, PAYLOAD, METADATA>>
+  | Promise<ParsedEventDetail<EventDetail<TYPE, PAYLOAD, METADATA>>>;
+
 export class EventType<
   TYPE extends string = string,
   PAYLOAD = string extends TYPE ? unknown : never,
@@ -10,19 +32,15 @@ export class EventType<
     detail: EventDetail<TYPE, PAYLOAD, METADATA>;
   };
   type: TYPE;
-  parseEventDetail?: (candidate: unknown) =>
-    | {
-        isValid: true;
-        parsedEventDetail: EventDetail<TYPE, PAYLOAD, METADATA>;
-        parsingErrors?: never;
-      }
-    | {
-        isValid: false;
-        parsedEventDetail?: never;
-        parsingErrors?: [Error, ...Error[]];
-      };
+  parseEventDetail?: EventDetailParser<TYPE, PAYLOAD, METADATA>;
 
-  constructor({ type }: { type: TYPE }) {
+  constructor({
+    type,
+    parseEventDetail,
+  }: {
+    type: TYPE;
+    parseEventDetail?: EventDetailParser<TYPE, PAYLOAD, METADATA>;
+  }) {
     if (reservedEventTypes.has(type)) {
       throw new Error(
         `${type} is a reserved event type. Please chose another one.`,
@@ -30,6 +48,9 @@ export class EventType<
     }
 
     this.type = type;
+    if (parseEventDetail !== undefined) {
+      this.parseEventDetail = parseEventDetail;
+    }
   }
 }
 
