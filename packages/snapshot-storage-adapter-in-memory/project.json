@@ -1,0 +1,7 @@
+{
+  "name": "snapshot-storage-adapter-in-memory",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "tags": [],
+  "implicitDependencies": ["core"]
+}
