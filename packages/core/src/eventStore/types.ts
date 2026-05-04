@@ -105,31 +105,37 @@ export type GetAggregateOptions = {
   maxVersion?: number;
 };
 
+/**
+ * Selects which events are returned by `getAggregateAndEvents`. Exactly one
+ * of `fromVersion`, `fromLatestSnapshot` or `lastN` may be set; when none is
+ * set, the returned `events` array is the full event history.
+ *
+ * - `fromVersion: N` — events with `version >= N`. The latest applicable
+ *   snapshot is used regardless of its position relative to `N`; the events
+ *   fetch covers `[min(snapshot.version + 1, N), maxVersion]` in a single
+ *   range so both aggregate replay and event return are satisfied.
+ * - `fromLatestSnapshot: true` — events read on top of the latest applicable
+ *   snapshot. Falls back to the full history when no snapshot applies.
+ * - `lastN: K` — guarantees at least the last `K` events of the aggregate's
+ *   history (up to `maxVersion`); missing earlier events are re-fetched if
+ *   the snapshot covers them.
+ */
 export type GetAggregateAndEventsOptions = {
   maxVersion?: number;
-  /**
-   * Lowest event version that MUST appear in the returned `events` array.
-   * Defaults to `1` (i.e. the full event history).
-   *
-   * Used to support incremental projections / "events since checkpoint"
-   * patterns: a caller that has already processed events up to version
-   * `V` can ask for `fromVersion: V + 1` and receive only the new events,
-   * alongside the up-to-date aggregate.
-   *
-   * When the EventStore has snapshots configured, `fromVersion` also
-   * bounds which snapshot may seed the aggregate: only snapshots whose
-   * `aggregate.version < fromVersion` are eligible. Otherwise the full
-   * history is read.
-   */
-  fromVersion?: number;
-};
+} & (
+  | { fromVersion?: number; fromLatestSnapshot?: never; lastN?: never }
+  | { fromVersion?: never; fromLatestSnapshot: true; lastN?: never }
+  | { fromVersion?: never; fromLatestSnapshot?: never; lastN: number }
+);
 
 /**
  * `getAggregate` returns the rebuilt aggregate only.
  *
  * The previous shape (which also included `events` and `lastEvent`) is
  * available via `getAggregateAndEvents` / `getExistingAggregateAndEvents` for
- * callers that need the underlying events. See the v3-to-v4 migration guide.
+ * callers that need the underlying events. This split lets snapshot-backed
+ * reads avoid materialising a partial event list. See the v3-to-v4 migration
+ * guide.
  */
 export type AggregateGetter<
   AGGREGATE extends Aggregate,
@@ -142,27 +148,44 @@ export type AggregateGetter<
 }>;
 
 /**
- * Full-history aggregate getter — returns the rebuilt aggregate plus the
- * events that produced it. This replaces the legacy `getAggregate` return
- * shape.
+ * `true` if `OPT` opts into one of the event-filtering modes that may
+ * legitimately yield an empty `events` array (and therefore an undefined
+ * `lastEvent`) for an existing aggregate. Default reads (no options or
+ * `maxVersion` only) always materialise the full event history.
+ */
+type FiltersEvents<OPT> = OPT extends
+  | { fromVersion: number }
+  | { fromLatestSnapshot: true }
+  | { lastN: number }
+  ? true
+  : false;
+
+/**
+ * Full-history aggregate getter. By default the returned `events` array is
+ * the complete event history up to `maxVersion`; the range can be narrowed
+ * via {@link GetAggregateAndEventsOptions}. The aggregate always reflects
+ * the entire history regardless of which range is chosen.
  *
- * By default (`fromVersion` unset / `1`), `events` is the complete event
- * history of the aggregate up to `maxVersion`. With `fromVersion: X`, only
- * events with `version >= X` are returned (the aggregate still reflects the
- * entire history up to `maxVersion`).
+ * For `getExistingAggregateAndEvents` (`SHOULD_EXIST = true`) called without
+ * an event-filtering option (`fromVersion` / `fromLatestSnapshot` / `lastN`),
+ * the events array is necessarily non-empty so `lastEvent` is typed as
+ * `EVENT_DETAIL`; with a filtering option (or the non-existing variant) the
+ * array can be empty and `lastEvent` may be `undefined`.
  */
 export type AggregateAndEventsGetter<
   EVENT_DETAIL extends EventDetail,
   AGGREGATE extends Aggregate,
   SHOULD_EXIST extends boolean = false,
-> = (
+> = <OPT extends GetAggregateAndEventsOptions = GetAggregateAndEventsOptions>(
   aggregateId: string,
-  options?: GetAggregateAndEventsOptions,
+  options?: OPT,
 ) => Promise<{
   aggregate: SHOULD_EXIST extends true ? AGGREGATE : AGGREGATE | undefined;
   events: EVENT_DETAIL[];
   lastEvent: SHOULD_EXIST extends true
-    ? EVENT_DETAIL
+    ? FiltersEvents<OPT> extends true
+      ? EVENT_DETAIL | undefined
+      : EVENT_DETAIL
     : EVENT_DETAIL | undefined;
 }>;
 

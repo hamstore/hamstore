@@ -114,6 +114,33 @@ const assertGetAggregateAndEventsOutput: A.Equals<
 > = 1;
 assertGetAggregateAndEventsOutput;
 
+// `getExistingAggregateAndEvents` narrows `lastEvent` to `EVENT_DETAIL` for
+// the default / `maxVersion`-only call shape, since the events array is the
+// full aggregate history (and an existing aggregate has at least one event).
+const assertGetExistingAggregateAndEventsDefaultLastEvent: A.Equals<
+  Awaited<
+    ReturnType<typeof pokemonsEventStore.getExistingAggregateAndEvents>
+  >['lastEvent'],
+  PokemonEventDetails
+> = 1;
+assertGetExistingAggregateAndEventsDefaultLastEvent;
+
+// With an event-filtering option, `lastEvent` widens back to
+// `EVENT_DETAIL | undefined` because the returned events array can be empty
+// (e.g. `fromVersion` past the aggregate's last version, an empty tail on top
+// of a snapshot, or `lastN: 0`).
+const assertGetExistingAggregateAndEventsFromVersionLastEvent: A.Equals<
+  Awaited<
+    ReturnType<
+      typeof pokemonsEventStore.getExistingAggregateAndEvents<{
+        fromVersion: number;
+      }>
+    >
+  >['lastEvent'],
+  PokemonEventDetails | undefined
+> = 1;
+assertGetExistingAggregateAndEventsFromVersionLastEvent;
+
 // --- PUSH EVENTS ---
 
 const assertPushEventInput1: A.Equals<

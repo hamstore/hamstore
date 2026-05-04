@@ -31,6 +31,23 @@ export type {
   EventStoreAggregate,
   Reducer,
 } from './eventStore';
+export {
+  cleanUpOutdatedSnapshots,
+  compileSnapshotPolicy,
+  UndefinedSnapshotStorageAdapterError,
+} from './snapshot';
+export type {
+  Snapshot,
+  SnapshotKey,
+  SnapshotConfig,
+  SnapshotPolicy,
+  SnapshotStorageAdapter,
+  ListSnapshotsOptions,
+  ListSnapshotsOutput,
+  PruningPolicy,
+  ShouldSaveSnapshot,
+  ShouldSaveSnapshotArgs,
+} from './snapshot';
 export { ConnectedEventStore } from './connectedEventStore';
 export { Command, tuple } from './command/command';
 export type {
