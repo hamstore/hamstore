@@ -52,6 +52,7 @@ describe('event store', () => {
         'getSnapshotStorageAdapter',
         '_snapshotConfig',
         '_compiledShouldSaveSnapshot',
+        '_compiledShouldSaveSnapshotOnWrite',
         '_compiledShouldKeepSnapshot',
         'getEvents',
         'pushEvent',

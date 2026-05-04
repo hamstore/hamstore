@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 
 import type { Snapshot, SnapshotKey } from './snapshotStorageAdapter';
@@ -108,6 +109,38 @@ export type PruningPolicy =
   | { strategy: 'KEEP_NEWER_THAN_MS'; ageMs: number }
   | { strategy: 'CUSTOM'; shouldKeep: ShouldKeepSnapshot };
 
+/**
+ * When the EventStore should attempt to save a snapshot.
+ *
+ * - `'write'` (default) — save fires after a successful `pushEvent` /
+ *   `pushEventGroup`, when `nextAggregate` was computed (i.e. caller
+ *   supplied `prevAggregate`, or the event was `version: 1`). This is the
+ *   recommended default: snapshot saves are correlated with mutations,
+ *   reads stay read-only, and concurrent reads cannot race the save.
+ *
+ *   Caveat: the write path does not have the previous snapshot in scope, so
+ *   policies that rely on it are evaluated in a stateless mode:
+ *     - `EVERY_N_VERSIONS` fires when `aggregate.version % periodInVersions
+ *       === 0`. Equivalent steady-state spacing to the read-path version
+ *       that subtracts from the previous snapshot.
+ *     - `EVERY_N_MS_SINCE_LAST` and `AUTO` cannot evaluate without the
+ *       previous snapshot's `savedAt`, so they silently skip on the write
+ *       path. Use `'read'` or `'both'` if you need time-based policies.
+ *     - `CUSTOM` is invoked with `previousSnapshot: undefined`; your
+ *       predicate decides.
+ *
+ * - `'read'` — save fires inside `getAggregate` /
+ *   `getAggregateAndEvents` after the aggregate is rebuilt, with full
+ *   knowledge of the previous snapshot. Use this when events are written
+ *   directly to storage (bulk import, replay-from-other-system) and never
+ *   flow through `pushEvent`.
+ *
+ * - `'both'` — both paths attempt to save; storage writes are idempotent so
+ *   concurrent saves at the same `savedAt` are harmless. Useful when most
+ *   pushes go through `pushEvent` but you also occasionally bulk-import.
+ */
+export type SnapshotSaveTrigger = 'write' | 'read' | 'both';
+
 export interface SnapshotConfig<AGGREGATE extends Aggregate = Aggregate> {
   /**
    * Reducer fingerprint. Bump whenever the reducer's logic or the aggregate
@@ -121,6 +154,13 @@ export interface SnapshotConfig<AGGREGATE extends Aggregate = Aggregate> {
    *     currentReducerVersion: 'v3',
    */
   currentReducerVersion: string;
+
+  /**
+   * When to attempt snapshot saves. Defaults to `'write'`. See
+   * `SnapshotSaveTrigger` for trade-offs and the policy-evaluation caveats
+   * for the write path.
+   */
+  saveOn?: SnapshotSaveTrigger;
 
   /** When to save snapshots. */
   policy: SnapshotPolicy<AGGREGATE>;

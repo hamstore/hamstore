@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 
 import type {
@@ -127,13 +128,65 @@ export const compileSnapshotPolicy = <AGGREGATE extends Aggregate>(
   }
 };
 
-const compileAutoPolicy = (policy: {
+/**
+ * Like `compileSnapshotPolicy`, but produces a predicate suitable for the
+ * **write path** — i.e. evaluated *after* a `pushEvent` /
+ * `pushEventGroup` succeeds and the new aggregate is in scope, **without**
+ * the previous snapshot.
+ *
+ * Strategies that fundamentally need the previous snapshot to compute a
+ * spacing decision are evaluated in a stateless mode (or skipped):
+ *
+ * - `EVERY_N_VERSIONS` — fires when `aggregate.version > 0 &&
+ *   aggregate.version % periodInVersions === 0`. Equivalent steady-state
+ *   spacing to the read-path version that subtracts from the previous
+ *   snapshot's version.
+ * - `EVERY_N_MS_SINCE_LAST` — silently returns `false` (no time data
+ *   without the previous snapshot's `savedAt`). Users who need time-based
+ *   policies should set `saveOn: 'read'` or `saveOn: 'both'`.
+ * - `AUTO` — silently returns `false` for the same reason as above.
+ * - `CUSTOM` — invoked with `previousSnapshot: undefined`; the user
+ *   predicate decides.
+ * - `NONE` — returns `false`.
+ */
+export const compileWritePathSnapshotPolicy = <AGGREGATE extends Aggregate>(
+  policy: SnapshotPolicy<AGGREGATE>,
+): ShouldSaveSnapshot<AGGREGATE> => {
+  switch (policy.strategy) {
+    case 'NONE':
+      return () => false;
+
+    case 'EVERY_N_VERSIONS': {
+      validatePositive('periodInVersions', policy.periodInVersions);
+      const period = policy.periodInVersions;
+
+      return ({ aggregate }) =>
+        aggregate.version > 0 && aggregate.version % period === 0;
+    }
+
+    case 'EVERY_N_MS_SINCE_LAST': {
+      validatePositive('periodInMs', policy.periodInMs);
+
+      return () => false;
+    }
+
+    case 'AUTO':
+      validateAutoPolicy(policy); // throws on bad config
+
+      return () => false;
+
+    case 'CUSTOM':
+      return policy.shouldSaveSnapshot as ShouldSaveSnapshot<AGGREGATE>;
+  }
+};
+
+const validateAutoPolicy = (policy: {
   strategy: 'AUTO';
   minPeriodInVersions?: number;
   maxPeriodInVersions?: number;
   minPeriodInMs?: number;
   maxPeriodInMs?: number;
-}): ShouldSaveSnapshot => {
+}): void => {
   const minPeriodInVersions =
     policy.minPeriodInVersions ?? AUTO_DEFAULTS.minPeriodInVersions;
   const maxPeriodInVersions =
@@ -157,12 +210,24 @@ const compileAutoPolicy = (policy: {
       'Invalid SnapshotPolicy AUTO: minPeriodInMs > maxPeriodInMs',
     );
   }
+};
+
+const compileAutoPolicy = (policy: {
+  strategy: 'AUTO';
+  minPeriodInVersions?: number;
+  maxPeriodInVersions?: number;
+  minPeriodInMs?: number;
+  maxPeriodInMs?: number;
+}): ShouldSaveSnapshot => {
+  validateAutoPolicy(policy);
 
   return auto({
-    minPeriodInVersions,
-    maxPeriodInVersions,
-    minPeriodInMs,
-    maxPeriodInMs,
+    minPeriodInVersions:
+      policy.minPeriodInVersions ?? AUTO_DEFAULTS.minPeriodInVersions,
+    maxPeriodInVersions:
+      policy.maxPeriodInVersions ?? AUTO_DEFAULTS.maxPeriodInVersions,
+    minPeriodInMs: policy.minPeriodInMs ?? AUTO_DEFAULTS.minPeriodInMs,
+    maxPeriodInMs: policy.maxPeriodInMs ?? AUTO_DEFAULTS.maxPeriodInMs,
   });
 };
 
