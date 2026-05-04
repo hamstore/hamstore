@@ -70,7 +70,9 @@ You can choose to build a snapshot storage adapter that suits your usage. We rec
 
 ## When to save: `SnapshotPolicy`
 
-The `policy` field of a `SnapshotConfig` decides whether to persist a new snapshot after a successful `getAggregate` call. It is a discriminated union — pick the strategy that matches the access pattern of your aggregate.
+The `policy` field of a `SnapshotConfig` decides whether to persist a new snapshot after a successful read or write. It is a discriminated union — pick the strategy that matches the access pattern of your aggregate.
+
+The trigger that lets the EventStore consider a save in the first place is controlled by [`saveOn`](#which-path-triggers-the-save-saveon) (default `'write'`). The policy then decides whether the candidate save fires.
 
 ### `NONE`
 
@@ -130,6 +132,26 @@ Bring your own predicate when none of the built-in strategies fits:
 ```
 
 The arguments are documented under `ShouldSaveSnapshotArgs` in the reference block at the bottom of this page.
+
+## Which path triggers the save: `saveOn`
+
+`SnapshotConfig.saveOn` controls which code path is allowed to attempt a snapshot save. It defaults to `'write'`.
+
+```ts
+type SnapshotSaveTrigger = 'write' | 'read' | 'both';
+```
+
+- `'write'` (default) — save fires after a successful `pushEvent` / `pushEventGroup` if the policy says so. The push needs to know the aggregate's new state, so this only triggers when `nextAggregate` was computed (typically when `prevAggregate` was passed, or for the first event of a new aggregate). No previous snapshot is in scope on this path; see the policy caveats below.
+- `'read'` — save fires after `getAggregate` / `getExistingAggregate` / `getAggregateAndEvents` rebuilt the aggregate, using the seed snapshot it was rebuilt from as `previousSnapshot`. This is the only mode that gives the policy full information about the previous snapshot, but it makes reads side-effectful and can race when the same aggregate is read concurrently.
+- `'both'` — both paths attempt saves. `putSnapshot` is idempotent at the storage layer, so this is safe but does extra work; useful when most aggregates are mutated through `pushEvent` but some are also written outside hamstore (bulk import, replay) and you still want reads to keep them snapshotted.
+
+### Policy evaluation on the write path
+
+The write path does not have a `previousSnapshot` in scope. To avoid a hidden `getLatestSnapshot` round-trip on every push, policies degrade as follows:
+
+- `EVERY_N_VERSIONS` — evaluated statelessly: `aggregate.version > 0 && aggregate.version % periodInVersions === 0`. Equivalent steady-state behaviour, no extra fetch.
+- `EVERY_N_MS_SINCE_LAST` and `AUTO` — cannot be evaluated without `previousSnapshot`, so the write-path always returns `false` for these. Set `saveOn: 'read'` or `'both'` if you need time-based saves.
+- `CUSTOM` — your predicate is called with `previousSnapshot: undefined`. Decide what makes sense for your aggregate.
 
 ## What to keep: `PruningPolicy`
 
@@ -375,6 +397,7 @@ The simplest reference implementation is [`@hamstore/snapshot-storage-adapter-in
 **`SnapshotConfig`:**
 
 - <code>currentReducerVersion <i>(string)</i></code>: The current reducer fingerprint. Snapshots written under a different value are never silently applied — they are migrated by `migrateSnapshotReducerVersion` if configured, or ignored otherwise.
+- <code>saveOn <i>(?'write' | 'read' | 'both')</i></code>: Which code path may attempt a save. Defaults to `'write'`. See [`saveOn`](#which-path-triggers-the-save-saveon).
 - <code>policy <i>(SnapshotPolicy)</i></code>: When to save snapshots. See [save policies](#when-to-save-snapshotpolicy).
 - <code>pruning <i>(?PruningPolicy)</i></code>: What to do with older snapshots after a successful save. Defaults to `{ strategy: 'NONE' }`. See [pruning policies](#what-to-keep-pruningpolicy).
 - <code>migrateSnapshotReducerVersion <i>(?(snapshot: Snapshot) => Promise&lt;Snapshot | undefined&gt; | Snapshot | undefined)</i></code>: Optional migrator invoked when a snapshot under a different `reducerVersion` is found. Returning the migrated snapshot uses it as the seed; returning `undefined` rebuilds from events.
