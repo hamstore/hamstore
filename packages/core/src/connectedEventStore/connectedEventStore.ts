@@ -18,6 +18,7 @@ import type {
 } from '~/eventStore';
 import type { EventStoreMessageChannel } from '~/messaging';
 import type {
+  Snapshot,
   SnapshotConfig,
   SnapshotStorageAdapter,
 } from '~/snapshot';
@@ -203,5 +204,52 @@ export class ConnectedEventStore<
 
   get snapshotConfig(): SnapshotConfig<$AGGREGATE> | undefined {
     return this.eventStore.snapshotConfig;
+  }
+
+  _tryPersistSnapshot(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): void {
+    this.eventStore._tryPersistSnapshot(args);
+  }
+
+  _snapshotSaveAllowed(source: 'read' | 'write'): boolean {
+    return this.eventStore._snapshotSaveAllowed(source);
+  }
+
+  async _persistSnapshotIfPolicy(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): Promise<void> {
+    await this.eventStore._persistSnapshotIfPolicy(args);
+  }
+
+  _buildSnapshotIfPolicyFires(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): Snapshot<$AGGREGATE> | undefined {
+    return this.eventStore._buildSnapshotIfPolicyFires(args);
+  }
+
+  _snapshotPolicyFires(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): boolean {
+    return this.eventStore._snapshotPolicyFires(args);
+  }
+
+  async _pruneSnapshotsAfterSave(args: {
+    aggregateId: string;
+    newSnapshot: Snapshot<$AGGREGATE>;
+  }): Promise<void> {
+    await this.eventStore._pruneSnapshotsAfterSave(args);
   }
 }

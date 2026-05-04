@@ -10,6 +10,7 @@ import type {
 import {
   compilePruningPolicy,
   compileSnapshotPolicy,
+  compileWritePathSnapshotPolicy,
   UndefinedSnapshotStorageAdapterError,
 } from '~/snapshot';
 import type {
@@ -103,6 +104,20 @@ export class EventStore<
       },
     );
 
+    for (let eventIndex = 0; eventIndex < groupedEvents.length; eventIndex++) {
+      const eventStore = groupedEvents[eventIndex]?.eventStore;
+      const pushed = eventGroupWithAggregates[eventIndex];
+      const nextAggregate = pushed?.nextAggregate;
+      if (eventStore !== undefined && nextAggregate !== undefined) {
+        eventStore._tryPersistSnapshot({
+          aggregate: nextAggregate,
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          source: 'write',
+        });
+      }
+    }
+
     await Promise.all(
       groupedEvents.map((groupedEvent, eventIndex) => {
         const eventStore = groupedEvent.eventStore;
@@ -170,8 +185,20 @@ export class EventStore<
    * issues across duplicated package copies). Should be considered internal.
    */
   _snapshotConfig?: SnapshotConfig<$AGGREGATE>;
-  /** Cached `compileSnapshotPolicy(policy)`; invalidated on config writes. */
+  /**
+   * Cached read-path predicate: `compileSnapshotPolicy(policy)`. Used inside
+   * `getAggregate` / `getAggregateAndEvents` where the previous snapshot is
+   * in scope. Invalidated on config writes.
+   */
   _compiledShouldSaveSnapshot?: ShouldSaveSnapshot<$AGGREGATE>;
+  /**
+   * Cached write-path predicate:
+   * `compileWritePathSnapshotPolicy(policy)`. Used after a successful
+   * `pushEvent` / `pushEventGroup` where there is no previous snapshot in
+   * scope. Time-based strategies degrade to `() => false`. Invalidated on
+   * config writes.
+   */
+  _compiledShouldSaveSnapshotOnWrite?: ShouldSaveSnapshot<$AGGREGATE>;
   /** Cached `compilePruningPolicy(pruning)`; invalidated on config writes. */
   _compiledShouldKeepSnapshot?: ShouldKeepSnapshot;
 
@@ -185,6 +212,10 @@ export class EventStore<
       config === undefined
         ? undefined
         : compileSnapshotPolicy(config.policy);
+    this._compiledShouldSaveSnapshotOnWrite =
+      config === undefined
+        ? undefined
+        : compileWritePathSnapshotPolicy(config.policy);
     const pruning = config?.pruning;
     this._compiledShouldKeepSnapshot =
       pruning === undefined || pruning.strategy === 'NONE'
@@ -275,6 +306,15 @@ export class EventStore<
         ...(nextAggregate !== undefined ? { nextAggregate } : {}),
       };
 
+      if (nextAggregate !== undefined) {
+        this._tryPersistSnapshot({
+          aggregate: nextAggregate as unknown as $AGGREGATE,
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          source: 'write',
+        });
+      }
+
       if (this.onEventPushed !== undefined) {
         await this.onEventPushed(
           response as unknown as {
@@ -335,26 +375,26 @@ export class EventStore<
     };
 
     /**
-     * Fire-and-forget snapshot save when configured. Intentionally void; any
-     * error inside `maybePersistSnapshot` is swallowed there.
+     * Read-path snapshot save shim. Delegates to the instance method so the
+     * write-path code (in `pushEvent` and the static `pushEventGroup`) can
+     * share the same logic.
      */
     const tryPersistSnapshot = (
       aggregate: AGGREGATE | undefined,
       previousSnapshot: Snapshot<AGGREGATE> | undefined,
       newEventCount: number,
     ): void => {
-      if (
-        aggregate === undefined ||
-        this.snapshotConfig === undefined ||
-        this.snapshotStorageAdapter === undefined
-      ) {
+      if (aggregate === undefined) {
         return;
       }
 
-      void maybePersistSnapshot({
-        aggregate,
-        previousSnapshot,
+      this._tryPersistSnapshot({
+        aggregate: aggregate as unknown as $AGGREGATE,
+        previousSnapshot: previousSnapshot as unknown as
+          | Snapshot<$AGGREGATE>
+          | undefined,
         newEventCount,
+        source: 'read',
       });
     };
 
@@ -538,130 +578,6 @@ export class EventStore<
 
         return undefined;
       }
-    };
-
-    /**
-     * Decide whether to save a snapshot, save it, and prune older snapshots
-     * according to the configured pruning policy. Always called in a
-     * "fire-and-forget" fashion by the read path, so all errors are caught
-     * here and never propagate.
-     */
-    const shouldPersistNewSnapshot = (args: {
-      aggregate: AGGREGATE;
-      previousSnapshot: Snapshot<AGGREGATE> | undefined;
-      newEventCount: number;
-      config: SnapshotConfig<$AGGREGATE>;
-    }): boolean => {
-      if (
-        args.aggregate.version <= 0 ||
-        args.previousSnapshot?.aggregate.version === args.aggregate.version
-      ) {
-        return false;
-      }
-
-      const shouldSaveSnapshot = this._compiledShouldSaveSnapshot;
-      if (shouldSaveSnapshot === undefined) {
-        return false;
-      }
-
-      return shouldSaveSnapshot({
-        aggregate: args.aggregate as unknown as $AGGREGATE,
-        previousSnapshot: args.previousSnapshot as unknown as
-          | Snapshot<$AGGREGATE>
-          | undefined,
-        newEventCount: args.newEventCount,
-        now: new Date(),
-      });
-    };
-
-    const maybePersistSnapshot = async (args: {
-      aggregate: AGGREGATE;
-      previousSnapshot: Snapshot<AGGREGATE> | undefined;
-      newEventCount: number;
-    }): Promise<void> => {
-      try {
-        const config = this.snapshotConfig;
-        const adapter = this.snapshotStorageAdapter;
-        if (config === undefined || adapter === undefined) {
-          return;
-        }
-
-        if (!shouldPersistNewSnapshot({ ...args, config })) {
-          return;
-        }
-
-        const newSnapshot: Snapshot<AGGREGATE> = {
-          aggregate: args.aggregate,
-          reducerVersion: config.currentReducerVersion,
-          eventStoreId: this.eventStoreId,
-          savedAt: new Date().toISOString(),
-        };
-
-        await adapter.putSnapshot(newSnapshot, {
-          eventStoreId: this.eventStoreId,
-        });
-
-        await pruneSnapshotsAfterSave({
-          aggregateId: args.aggregate.aggregateId,
-          newSnapshot,
-        });
-      } catch (error) {
-        this.snapshotConfig?.onSnapshotError?.({
-          phase: 'save',
-          aggregateId: args.aggregate.aggregateId,
-          eventStoreId: this.eventStoreId,
-          error,
-        });
-      }
-    };
-
-    const pruneSnapshotsAfterSave = async (args: {
-      aggregateId: string;
-      newSnapshot: Snapshot<AGGREGATE>;
-    }): Promise<void> => {
-      if (
-        this.snapshotConfig === undefined ||
-        this.snapshotStorageAdapter === undefined
-      ) {
-        return;
-      }
-      const shouldKeep = this._compiledShouldKeepSnapshot;
-      if (shouldKeep === undefined) {
-        return;
-      }
-
-      const adapter = this.snapshotStorageAdapter;
-      const ctx = { eventStoreId: this.eventStoreId };
-      const reducerVersion = this.snapshotConfig.currentReducerVersion;
-      const now = new Date(args.newSnapshot.savedAt);
-
-      let pageToken: string | undefined = undefined;
-      let position = 0;
-
-      do {
-        const { snapshotKeys, nextPageToken } = await adapter.listSnapshots(
-          ctx,
-          {
-            aggregateId: args.aggregateId,
-            reducerVersion,
-            reverse: true,
-            maxVersion: args.newSnapshot.aggregate.version,
-            pageToken,
-          },
-        );
-
-        for (const key of snapshotKeys) {
-          const ageMs = now.getTime() - new Date(key.savedAt).getTime();
-          if (shouldKeep({ key, position, ageMs, now })) {
-            position += 1;
-            continue;
-          }
-          await adapter.deleteSnapshot(key, ctx);
-          position += 1;
-        }
-
-        pageToken = nextPageToken;
-      } while (pageToken !== undefined);
     };
 
     this.getAggregate = async (aggregateId, { maxVersion } = {}) => {
@@ -874,5 +790,195 @@ export class EventStore<
 
       return this.buildAggregate(sortedEventsWithSideEffects);
     };
+  }
+
+  /**
+   * Internal helper used by both the read path
+   * (`getAggregate`/`getAggregateAndEvents`) and the write path
+   * (`pushEvent`/`pushEventGroup`) to fire-and-forget a snapshot save.
+   *
+   * Decides based on `snapshotConfig.saveOn` (default `'write'`) whether
+   * `source` is allowed to save, then evaluates the appropriate compiled
+   * predicate (read-path uses the previous-snapshot-aware variant;
+   * write-path uses the stateless variant).
+   *
+   * Always returns synchronously; the underlying save/prune work runs in a
+   * detached promise so callers never block on it. All errors are caught
+   * inside `_persistSnapshotIfPolicy` and routed through `onSnapshotError`.
+   *
+   * Underscored (no `private` keyword) for the same reason as
+   * `_snapshotConfig` — TS structural-compatibility across duplicated
+   * package copies. Should be considered internal.
+   */
+  _tryPersistSnapshot(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): void {
+    if (!this._snapshotSaveAllowed(args.source)) {
+      return;
+    }
+
+    void this._persistSnapshotIfPolicy(args);
+  }
+
+  /**
+   * Returns `true` if the EventStore is configured for snapshot saves and
+   * the configured `saveOn` permits saves from the given source.
+   */
+  _snapshotSaveAllowed(source: 'read' | 'write'): boolean {
+    const config = this.snapshotConfig;
+    if (config === undefined || this.snapshotStorageAdapter === undefined) {
+      return false;
+    }
+    const saveOn = config.saveOn ?? 'write';
+
+    return source === 'read'
+      ? saveOn === 'read' || saveOn === 'both'
+      : saveOn === 'write' || saveOn === 'both';
+  }
+
+  /**
+   * Async portion of `_tryPersistSnapshot`. Evaluates the appropriate
+   * compiled predicate, persists the snapshot, then prunes. All errors are
+   * caught here and routed through `onSnapshotError`.
+   */
+  async _persistSnapshotIfPolicy(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): Promise<void> {
+    try {
+      const newSnapshot = this._buildSnapshotIfPolicyFires(args);
+      if (newSnapshot === undefined) {
+        return;
+      }
+      const adapter = this.snapshotStorageAdapter;
+      if (adapter === undefined) {
+        return;
+      }
+
+      await adapter.putSnapshot(newSnapshot as unknown as Snapshot, {
+        eventStoreId: this.eventStoreId,
+      });
+
+      await this._pruneSnapshotsAfterSave({
+        aggregateId: args.aggregate.aggregateId,
+        newSnapshot,
+      });
+    } catch (error) {
+      this.snapshotConfig?.onSnapshotError?.({
+        phase: 'save',
+        aggregateId: args.aggregate.aggregateId,
+        eventStoreId: this.eventStoreId,
+        error,
+      });
+    }
+  }
+
+  /**
+   * Returns the new `Snapshot` to persist, or `undefined` if the configured
+   * policy does not fire for the given args.
+   */
+  _buildSnapshotIfPolicyFires(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): Snapshot<$AGGREGATE> | undefined {
+    const config = this.snapshotConfig;
+    if (config === undefined || !this._snapshotPolicyFires(args)) {
+      return undefined;
+    }
+
+    return {
+      aggregate: args.aggregate,
+      reducerVersion: config.currentReducerVersion,
+      eventStoreId: this.eventStoreId,
+      savedAt: new Date().toISOString(),
+    };
+  }
+
+  _snapshotPolicyFires(args: {
+    aggregate: $AGGREGATE;
+    previousSnapshot: Snapshot<$AGGREGATE> | undefined;
+    newEventCount: number;
+    source: 'read' | 'write';
+  }): boolean {
+    if (args.aggregate.version <= 0) {
+      return false;
+    }
+    if (
+      args.source === 'read' &&
+      args.previousSnapshot?.aggregate.version === args.aggregate.version
+    ) {
+      return false;
+    }
+
+    const predicate =
+      args.source === 'read'
+        ? this._compiledShouldSaveSnapshot
+        : this._compiledShouldSaveSnapshotOnWrite;
+    if (predicate === undefined) {
+      return false;
+    }
+
+    return predicate({
+      aggregate: args.aggregate,
+      previousSnapshot: args.previousSnapshot,
+      newEventCount: args.newEventCount,
+      now: new Date(),
+    });
+  }
+
+  async _pruneSnapshotsAfterSave(args: {
+    aggregateId: string;
+    newSnapshot: Snapshot<$AGGREGATE>;
+  }): Promise<void> {
+    if (
+      this.snapshotConfig === undefined ||
+      this.snapshotStorageAdapter === undefined
+    ) {
+      return;
+    }
+    const shouldKeep = this._compiledShouldKeepSnapshot;
+    if (shouldKeep === undefined) {
+      return;
+    }
+
+    const adapter = this.snapshotStorageAdapter;
+    const ctx = { eventStoreId: this.eventStoreId };
+    const reducerVersion = this.snapshotConfig.currentReducerVersion;
+    const now = new Date(args.newSnapshot.savedAt);
+
+    let pageToken: string | undefined = undefined;
+    let position = 0;
+
+    do {
+      const { snapshotKeys, nextPageToken } = await adapter.listSnapshots(
+        ctx,
+        {
+          aggregateId: args.aggregateId,
+          reducerVersion,
+          reverse: true,
+          maxVersion: args.newSnapshot.aggregate.version,
+          pageToken,
+        },
+      );
+
+      for (const key of snapshotKeys) {
+        const ageMs = now.getTime() - new Date(key.savedAt).getTime();
+        if (shouldKeep({ key, position, ageMs, now })) {
+          position += 1;
+          continue;
+        }
+        await adapter.deleteSnapshot(key, ctx);
+        position += 1;
+      }
+
+      pageToken = nextPageToken;
+    } while (pageToken !== undefined);
   }
 }

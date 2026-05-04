@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
+import { GroupedEvent } from '~/event/groupedEvent';
 import type { Snapshot, SnapshotStorageAdapter } from '~/snapshot';
 
 import { EventStore } from './eventStore';
@@ -758,7 +759,7 @@ describe('EventStore snapshot integration', () => {
       vi.setSystemTime(new Date('2025-06-01T00:00:00.000Z'));
     });
 
-    it('saves a snapshot when EVERY_N_VERSIONS threshold is reached', async () => {
+    it('saves a snapshot when EVERY_N_VERSIONS threshold is reached on read (saveOn: "read")', async () => {
       const adapter = makeSnapshotAdapter();
       const getEventsMock = vi
         .fn()
@@ -782,6 +783,7 @@ describe('EventStore snapshot integration', () => {
         snapshotStorageAdapter: adapter,
         snapshotConfig: {
           currentReducerVersion: 'v1',
+          saveOn: 'read',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 3 },
           pruning: { strategy: 'NONE' },
         },
@@ -859,6 +861,7 @@ describe('EventStore snapshot integration', () => {
         snapshotStorageAdapter: adapter,
         snapshotConfig: {
           currentReducerVersion: 'v1',
+          saveOn: 'read',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
         },
       });
@@ -899,6 +902,7 @@ describe('EventStore snapshot integration', () => {
         snapshotStorageAdapter: adapter,
         snapshotConfig: {
           currentReducerVersion: 'v1',
+          saveOn: 'read',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
           onSnapshotError,
         },
@@ -964,6 +968,7 @@ describe('EventStore snapshot integration', () => {
         snapshotStorageAdapter: adapter,
         snapshotConfig: {
           currentReducerVersion: 'v1',
+          saveOn: 'read',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
           // pruning omitted ⇒ defaults to NONE
         },
@@ -1025,6 +1030,7 @@ describe('EventStore snapshot integration', () => {
         snapshotStorageAdapter: adapter,
         snapshotConfig: {
           currentReducerVersion: 'v1',
+          saveOn: 'read',
           policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 1 },
           pruning: { strategy: 'DELETE_PREVIOUS' },
         },
@@ -1040,6 +1046,311 @@ describe('EventStore snapshot integration', () => {
       });
       expect(adapter.deleteSnapshotMock).toHaveBeenCalledWith(previousKeys[2], {
         eventStoreId,
+      });
+    });
+  });
+
+  describe('saveOn', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2025-06-01T00:00:00.000Z'));
+    });
+
+    const setupStore = (
+      saveOn: 'write' | 'read' | 'both' | undefined,
+      policy = { strategy: 'EVERY_N_VERSIONS' as const, periodInVersions: 3 },
+    ): {
+      store: EventStore<
+        'POKEMONS',
+        typeof eventTypes,
+        PokemonEventDetails,
+        PokemonEventDetails,
+        typeof pokemonsReducer
+      >;
+      adapter: ReturnType<typeof makeSnapshotAdapter>;
+      pushEventMock: ReturnType<typeof vi.fn>;
+    } => {
+      const adapter = makeSnapshotAdapter();
+      const pushEventMock = vi
+        .fn()
+        .mockImplementation(async (event: PokemonEventDetails) => ({ event }));
+      const getEventsMock = vi
+        .fn()
+        .mockResolvedValue({ events: pikachuEventsMocks });
+
+      const store = new EventStore({
+        eventStoreId,
+        eventTypes,
+        reducer: pokemonsReducer,
+        eventStorageAdapter: {
+          pushEvent: pushEventMock,
+          pushEventGroup: vi.fn(),
+          groupEvent: vi.fn(),
+          getEvents: getEventsMock,
+          listAggregateIds: vi.fn(),
+        },
+        snapshotStorageAdapter: adapter,
+        snapshotConfig: {
+          currentReducerVersion: 'v1',
+          ...(saveOn !== undefined ? { saveOn } : {}),
+          policy,
+        },
+      });
+
+      return { store, adapter, pushEventMock };
+    };
+
+    const eventTypes = [
+      pokemonAppearedEvent,
+      pokemonCaughtEvent,
+      pokemonLeveledUpEvent,
+    ];
+
+    describe("default (saveOn omitted, equivalent to 'write')", () => {
+      it('saves on pushEvent when threshold is reached', async () => {
+        const { store, adapter } = setupStore(undefined);
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).toHaveBeenCalledTimes(1);
+        const [savedSnapshot] = adapter.putSnapshotMock.mock.calls[0] as [
+          Snapshot<PokemonAggregate>,
+        ];
+        expect(savedSnapshot.aggregate).toEqual(fullAggregate);
+      });
+
+      it('does NOT save on getAggregate', async () => {
+        const { store, adapter } = setupStore(undefined);
+
+        await store.getAggregate(pikachuId);
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("'write'", () => {
+      it('saves on pushEvent when threshold is reached', async () => {
+        const { store, adapter } = setupStore('write');
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('does NOT save on getAggregate', async () => {
+        const { store, adapter } = setupStore('write');
+
+        await store.getAggregate(pikachuId);
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+
+      it('does NOT save on pushEvent when version is not a multiple of period', async () => {
+        const { store, adapter } = setupStore('write');
+
+        await store.pushEvent(pikachuCaughtEvent, {
+          prevAggregate: buildAggregate([pikachuAppearedEvent]),
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+
+      it('skips when prevAggregate is missing on a non-initial event (no nextAggregate computed)', async () => {
+        const { store, adapter } = setupStore('write');
+
+        // Pushing without prevAggregate on a version > 1 event means
+        // pushEvent does not compute nextAggregate, and the write-path save
+        // therefore has nothing to evaluate.
+        await store.pushEvent(pikachuLeveledUpEvent);
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+
+      it('silently skips EVERY_N_MS_SINCE_LAST on the write path', async () => {
+        const { store, adapter } = setupStore('write', {
+          strategy: 'EVERY_N_VERSIONS',
+          periodInVersions: 1,
+        });
+        // Reset for time-based test:
+        store.snapshotConfig = {
+          currentReducerVersion: 'v1',
+          saveOn: 'write',
+          policy: { strategy: 'EVERY_N_MS_SINCE_LAST', periodInMs: 1 },
+        };
+
+        await store.pushEvent(pikachuAppearedEvent);
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+
+      it('silently skips AUTO on the write path', async () => {
+        const { store, adapter } = setupStore('write');
+        store.snapshotConfig = {
+          currentReducerVersion: 'v1',
+          saveOn: 'write',
+          policy: { strategy: 'AUTO' },
+        };
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+
+      it('routes write-path save errors to onSnapshotError', async () => {
+        const onSnapshotError = vi.fn();
+        const { store, adapter } = setupStore('write');
+        const saveError = new Error('write save fail');
+        adapter.putSnapshotMock.mockRejectedValue(saveError);
+        store.snapshotConfig = {
+          currentReducerVersion: 'v1',
+          saveOn: 'write',
+          policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 3 },
+          onSnapshotError,
+        };
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(onSnapshotError).toHaveBeenCalledWith({
+          phase: 'save',
+          aggregateId: pikachuId,
+          eventStoreId,
+          error: saveError,
+        });
+      });
+    });
+
+    describe("'read'", () => {
+      it('saves on getAggregate when threshold is reached', async () => {
+        const { store, adapter } = setupStore('read');
+
+        await store.getAggregate(pikachuId);
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('does NOT save on pushEvent', async () => {
+        const { store, adapter } = setupStore('read');
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("'both'", () => {
+      it('saves on both getAggregate and pushEvent', async () => {
+        const { store, adapter } = setupStore('both');
+
+        await store.getAggregate(pikachuId);
+        await vi.runAllTimersAsync();
+        const callsAfterRead = adapter.putSnapshotMock.mock.calls.length;
+        expect(callsAfterRead).toBeGreaterThanOrEqual(1);
+
+        adapter.putSnapshotMock.mockClear();
+
+        await store.pushEvent(pikachuLeveledUpEvent, {
+          prevAggregate: partialAggregate,
+        });
+        await vi.runAllTimersAsync();
+
+        expect(adapter.putSnapshotMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('pushEventGroup write-path saves', () => {
+      it('saves a snapshot per event store whose policy fires after pushEventGroup', async () => {
+        const adapterA = makeSnapshotAdapter();
+        const adapterB = makeSnapshotAdapter();
+
+        const pushEventGroupMock = vi.fn().mockResolvedValue({
+          eventGroup: [
+            { event: pikachuLeveledUpEvent },
+            { event: pikachuLeveledUpEvent },
+          ],
+        });
+
+        const eventStorageAdapterA = {
+          pushEvent: vi.fn(),
+          pushEventGroup: pushEventGroupMock,
+          groupEvent: vi.fn(),
+          getEvents: vi.fn(),
+          listAggregateIds: vi.fn(),
+        };
+        const eventStorageAdapterB = {
+          ...eventStorageAdapterA,
+          pushEventGroup: vi.fn(),
+        };
+
+        const storeA = new EventStore({
+          eventStoreId: 'A',
+          eventTypes,
+          reducer: pokemonsReducer,
+          eventStorageAdapter: eventStorageAdapterA,
+          snapshotStorageAdapter: adapterA,
+          snapshotConfig: {
+            currentReducerVersion: 'v1',
+            saveOn: 'write',
+            policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 3 },
+          },
+        });
+
+        const storeB = new EventStore({
+          eventStoreId: 'B',
+          eventTypes,
+          reducer: pokemonsReducer,
+          eventStorageAdapter: eventStorageAdapterB,
+          snapshotStorageAdapter: adapterB,
+          snapshotConfig: {
+            currentReducerVersion: 'v1',
+            saveOn: 'write',
+            policy: { strategy: 'EVERY_N_VERSIONS', periodInVersions: 7 },
+          },
+        });
+
+        const groupedA = new GroupedEvent({
+          event: pikachuLeveledUpEvent,
+          eventStorageAdapter: eventStorageAdapterA,
+          context: { eventStoreId: 'A' },
+        });
+        groupedA.eventStore = storeA;
+        groupedA.prevAggregate = partialAggregate;
+
+        const groupedB = new GroupedEvent({
+          event: pikachuLeveledUpEvent,
+          eventStorageAdapter: eventStorageAdapterA,
+          context: { eventStoreId: 'B' },
+        });
+        groupedB.eventStore = storeB;
+        groupedB.prevAggregate = partialAggregate;
+
+        await EventStore.pushEventGroup(groupedA, groupedB);
+        await vi.runAllTimersAsync();
+
+        // Store A: aggregate version becomes 3 → 3 % 3 === 0 → save fires.
+        expect(adapterA.putSnapshotMock).toHaveBeenCalledTimes(1);
+        // Store B: aggregate version becomes 3 → 3 % 7 !== 0 → no save.
+        expect(adapterB.putSnapshotMock).not.toHaveBeenCalled();
       });
     });
   });

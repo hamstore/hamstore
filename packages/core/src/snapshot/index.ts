@@ -8,13 +8,17 @@ export type {
 export type {
   SnapshotConfig,
   SnapshotPolicy,
+  SnapshotSaveTrigger,
   PruningPolicy,
   ShouldSaveSnapshot,
   ShouldSaveSnapshotArgs,
   ShouldKeepSnapshot,
   ShouldKeepSnapshotArgs,
 } from './snapshotConfig';
-export { compileSnapshotPolicy } from './policy';
+export {
+  compileSnapshotPolicy,
+  compileWritePathSnapshotPolicy,
+} from './policy';
 export { compilePruningPolicy } from './pruningPolicy';
 export { cleanUpOutdatedSnapshots } from './cleanUpOutdatedSnapshots';
 export {

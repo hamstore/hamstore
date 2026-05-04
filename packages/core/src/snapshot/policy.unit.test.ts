@@ -1,7 +1,10 @@
 /* eslint-disable max-lines */
 import { describe, it, expect } from 'vitest';
 
-import { compileSnapshotPolicy } from './policy';
+import {
+  compileSnapshotPolicy,
+  compileWritePathSnapshotPolicy,
+} from './policy';
 import type { Snapshot } from './snapshotStorageAdapter';
 
 type Aggregate = { aggregateId: string; version: number };
@@ -237,6 +240,183 @@ describe('compileSnapshotPolicy', () => {
           aggregate: makeAggregate(8),
           previousSnapshot: undefined,
           newEventCount: 0,
+          now,
+        }),
+      ).toBe(false);
+    });
+  });
+});
+
+describe('compileWritePathSnapshotPolicy', () => {
+  describe('NONE', () => {
+    it('always returns false', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>({
+        strategy: 'NONE',
+      });
+
+      expect(
+        should({
+          aggregate: makeAggregate(100),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(false);
+    });
+  });
+
+  describe('EVERY_N_VERSIONS', () => {
+    const policy = {
+      strategy: 'EVERY_N_VERSIONS' as const,
+      periodInVersions: 25,
+    };
+
+    it('fires on exact multiples of periodInVersions', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>(policy);
+
+      expect(
+        should({
+          aggregate: makeAggregate(25),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(true);
+
+      expect(
+        should({
+          aggregate: makeAggregate(50),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(true);
+
+      expect(
+        should({
+          aggregate: makeAggregate(125),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(true);
+    });
+
+    it('does not fire on non-multiples', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>(policy);
+
+      for (const version of [1, 24, 26, 49, 51, 124, 126]) {
+        expect(
+          should({
+            aggregate: makeAggregate(version),
+            previousSnapshot: undefined,
+            newEventCount: 1,
+            now,
+          }),
+        ).toBe(false);
+      }
+    });
+
+    it('rejects invalid period', () => {
+      expect(() =>
+        compileWritePathSnapshotPolicy({
+          strategy: 'EVERY_N_VERSIONS',
+          periodInVersions: 0,
+        }),
+      ).toThrow();
+    });
+  });
+
+  describe('EVERY_N_MS_SINCE_LAST', () => {
+    it('always returns false (cannot evaluate without previousSnapshot)', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>({
+        strategy: 'EVERY_N_MS_SINCE_LAST',
+        periodInMs: 60_000,
+      });
+
+      expect(
+        should({
+          aggregate: makeAggregate(50),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(false);
+
+      // Even when a previousSnapshot is somehow provided, the predicate is
+      // intentionally `() => false` on the write path; it should never be
+      // invoked with one.
+      expect(
+        should({
+          aggregate: makeAggregate(50),
+          previousSnapshot: makeSnapshot(
+            1,
+            new Date(now.getTime() - 999_999).toISOString(),
+          ),
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(false);
+    });
+
+    it('rejects invalid period', () => {
+      expect(() =>
+        compileWritePathSnapshotPolicy({
+          strategy: 'EVERY_N_MS_SINCE_LAST',
+          periodInMs: 0,
+        }),
+      ).toThrow();
+    });
+  });
+
+  describe('AUTO', () => {
+    it('always returns false (cannot evaluate without previousSnapshot)', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>({
+        strategy: 'AUTO',
+      });
+
+      expect(
+        should({
+          aggregate: makeAggregate(1000),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(false);
+    });
+
+    it('still validates min/max ordering', () => {
+      expect(() =>
+        compileWritePathSnapshotPolicy({
+          strategy: 'AUTO',
+          minPeriodInVersions: 100,
+          maxPeriodInVersions: 50,
+        }),
+      ).toThrow();
+    });
+  });
+
+  describe('CUSTOM', () => {
+    it('passes through the user-supplied callback', () => {
+      const should = compileWritePathSnapshotPolicy<Aggregate>({
+        strategy: 'CUSTOM',
+        shouldSaveSnapshot: ({ aggregate }) => aggregate.version === 7,
+      });
+
+      expect(
+        should({
+          aggregate: makeAggregate(7),
+          previousSnapshot: undefined,
+          newEventCount: 1,
+          now,
+        }),
+      ).toBe(true);
+
+      expect(
+        should({
+          aggregate: makeAggregate(8),
+          previousSnapshot: undefined,
+          newEventCount: 1,
           now,
         }),
       ).toBe(false);
