@@ -1,0 +1,76 @@
+{
+  "name": "@hamstore/snapshot-storage-adapter-dynamodb",
+  "description": "DRY Hamstore SnapshotStorageAdapter implementation using DynamoDB",
+  "license": "MIT",
+  "keywords": [
+    "event",
+    "snapshot",
+    "source",
+    "store",
+    "typescript"
+  ],
+  "homepage": "https://github.com/hamstore/hamstore#readme",
+  "bugs": "https://github.com/hamstore/hamstore/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamstore/hamstore.git",
+    "directory": "packages/snapshot-storage-adapter-dynamodb"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.mjs"
+    },
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/esm/*.mjs",
+      "require": "./dist/cjs/*.cjs",
+      "default": "./dist/esm/*.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "lint-fix": "pnpm oxlint --fix",
+    "lint-fix-all": "pnpm lint-fix .",
+    "package": "tsdown",
+    "publish-package": "npm publish ${NPM_PROVENANCE:+--provenance} --access public --tag ${NPM_DIST_TAG:-latest}",
+    "test": "pnpm test-type && pnpm test-unit && pnpm test-circular && pnpm test-linter",
+    "test-circular": "pnpm depcruise --validate .dependency-cruiser.js .",
+    "test-linter": "pnpm oxlint .",
+    "test-type": "tsc --noEmit --emitDeclarationOnly false",
+    "test-unit": "pnpm vitest run --passWithNoTests",
+    "watch": "tsdown --watch"
+  },
+  "dependencies": {
+    "@aws-sdk/util-dynamodb": "^3.893.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.893.0",
+    "@hamstore/core": "workspace:",
+    "@types/node": "^24.5.2",
+    "aws-sdk-client-mock": "^2.2.0",
+    "dependency-cruiser": "^17.0.1",
+    "mockdate": "^3.0.5",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "tsdown": "^0.21.4",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@hamstore/core": "*"
+  }
+}

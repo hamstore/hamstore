@@ -76,6 +76,7 @@ To add run-time validation to your event types:
 
 ## 📸 Snapshot Storage Adapters
 
+- [DynamoDB Snapshot Storage Adapter](https://www.npmjs.com/package/@hamstore/snapshot-storage-adapter-dynamodb): Implementation of the `SnapshotStorageAdapter` interface using AWS [DynamoDB](https://aws.amazon.com/dynamodb/) and a [single-table layout](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/). See [Snapshots](./3-reacting-to-events/5-snapshots.md) for usage.
 - [In-Memory Snapshot Storage Adapter](https://www.npmjs.com/package/@hamstore/snapshot-storage-adapter-in-memory): Implementation of the `SnapshotStorageAdapter` interface using a local Node/JS object. To be used in manual or unit tests. See [Snapshots](./3-reacting-to-events/5-snapshots.md) for usage.
 
 ## 🏋️‍♂️ Commands
