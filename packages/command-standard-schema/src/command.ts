@@ -44,29 +44,45 @@ const assertOutputSchemaPresent = (
   }
 };
 
-const buildValidatingHandler = <HANDLER_INPUT, OUTPUT>(
-  inputSchema: StandardSchemaV1,
-  outputSchema: StandardSchemaV1 | undefined,
+const buildValidatingHandler = <
+  INPUT_SCHEMA extends StandardSchemaV1,
+  OUTPUT_SCHEMA extends StandardSchemaV1 | undefined,
+  HANDLER_INPUT,
+  OUTPUT,
+  EVENT_STORES extends EventStore[],
+  CONTEXT extends unknown[],
+>(
+  inputSchema: INPUT_SCHEMA,
+  outputSchema: OUTPUT_SCHEMA,
   validate: ValidateCommandOption | undefined,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler: (...args: any[]) => Promise<OUTPUT>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ((...args: any[]) => Promise<OUTPUT>) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return async (input: any, eventStores: any, ...context: any[]) => {
+  handler: (
+    input: HANDLER_INPUT,
+    eventStores: EVENT_STORES,
+    ...context: CONTEXT
+  ) => Promise<OUTPUT>,
+): ((
+  input: unknown,
+  eventStores: EVENT_STORES,
+  ...context: CONTEXT
+) => Promise<OUTPUT>) => {
+  return async (input, eventStores, ...context) => {
     let inputValidate = resolveValidateOption(validate, 'input');
     if (inputValidate === 'auto') {
       inputValidate = true;
     }
 
-    const validatedInput = (await validateSchema(
+    const validatedInput = await validateSchema(
       inputSchema,
       input,
       'Input',
       inputValidate,
-    )) as HANDLER_INPUT;
+    );
 
-    const result = await handler(validatedInput, eventStores, ...context);
+    const result = await handler(
+      validatedInput as HANDLER_INPUT,
+      eventStores,
+      ...context,
+    );
 
     if (outputSchema !== undefined) {
       let outputValidate = resolveValidateOption(validate, 'output');
@@ -163,7 +179,7 @@ export class StandardSchemaCommand<
 
     super({
       ...args,
-      handler: buildValidatingHandler<HANDLER_INPUT, OUTPUT>(
+      handler: buildValidatingHandler(
         inputSchema,
         outputSchema,
         validate,
