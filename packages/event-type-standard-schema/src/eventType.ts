@@ -8,11 +8,11 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 
 type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
-const validateSchema = async (
-  schema: StandardSchemaV1,
+const validateSchema = async <SCHEMA extends StandardSchemaV1>(
+  schema: SCHEMA,
   value: unknown,
   label: string,
-): Promise<{ errors: Error[]; value: unknown }> => {
+): Promise<{ errors: Error[]; value: InferOutput<SCHEMA> }> => {
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
@@ -23,7 +23,7 @@ const validateSchema = async (
         ),
     );
 
-    return { errors, value };
+    return { errors, value: value as InferOutput<SCHEMA> };
   }
 
   return { errors: [], value: result.value };
