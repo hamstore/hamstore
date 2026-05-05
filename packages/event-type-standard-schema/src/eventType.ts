@@ -12,7 +12,7 @@ const validateSchema = async <SCHEMA extends StandardSchemaV1>(
   schema: SCHEMA,
   value: unknown,
   label: string,
-): Promise<{ errors: Error[]; value: InferOutput<SCHEMA> }> => {
+): Promise<{ errors: Error[]; value?: InferOutput<SCHEMA> }> => {
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
@@ -23,7 +23,7 @@ const validateSchema = async <SCHEMA extends StandardSchemaV1>(
         ),
     );
 
-    return { errors, value: value as InferOutput<SCHEMA> };
+    return { errors };
   }
 
   return { errors: [], value: result.value };
