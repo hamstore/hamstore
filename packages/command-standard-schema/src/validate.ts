@@ -14,6 +14,10 @@ export type ValidateCommandOption =
 
 // --- shared low-level helpers (kept identical with @hamstore/event-type-standard-schema) ---
 
+type RunSchemaResult<T> =
+  | { value: T; errors?: never }
+  | { errors: Error[]; value?: never };
+
 const formatIssueMessage = (
   issue: StandardSchemaV1.Issue,
   label: string,
@@ -24,7 +28,7 @@ const runSchema = async <SCHEMA extends StandardSchemaV1>(
   schema: SCHEMA,
   value: unknown,
   label: string,
-): Promise<{ errors: Error[]; value?: InferOutput<SCHEMA> }> => {
+): Promise<RunSchemaResult<InferOutput<SCHEMA>>> => {
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
@@ -35,7 +39,7 @@ const runSchema = async <SCHEMA extends StandardSchemaV1>(
     };
   }
 
-  return { errors: [], value: result.value };
+  return { value: result.value };
 };
 
 // --- command-specific policy ---
@@ -77,13 +81,13 @@ export const validateSchema = async <SCHEMA extends StandardSchemaV1>(
     return value as InferOutput<SCHEMA>;
   }
 
-  const { errors, value: validated } = await runSchema(schema, value, label);
+  const result = await runSchema(schema, value, label);
 
-  if (errors.length === 0) {
-    return validated as InferOutput<SCHEMA>;
+  if (result.errors === undefined) {
+    return result.value;
   }
 
-  const error = new Error(errors.map(e => e.message).join('; '));
+  const error = new Error(result.errors.map(e => e.message).join('; '));
 
   if (validate === true) {
     throw error;

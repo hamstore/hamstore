@@ -10,6 +10,10 @@ type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
 // --- shared low-level helpers (kept identical with @hamstore/command-standard-schema) ---
 
+type RunSchemaResult<T> =
+  | { value: T; errors?: never }
+  | { errors: Error[]; value?: never };
+
 const formatIssueMessage = (
   issue: StandardSchemaV1.Issue,
   label: string,
@@ -20,7 +24,7 @@ const runSchema = async <SCHEMA extends StandardSchemaV1>(
   schema: SCHEMA,
   value: unknown,
   label: string,
-): Promise<{ errors: Error[]; value?: InferOutput<SCHEMA> }> => {
+): Promise<RunSchemaResult<InferOutput<SCHEMA>>> => {
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
@@ -31,7 +35,7 @@ const runSchema = async <SCHEMA extends StandardSchemaV1>(
     };
   }
 
-  return { errors: [], value: result.value };
+  return { value: result.value };
 };
 
 export class StandardSchemaEventType<
@@ -78,26 +82,28 @@ export class StandardSchemaEventType<
       let parsedMetadata = candidate.metadata as METADATA;
 
       if (payloadSchema !== undefined) {
-        const { errors: payloadErrors, value } = await runSchema(
+        const result = await runSchema(
           payloadSchema,
           candidate.payload,
           'Payload',
         );
-        errors.push(...payloadErrors);
-        if (payloadErrors.length === 0) {
-          parsedPayload = value as PAYLOAD;
+        if (result.errors === undefined) {
+          parsedPayload = result.value as PAYLOAD;
+        } else {
+          errors.push(...result.errors);
         }
       }
 
       if (metadataSchema !== undefined) {
-        const { errors: metadataErrors, value } = await runSchema(
+        const result = await runSchema(
           metadataSchema,
           candidate.metadata,
           'Metadata',
         );
-        errors.push(...metadataErrors);
-        if (metadataErrors.length === 0) {
-          parsedMetadata = value as METADATA;
+        if (result.errors === undefined) {
+          parsedMetadata = result.value as METADATA;
+        } else {
+          errors.push(...result.errors);
         }
       }
 
