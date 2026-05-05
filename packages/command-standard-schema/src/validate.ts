@@ -1,5 +1,7 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 
+type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
+
 export type ValidateOption =
   | boolean
   | 'auto'
@@ -10,17 +12,33 @@ export type ValidateCommandOption =
   | ValidateOption
   | { input?: ValidateOption; output?: ValidateOption };
 
-const buildValidationError = (
-  issues: ReadonlyArray<StandardSchemaV1.Issue>,
-  label: string,
-): Error => {
-  const messages = issues.map(
-    issue =>
-      `${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`,
-  );
+// --- shared low-level helpers (kept identical with @hamstore/event-type-standard-schema) ---
 
-  return new Error(`${label} validation failed: ${messages.join('; ')}`);
+const formatIssueMessage = (
+  issue: StandardSchemaV1.Issue,
+  label: string,
+): string =>
+  `${label} validation failed: ${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`;
+
+const runSchema = async <SCHEMA extends StandardSchemaV1>(
+  schema: SCHEMA,
+  value: unknown,
+  label: string,
+): Promise<{ errors: Error[]; value?: InferOutput<SCHEMA> }> => {
+  const result = await schema['~standard'].validate(value);
+
+  if (result.issues !== undefined) {
+    return {
+      errors: result.issues.map(
+        issue => new Error(formatIssueMessage(issue, label)),
+      ),
+    };
+  }
+
+  return { errors: [], value: result.value };
 };
+
+// --- command-specific policy ---
 
 export const isObjectForm = (
   value: ValidateCommandOption,
@@ -54,30 +72,30 @@ export const validateSchema = async <SCHEMA extends StandardSchemaV1>(
   value: unknown,
   label: string,
   validate: ValidateOption,
-): Promise<StandardSchemaV1.InferOutput<SCHEMA>> => {
+): Promise<InferOutput<SCHEMA>> => {
   if (validate === false) {
-    return value as StandardSchemaV1.InferOutput<SCHEMA>;
+    return value as InferOutput<SCHEMA>;
   }
 
-  const result = await schema['~standard'].validate(value);
+  const { errors, value: validated } = await runSchema(schema, value, label);
 
-  if (result.issues !== undefined) {
-    const error = buildValidationError(result.issues, label);
-
-    if (validate === true) {
-      throw error;
-    }
-
-    if (validate === 'warn') {
-      console.warn(error.message);
-    }
-
-    if (typeof validate === 'function') {
-      validate(error);
-    }
-
-    return value as StandardSchemaV1.InferOutput<SCHEMA>;
+  if (errors.length === 0) {
+    return validated as InferOutput<SCHEMA>;
   }
 
-  return result.value;
+  const error = new Error(errors.map(e => e.message).join('; '));
+
+  if (validate === true) {
+    throw error;
+  }
+
+  if (validate === 'warn') {
+    console.warn(error.message);
+  }
+
+  if (typeof validate === 'function') {
+    validate(error);
+  }
+
+  return value as InferOutput<SCHEMA>;
 };

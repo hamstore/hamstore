@@ -210,7 +210,9 @@ describe('standardSchemaCommand implementation', () => {
 
       await expect(
         command.handler({} as never, requiredEventStores),
-      ).rejects.toThrow('a is required; b is required');
+      ).rejects.toThrow(
+        'Input validation failed: a is required; Input validation failed: b is required',
+      );
     });
   });
 

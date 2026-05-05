@@ -8,7 +8,15 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 
 type InferOutput<T extends StandardSchemaV1> = StandardSchemaV1.InferOutput<T>;
 
-const validateSchema = async <SCHEMA extends StandardSchemaV1>(
+// --- shared low-level helpers (kept identical with @hamstore/command-standard-schema) ---
+
+const formatIssueMessage = (
+  issue: StandardSchemaV1.Issue,
+  label: string,
+): string =>
+  `${label} validation failed: ${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`;
+
+const runSchema = async <SCHEMA extends StandardSchemaV1>(
   schema: SCHEMA,
   value: unknown,
   label: string,
@@ -16,14 +24,11 @@ const validateSchema = async <SCHEMA extends StandardSchemaV1>(
   const result = await schema['~standard'].validate(value);
 
   if (result.issues !== undefined) {
-    const errors = result.issues.map(
-      issue =>
-        new Error(
-          `${label} validation failed: ${issue.message}${issue.path !== undefined ? ` (at ${String(issue.path.map(p => (typeof p === 'object' ? p.key : p)).join('.'))})` : ''}`,
-        ),
-    );
-
-    return { errors };
+    return {
+      errors: result.issues.map(
+        issue => new Error(formatIssueMessage(issue, label)),
+      ),
+    };
   }
 
   return { errors: [], value: result.value };
@@ -73,7 +78,7 @@ export class StandardSchemaEventType<
       let parsedMetadata = candidate.metadata as METADATA;
 
       if (payloadSchema !== undefined) {
-        const { errors: payloadErrors, value } = await validateSchema(
+        const { errors: payloadErrors, value } = await runSchema(
           payloadSchema,
           candidate.payload,
           'Payload',
@@ -85,7 +90,7 @@ export class StandardSchemaEventType<
       }
 
       if (metadataSchema !== undefined) {
-        const { errors: metadataErrors, value } = await validateSchema(
+        const { errors: metadataErrors, value } = await runSchema(
           metadataSchema,
           candidate.metadata,
           'Metadata',
