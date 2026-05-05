@@ -170,7 +170,7 @@ export class StandardSchemaCommand<
     'handler'
   > & {
     handler: (
-      input: NoInfer<HANDLER_INPUT>,
+      input: NoInfer<HANDLER_INPUT> & InferOutput<INPUT_SCHEMA>,
       eventStores: $EVENT_STORES,
       ...context: CONTEXT
     ) => Promise<OUTPUT>;
