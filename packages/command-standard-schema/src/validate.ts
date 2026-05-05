@@ -49,14 +49,14 @@ export const resolveValidateOption = (
   return commandValidate as ValidateOption;
 };
 
-export const validateSchema = async (
-  schema: StandardSchemaV1,
+export const validateSchema = async <SCHEMA extends StandardSchemaV1>(
+  schema: SCHEMA,
   value: unknown,
   label: string,
   validate: ValidateOption,
-): Promise<unknown> => {
+): Promise<StandardSchemaV1.InferOutput<SCHEMA>> => {
   if (validate === false) {
-    return value;
+    return value as StandardSchemaV1.InferOutput<SCHEMA>;
   }
 
   const result = await schema['~standard'].validate(value);
@@ -76,7 +76,7 @@ export const validateSchema = async (
       validate(error);
     }
 
-    return value;
+    return value as StandardSchemaV1.InferOutput<SCHEMA>;
   }
 
   return result.value;
