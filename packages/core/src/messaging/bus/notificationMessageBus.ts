@@ -1,10 +1,11 @@
 import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 
 import type { MessageChannelAdapter } from '../channel/messageChannelAdapter';
 import { NotificationMessageChannel } from '../channel/notificationMessageChannel';
 
 export class NotificationMessageBus<
-  EVENT_STORE extends EventStore = EventStore,
+  EVENT_STORE extends AnyEventStore = EventStore,
 > extends NotificationMessageChannel<EVENT_STORE> {
   constructor({
     messageBusId,

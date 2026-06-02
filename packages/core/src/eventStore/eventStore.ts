@@ -9,6 +9,7 @@ import type { $Contravariant } from '~/utils';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
 import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
+import { MissingPrevAggregateError } from './errors/missingPrevAggregate';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import type {
   AggregateIdsLister,
@@ -79,6 +80,7 @@ export class EventStore<
   >,
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
+  REQUIRES_PREV_AGGREGATE extends boolean = false,
 > {
   static pushEventGroup: EventGroupPusher = async <
     GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]],
@@ -182,14 +184,29 @@ export class EventStore<
   simulateSideEffect: SideEffectsSimulator<EVENT_DETAILS, $EVENT_DETAILS>;
 
   getEvents: EventsGetter<EVENT_DETAILS>;
-  pushEvent: EventPusher<EVENT_DETAILS, $EVENT_DETAILS, AGGREGATE, $AGGREGATE>;
+  pushEvent: EventPusher<
+    EVENT_DETAILS,
+    $EVENT_DETAILS,
+    AGGREGATE,
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
+  >;
   onEventPushed?: OnEventPushed<$EVENT_DETAILS, $AGGREGATE>;
   groupEvent: EventGrouper<
     EVENT_DETAILS,
     $EVENT_DETAILS,
     AGGREGATE,
-    $AGGREGATE
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
   >;
+  /**
+   * When `true`, `pushEvent` and `groupEvent` require a non-undefined
+   * `prevAggregate` to be passed (enforced both by the type system and at
+   * runtime). Useful when the event store is connected to a state-carrying
+   * message bus that expects every published event to carry the resulting
+   * aggregate.
+   */
+  requirePrevAggregate: REQUIRES_PREV_AGGREGATE;
   listAggregateIds: AggregateIdsLister;
 
   buildAggregate: (
@@ -213,6 +230,7 @@ export class EventStore<
     }),
     onEventPushed,
     eventStorageAdapter,
+    requirePrevAggregate = false as REQUIRES_PREV_AGGREGATE,
   }: {
     eventStoreId: EVENT_STORE_ID;
     eventTypes: EVENT_TYPES;
@@ -220,6 +238,7 @@ export class EventStore<
     simulateSideEffect?: SideEffectsSimulator<EVENT_DETAILS, $EVENT_DETAILS>;
     onEventPushed?: OnEventPushed<$EVENT_DETAILS, $AGGREGATE>;
     eventStorageAdapter?: EventStorageAdapter;
+    requirePrevAggregate?: REQUIRES_PREV_AGGREGATE;
   }) {
     this.eventStoreId = eventStoreId;
     this.eventTypes = eventTypes;
@@ -227,6 +246,7 @@ export class EventStore<
     this.simulateSideEffect = simulateSideEffect;
     this.onEventPushed = onEventPushed;
     this.eventStorageAdapter = eventStorageAdapter;
+    this.requirePrevAggregate = requirePrevAggregate;
 
     this.getEventStorageAdapter = () => {
       if (this.eventStorageAdapter === undefined) {
@@ -248,10 +268,35 @@ export class EventStore<
          */
       ) as Promise<{ events: EVENT_DETAILS[] }>;
 
-    this.pushEvent = async (
+    const assertPrevAggregateProvided = (
+      eventDetail: { version?: number },
+      prevAggregate: unknown,
+    ): void => {
+      // Initial events (version === 1) can compute `nextAggregate` without a
+      // `prevAggregate`, so they are exempt from the strict-mode check.
+      if (
+        this.requirePrevAggregate &&
+        prevAggregate === undefined &&
+        eventDetail.version !== 1
+      ) {
+        throw new MissingPrevAggregateError({
+          eventStoreId: this.eventStoreId,
+        });
+      }
+    };
+
+    type LoosePushEvent = (
+      ...args: Parameters<
+        EventPusher<EVENT_DETAILS, $EVENT_DETAILS, AGGREGATE, $AGGREGATE>
+      >
+    ) => Promise<{ event: EVENT_DETAILS; nextAggregate?: AGGREGATE }>;
+
+    const pushEvent: LoosePushEvent = async (
       eventDetail,
       { prevAggregate, force = false, validate = 'auto' } = {},
     ) => {
+      assertPrevAggregateProvided(eventDetail, prevAggregate);
+
       await resolveEventValidation(
         this.eventTypes,
         eventDetail as EventDetail,
@@ -287,8 +332,20 @@ export class EventStore<
 
       return response;
     };
+    this.pushEvent = pushEvent as typeof this.pushEvent;
 
-    this.groupEvent = (eventDetail, { prevAggregate, validate } = {}) => {
+    type LooseGroupEvent = (
+      ...args: Parameters<
+        EventGrouper<EVENT_DETAILS, $EVENT_DETAILS, AGGREGATE, $AGGREGATE>
+      >
+    ) => GroupedEvent<EVENT_DETAILS, AGGREGATE>;
+
+    const groupEvent: LooseGroupEvent = (
+      eventDetail,
+      { prevAggregate, validate } = {},
+    ) => {
+      assertPrevAggregateProvided(eventDetail, prevAggregate);
+
       const groupedEvent = this.getEventStorageAdapter().groupEvent(
         eventDetail,
       ) as GroupedEvent<EVENT_DETAILS, AGGREGATE>;
@@ -306,6 +363,7 @@ export class EventStore<
 
       return groupedEvent;
     };
+    this.groupEvent = groupEvent as typeof this.groupEvent;
 
     this.listAggregateIds = options =>
       this.getEventStorageAdapter().listAggregateIds(

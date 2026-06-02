@@ -9,15 +9,19 @@ import type {
   EventGrouper,
   EventPusher,
   EventsGetter,
-  EventStore,
   OnEventPushed,
   Reducer,
   SideEffectsSimulator,
 } from '~/eventStore';
-import type { EventStoreMessageChannel } from '~/messaging';
 import type { $Contravariant } from '~/utils';
 
 import { publishPushedEvent } from './publishPushedEvent';
+import type {
+  ConnectedMessageChannel,
+  InnerEventStore,
+  LooseGroupEvent,
+  LoosePushEvent,
+} from './types';
 
 export class ConnectedEventStore<
   EVENT_STORE_ID extends string = string,
@@ -30,41 +34,35 @@ export class ConnectedEventStore<
   >,
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
-  MESSAGE_CHANNEL extends Pick<
-    EventStoreMessageChannel<
-      EventStore<
-        EVENT_STORE_ID,
-        EVENT_TYPES,
-        EVENT_DETAIL,
-        $EVENT_DETAIL,
-        REDUCER,
-        AGGREGATE,
-        $AGGREGATE
-      >
-    >,
-    'publishMessage'
-  > = Pick<
-    EventStoreMessageChannel<
-      EventStore<
-        EVENT_STORE_ID,
-        EVENT_TYPES,
-        EVENT_DETAIL,
-        $EVENT_DETAIL,
-        REDUCER,
-        AGGREGATE,
-        $AGGREGATE
-      >
-    >,
-    'publishMessage'
+  REQUIRES_PREV_AGGREGATE extends boolean = false,
+  MESSAGE_CHANNEL extends ConnectedMessageChannel<
+    EVENT_STORE_ID,
+    EVENT_TYPES,
+    EVENT_DETAIL,
+    $EVENT_DETAIL,
+    REDUCER,
+    AGGREGATE,
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
+  > = ConnectedMessageChannel<
+    EVENT_STORE_ID,
+    EVENT_TYPES,
+    EVENT_DETAIL,
+    $EVENT_DETAIL,
+    REDUCER,
+    AGGREGATE,
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
   >,
-> implements EventStore<
+> implements InnerEventStore<
   EVENT_STORE_ID,
   EVENT_TYPES,
   EVENT_DETAIL,
   $EVENT_DETAIL,
   REDUCER,
   AGGREGATE,
-  $AGGREGATE
+  $AGGREGATE,
+  REQUIRES_PREV_AGGREGATE
 > {
   _types?: {
     details: EVENT_DETAIL;
@@ -75,8 +73,21 @@ export class ConnectedEventStore<
   reducer: REDUCER;
   simulateSideEffect: SideEffectsSimulator<EVENT_DETAIL, $EVENT_DETAIL>;
   getEvents: EventsGetter<EVENT_DETAIL>;
-  pushEvent: EventPusher<EVENT_DETAIL, $EVENT_DETAIL, AGGREGATE, $AGGREGATE>;
-  groupEvent: EventGrouper<EVENT_DETAIL, $EVENT_DETAIL, AGGREGATE, $AGGREGATE>;
+  pushEvent: EventPusher<
+    EVENT_DETAIL,
+    $EVENT_DETAIL,
+    AGGREGATE,
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
+  >;
+  groupEvent: EventGrouper<
+    EVENT_DETAIL,
+    $EVENT_DETAIL,
+    AGGREGATE,
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
+  >;
+  requirePrevAggregate: REQUIRES_PREV_AGGREGATE;
   listAggregateIds: AggregateIdsLister;
   buildAggregate: (
     events: $EVENT_DETAIL[],
@@ -87,27 +98,20 @@ export class ConnectedEventStore<
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
 
-  eventStore: EventStore<
+  eventStore: InnerEventStore<
     EVENT_STORE_ID,
     EVENT_TYPES,
     EVENT_DETAIL,
     $EVENT_DETAIL,
     REDUCER,
     AGGREGATE,
-    $AGGREGATE
+    $AGGREGATE,
+    REQUIRES_PREV_AGGREGATE
   >;
   messageChannel: MESSAGE_CHANNEL;
 
   constructor(
-    eventStore: EventStore<
-      EVENT_STORE_ID,
-      EVENT_TYPES,
-      EVENT_DETAIL,
-      $EVENT_DETAIL,
-      REDUCER,
-      AGGREGATE,
-      $AGGREGATE
-    >,
+    eventStore: typeof this.eventStore,
     messageChannel: MESSAGE_CHANNEL,
   ) {
     this.eventStoreId = eventStore.eventStoreId;
@@ -121,21 +125,38 @@ export class ConnectedEventStore<
     this.getExistingAggregate = eventStore.getExistingAggregate;
     this.simulateAggregate = eventStore.simulateAggregate;
     this.getEventStorageAdapter = eventStore.getEventStorageAdapter;
+    this.requirePrevAggregate = eventStore.requirePrevAggregate;
 
-    this.groupEvent = (...args) => {
-      const groupedEvent = eventStore.groupEvent(...args);
+    type LooseGE = LooseGroupEvent<
+      EVENT_DETAIL,
+      $EVENT_DETAIL,
+      AGGREGATE,
+      $AGGREGATE
+    >;
+    const groupEvent: LooseGE = (...args) => {
+      const groupedEvent = (eventStore.groupEvent as LooseGE)(...args);
       groupedEvent.eventStore = this;
 
       return groupedEvent;
     };
+    this.groupEvent = groupEvent as typeof this.groupEvent;
 
-    this.pushEvent = async (eventInput, options = {}) => {
-      const response = await this.eventStore.pushEvent(eventInput, options);
-
+    type LoosePE = LoosePushEvent<
+      EVENT_DETAIL,
+      $EVENT_DETAIL,
+      AGGREGATE,
+      $AGGREGATE
+    >;
+    const pushEvent: LoosePE = async (eventInput, options = {}) => {
+      const response = await (this.eventStore.pushEvent as LoosePE)(
+        eventInput,
+        options,
+      );
       await publishPushedEvent(this, response);
 
       return response;
     };
+    this.pushEvent = pushEvent as typeof this.pushEvent;
 
     this.eventStore = eventStore;
     this.messageChannel = messageChannel;

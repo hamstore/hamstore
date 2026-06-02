@@ -1,4 +1,5 @@
 import type { EventStore } from '~/eventStore/eventStore';
+import type { AnyEventStore } from '~/eventStore/generics';
 import type { $Contravariant } from '~/utils';
 
 import type {
@@ -13,7 +14,7 @@ import type { MessageChannelAdapter } from './messageChannelAdapter';
 import type { PublishMessageOptions } from './types';
 
 export class StateCarryingMessageChannel<
-  EVENT_STORE extends EventStore = EventStore,
+  EVENT_STORE extends AnyEventStore = EventStore,
 > {
   // Mainly for type discrimination
   messageType: 'stateCarrying';
