@@ -167,7 +167,11 @@ const strictPokemonsEventStore = new EventStore({
 
 const assertStrictPushEventInput2: A.Equals<
   Parameters<typeof strictPokemonsEventStore.pushEvent>[1],
-  { prevAggregate: PokemonAggregate; force?: boolean }
+  {
+    prevAggregate: PokemonAggregate;
+    force?: boolean;
+    validate?: ValidateEventDetail;
+  }
 > = 1;
 assertStrictPushEventInput2;
 
@@ -179,7 +183,7 @@ assertStrictPushEventOutput;
 
 const assertStrictGroupEventInput2: A.Equals<
   Parameters<typeof strictPokemonsEventStore.groupEvent>[1],
-  { prevAggregate: PokemonAggregate }
+  { prevAggregate: PokemonAggregate; validate?: ValidateEventDetail }
 > = 1;
 assertStrictGroupEventInput2;
 
