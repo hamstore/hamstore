@@ -29,11 +29,11 @@ jobs:
         run: pnpm nx run docs:build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build
-          # Preserve the `pr-preview/` umbrella dir so a release deploy doesn't
-          # wipe open PR previews (see deploy-docs-preview.yml). Trade-off: pages
-          # removed/renamed in prod linger at the gh-pages root until overwritten.
-          keep_files: true
+          folder: docs/build
+          branch: gh-pages
+          # Preserve the `pr-preview/` umbrella dir (see deploy-docs-preview.yml)
+          # while still pruning pages removed/renamed in prod from the gh-pages
+          # root. This is the same action pr-preview-action uses internally.
+          clean-exclude: pr-preview/
