@@ -4,6 +4,12 @@ sidebar_position: 5
 
 # 📸 Snapshots
 
+:::info Planned feature
+
+Snapshots are **not implemented in Hamstore yet** — this page describes the concept and where we're headed.
+
+:::
+
 As events pile up in your event stores, the performances and costs of your commands can become an issue.
 
 One solution is to periodially persist **snapshots** of your aggregates (e.g. through a message bus listener), and only fetch them plus the subsequent events instead of all the events.

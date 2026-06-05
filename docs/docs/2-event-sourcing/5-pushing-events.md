@@ -4,6 +4,8 @@ sidebar_position: 5
 
 # ✍️ Pushing events / Commands
 
+## Defining a command
+
 Modifying the state of your application (i.e. pushing new events to your event stores) is done by executing **commands**. They typically consist in:
 
 - **Fetching the required aggregates** (if not the initial event of a new aggregate)
@@ -53,11 +55,15 @@ Note that we only provided TS types for `Input` and `Output` properties. That is
 
 `Commands` handlers should NOT use [read models](../3-reacting-to-events/6-read-models.md) when validating that a modification is acceptable. Read models are like cache: They are not the source of truth, and may not represent the freshest state.
 
+## Race conditions & retries
+
 Fetching and pushing events non-simultaneously exposes your application to [race conditions](https://en.wikipedia.org/wiki/Race_condition). To counter that, commands are designed to be retried when an `EventAlreadyExistsError` is triggered (which is part of the `EventStorageAdapter` interface).
 
 ![Command Retry](../../assets/docSchemas/commandRetry.png)
 
-Finally, Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@hamstore/lib-react-visualizer).
+## Writing pure handlers
+
+Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@hamstore/lib-react-visualizer).
 
 <details>
 <summary>

@@ -4,6 +4,8 @@ sidebar_position: 3
 
 # 🚌 Message Buses
 
+## Defining a message bus
+
 [Message Buses](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) are used to spread messages to multiple **listeners**. Contrary to message queues, they do not store the message or wait for the listeners to respond. Often, **filter patterns** can also be used to trigger listeners or not based on the message content.
 
 ![Message Bus](../../assets/docSchemas/messageBus.png)
@@ -29,6 +31,8 @@ await appMessageBus.publishMessage({
 
 // Similar for AggregateExistsMessageBus and StateCarryingMessageBus
 ```
+
+## Connecting an adapter
 
 Similarly to event stores, `MessageBus` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageBusAdapter`, that will connect it to your actual messaging solution:
 
@@ -56,6 +60,8 @@ await messageBus.publishMessage(...);
 You can code your own `MessageBusAdapter` (simply implement the `MessageChannelAdapter` interface), but we highly recommend using an [off-the-shelf adapter](../4-packages.md#-message-buses-adapters) (if the messaging solution that you use is missing, feel free to create/upvote an issue, or contribute 🤗).
 
 :::
+
+## Typing your listeners
 
 The adapter packages will also expose useful generics to type the arguments of your bus listeners. For instance:
 
