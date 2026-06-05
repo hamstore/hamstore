@@ -97,7 +97,7 @@ const pokemonMessagesListener = async (
 
 ```ts
 const appMessageBusId = appMessageBus.messageChannelId;
-// => 'APP_MESSAGE_BUS'
+// => 'APP_MESSAGE_BUSES'
 ```
 
 - <code>sourceEventStores <i>(EventStore[])</i></code>
