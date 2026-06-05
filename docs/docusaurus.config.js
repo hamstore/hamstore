@@ -16,7 +16,9 @@ const config = {
 
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/hamstore/',
+  // `DOCS_BASE_URL` lets CI build per-PR previews under a sub-path
+  // (e.g. `/hamstore/pr-preview/pr-42/`) without breaking asset/link paths.
+  baseUrl: process.env.DOCS_BASE_URL ?? '/hamstore/',
   trailingSlash: true,
 
   // GitHub pages deployment config.

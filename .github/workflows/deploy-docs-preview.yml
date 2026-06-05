@@ -1,0 +1,59 @@
+name: 📖 Deploy docs preview
+
+# Deploys a self-contained preview of the docs site for each PR to
+# `gh-pages/pr-preview/pr-<number>/`, comments the URL on the PR, and removes
+# the preview when the PR is closed. Previews live in their own sub-directory,
+# so they never override each other or the production site at the gh-pages root.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+# Serialise deploys per-PR so two pushes don't race on the gh-pages branch.
+concurrency:
+  group: docs-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # push the preview to the gh-pages branch
+  pull-requests: write # comment the preview URL on the PR
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy-preview:
+    name: 📖 Deploy docs preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # PRs from forks get a read-only GITHUB_TOKEN that cannot push to gh-pages,
+    # so skip them rather than fail. Previews still run for in-repo branches.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # Build steps are skipped on `closed` events (we only clean up then).
+      - name: Install node_modules
+        if: github.event.action != 'closed'
+        uses: ./.github/actions/install-node-modules
+
+      - name: Package
+        if: github.event.action != 'closed'
+        uses: ./.github/actions/package
+
+      - name: Build website
+        if: github.event.action != 'closed'
+        run: pnpm nx run docs:build
+        env:
+          # Must match the path the preview is served from on GitHub Pages.
+          DOCS_BASE_URL: /hamstore/pr-preview/pr-${{ github.event.number }}/
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs/build
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
