@@ -370,14 +370,7 @@ export class EventStore<
       let nextAggregate: AGGREGATE | undefined = undefined;
       if (prevAggregate !== undefined || event.version === 1) {
         nextAggregate = this.reducer(prevAggregate, event) as AGGREGATE;
-      }
 
-      const response = {
-        event: event as unknown as EVENT_DETAILS,
-        ...(nextAggregate !== undefined ? { nextAggregate } : {}),
-      };
-
-      if (nextAggregate !== undefined) {
         this._tryPersistSnapshot({
           aggregate: nextAggregate as unknown as $AGGREGATE,
           previousSnapshot: undefined,
@@ -385,6 +378,11 @@ export class EventStore<
           source: 'write',
         });
       }
+
+      const response = {
+        event: event as unknown as EVENT_DETAILS,
+        ...(nextAggregate !== undefined ? { nextAggregate } : {}),
+      };
 
       if (this.onEventPushed !== undefined) {
         await this.onEventPushed(
