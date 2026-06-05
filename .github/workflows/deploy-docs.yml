@@ -33,3 +33,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/build
+          # Preserve the `pr-preview/` umbrella dir so a release deploy doesn't
+          # wipe open PR previews (see deploy-docs-preview.yml). Trade-off: pages
+          # removed/renamed in prod linger at the gh-pages root until overwritten.
+          keep_files: true
