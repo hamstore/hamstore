@@ -74,7 +74,7 @@ To add run-time validation to your event types:
 - [Postgres Event Storage Adapter](https://www.npmjs.com/package/@hamstore/event-storage-adapter-postgres): Implementation of the `EventStorageAdapter` interface using a Postgres database.
 - [In-Memory Event Storage Adapter](https://www.npmjs.com/package/@hamstore/event-storage-adapter-in-memory): Implementation of the `EventStorageAdapter` interface using a local Node/JS object. To be used in manual or unit tests.
 
-## 🏋️‍♂️ Commands
+## 🏋️‍♂️ Commands {#commands}
 
 To add run-time validation to your commands:
 
