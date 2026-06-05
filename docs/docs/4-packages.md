@@ -64,8 +64,9 @@ Here is a [hosted example](https://hamstore.github.io/hamstore/visualizer/), bas
 
 To add run-time validation to your event types:
 
+- [Standard Schema Event Type](https://www.npmjs.com/package/@hamstore/event-type-standard-schema): DRY `EventType` definition using any [Standard Schema](https://standardschema.dev/) validator (Zod, Valibot, ArkType…)
 - [JSON Schema Event Type](https://www.npmjs.com/package/@hamstore/event-type-json-schema): DRY `EventType` definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts)
-- [Zod Event Type](https://www.npmjs.com/package/@hamstore/event-type-zod): DRY `EventType` definition using [`zod`](https://github.com/colinhacks/zod)
+- [Zod Event Type](https://www.npmjs.com/package/@hamstore/event-type-zod): DRY `EventType` definition using [`zod`](https://github.com/colinhacks/zod). **⚠️ Deprecated** — use [Standard Schema Event Type](https://www.npmjs.com/package/@hamstore/event-type-standard-schema) instead, which supports Zod and any other [Standard Schema](https://standardschema.dev/) validator.
 
 ## 💾 Event Storage Adapters
 
@@ -78,8 +79,9 @@ To add run-time validation to your event types:
 
 To add run-time validation to your commands:
 
+- [Standard Schema Command](https://www.npmjs.com/package/@hamstore/command-standard-schema): DRY `Command` definition using any [Standard Schema](https://standardschema.dev/) validator (Zod, Valibot, ArkType…)
 - [JSON Schema Command](https://www.npmjs.com/package/@hamstore/command-json-schema): DRY `Command` definition using [JSON Schemas](http://json-schema.org/understanding-json-schema/reference/index.html) and [`json-schema-to-ts`](https://github.com/ThomasAribart/json-schema-to-ts)
-- [Zod Command](https://www.npmjs.com/package/@hamstore/command-zod): DRY `Command` definition using [`zod`](https://github.com/colinhacks/zod)
+- [Zod Command](https://www.npmjs.com/package/@hamstore/command-zod): DRY `Command` definition using [`zod`](https://github.com/colinhacks/zod). **⚠️ Deprecated** — use [Standard Schema Command](https://www.npmjs.com/package/@hamstore/command-standard-schema) instead, which supports Zod and any other [Standard Schema](https://standardschema.dev/) validator.
 
 ## 📨 Message Queue Adapters
 
