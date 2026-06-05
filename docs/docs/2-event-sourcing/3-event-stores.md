@@ -243,7 +243,8 @@ const { aggregate } =
 
 - <code>getAggregateAndEvents <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate, builds it, and returns both.
 
-  `OptionsObj` contains <code>maxVersion <i>(?number)</i></code> plus optionally:
+  `OptionsObj` contains the following properties:
+  - <code>maxVersion <i>(?number)</i></code>: To retrieve the aggregate below a certain version
   - <code>fromVersion <i>(?number)</i></code>: Filters the returned events to <code>version >= fromVersion</code>. The aggregate is unaffected.
 
   `ResponseObj` contains the following properties:
