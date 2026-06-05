@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# ✍️ Pushing events
+# ✍️ Pushing events / Commands
 
 Modifying the state of your application (i.e. pushing new events to your event stores) is done by executing **commands**. They typically consist in:
 
