@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# ✍️ Pushing events / Commands
+# ✍️ Commands: Pushing Events
 
 ## Defining a command
 

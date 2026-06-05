@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# 🔗 Event Groups / Transactions
+# 🔗 Event Groups: Transactions
 
 Some commands can have an effect on **several event stores**, or on **several aggregates** of the same event store. For instance, the `CATCH_POKEMON` command could write both a `CAUGHT_BY_TRAINER` event on a pokemon aggregate (changing its `status` to `'caught'`) and a `POKEMON_CAUGHT` event on a trainer aggregate (appending the `pokemonId` to its `pokedex`).
 
