@@ -34,6 +34,8 @@ Note that setting a connected event store `eventStorageAdapter` and `onEventPush
 
 :::
 
+## Pairing with state-carrying channels
+
 If the message bus or queue is a state-carrying one, the `pushEvent` method will re-fetch the aggregate to append it to the message before publishing it. You can reduce this overhead by providing the previous aggregate as an option:
 
 ```ts
