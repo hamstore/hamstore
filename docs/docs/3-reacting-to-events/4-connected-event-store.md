@@ -4,6 +4,8 @@ sidebar_position: 4
 
 # 🔌 Connected Event Store
 
+## Using a ConnectedEventStore
+
 If your storage solution exposes data streaming capabilities (such as [DynamoDB streams](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html)), you can leverage them to push your freshly written events to a message bus or queue.
 
 Otherwise, you can use the `ConnectedEventStore` class. Its interface matches the `EventStore` one, but successfully pushing a new event will automatically forward it to a message queue/bus. Successfully pushing an event group will also automatically forward the events to their respective message queues/buses:
@@ -34,6 +36,8 @@ Note that setting a connected event store `eventStorageAdapter` and `onEventPush
 
 :::
 
+## Pairing with state-carrying channels
+
 If the message bus or queue is a state-carrying one, the `pushEvent` method will re-fetch the aggregate to append it to the message before publishing it. You can reduce this overhead by providing the previous aggregate as an option:
 
 ```ts
@@ -56,6 +60,8 @@ await EventStore.pushEventGroup(
   ),
 );
 ```
+
+## Trade-offs vs. data streams
 
 Compared to data streams, connected event stores have the advantage of simplicity, performances and costs. However, they **strongly decouple your storage and messaging solutions**: Make sure to anticipate any issue that might arise (consistency, non-caught errors etc.).
 

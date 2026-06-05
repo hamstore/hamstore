@@ -10,6 +10,8 @@ Events that concern the same entity (like a `Pokemon`) are aggregated through a 
 
 ![Events](../../assets/docSchemas/events.png)
 
+## Event details
+
 In Hamstore, stored events (also called **event details**) always have exactly the following properties:
 
 - <code>aggregateId <i>(string)</i></code>
@@ -38,6 +40,8 @@ type PokemonAppearedEventDetail = {
   metadata: { trigger?: 'random' | 'scripted' };
 };
 ```
+
+## Declaring event types
 
 Events are generally classified in **events types** (not to confuse with TS types). Hamstore lets you declare them via the `EventType` class:
 

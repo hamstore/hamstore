@@ -1,8 +1,14 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # 📖 Read Models
+
+:::info Planned feature
+
+Read models are **not implemented in Hamstore yet** — this page describes the concept and where we're headed.
+
+:::
 
 Even with snapshots, using the event store for querying needs (like displaying data in a web page) would be slow and inefficient, if not impossible depending on the access pattern.
 

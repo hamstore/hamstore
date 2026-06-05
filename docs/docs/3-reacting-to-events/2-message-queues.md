@@ -4,6 +4,8 @@ sidebar_position: 2
 
 # 📨 Message Queues
 
+## Defining a message queue
+
 [Message Queues](https://en.wikipedia.org/wiki/Message_queue) store the published messages until they are handled by a **worker**. The worker is unique and predictible. It consumes all messages indifferently of their content.
 
 ![Message Queue](../../assets/docSchemas/messageQueue.png)
@@ -29,6 +31,8 @@ await appMessageQueue.publishMessage({
 
 // Similar for AggregateExistsMessageQueue and StateCarryingMessageQueue
 ```
+
+## Connecting an adapter
 
 Similarly to event stores, `MessageQueue` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageQueueAdapter`, that will connect it to your actual messaging solution:
 
@@ -56,6 +60,8 @@ await messageQueue.publishMessage(...);
 You can code your own `MessageQueueAdapter` (simply implement the `MessageChannelAdapter` interface), but we highly recommend using an [off-the-shelf adapter](../4-packages.md#-message-queue-adapters) (if the messaging solution that you use does not have an adapter yet, feel free to create/upvote an issue, or contribute 🤗).
 
 :::
+
+## Typing your worker
 
 The adapter packages will also expose useful generics to type the arguments of your queue worker. For instance:
 

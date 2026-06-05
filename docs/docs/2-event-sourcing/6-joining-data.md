@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# 🔗 Joining data
+# 🔗 Event Groups: Transactions
 
 Some commands can have an effect on **several event stores**, or on **several aggregates** of the same event store. For instance, the `CATCH_POKEMON` command could write both a `CAUGHT_BY_TRAINER` event on a pokemon aggregate (changing its `status` to `'caught'`) and a `POKEMON_CAUGHT` event on a trainer aggregate (appending the `pokemonId` to its `pokedex`).
 
@@ -42,7 +42,7 @@ await EventStore.pushEventGroup(
 
 :::note
 
-Think of event groups as _"what JOINS would be in CRUD"_
+Think of an event group as a **transaction**: a set of writes — across one or more event stores — that must _all_ succeed or _all_ fail, never half-applied.
 
 :::
 

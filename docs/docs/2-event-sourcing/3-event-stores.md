@@ -14,7 +14,7 @@ Think of event stores as _"what tables would be in CRUD"_, except that instead o
 
 ![Event Store](../../assets/docSchemas/eventStore.png)
 
-In Hamstore, `EventStore` classes are NOT responsible for actually storing data (this will come with [event storage adapters](./4-fetching-events.md)). But rather to provide a boilerplate-free and type-safe interface to perform many actions such as:
+In Hamstore, `EventStore` classes are NOT responsible for actually storing data (this is the job of an [event storage adapter](#providing-a-storage-adapter)). They rather provide a boilerplate-free and type-safe interface to perform many actions such as:
 
 - Listing aggregate ids
 - Accessing events of an aggregate
@@ -43,6 +43,43 @@ const pokemonsEventStore = new EventStore({
 
 :::
 
+## Providing a storage adapter
+
+On its own, an `EventStore` doesn't persist anything — actually storing and retrieving events is the responsibility of an `EventStorageAdapter`. Until you provide one, the data-layer methods ([`getEvents`, `getAggregate`](./4-fetching-events.md), [`pushEvent`](./5-pushing-events.md)...) throw an `UndefinedEventStorageAdapterError`:
+
+```ts
+import { EventStore } from '@hamstore/core';
+
+await pokemonsEventStore.getEvents('pikachu1');
+// ❌ Throws an `UndefinedEventStorageAdapterError`
+```
+
+You can provide an adapter in the constructor, or set/switch it later (the property is not read-only):
+
+```ts
+const pokemonsEventStore = new EventStore({
+  eventStoreId: 'POKEMONS',
+  eventTypes: pokemonEventTypes,
+  reducer: pokemonsReducer,
+  // 👇 Provide it in the constructor
+  eventStorageAdapter: mySuperEventStorageAdapter,
+});
+
+// 👇 ...or set/switch it in context later
+pokemonsEventStore.eventStorageAdapter = mySuperEventStorageAdapter;
+
+const { events } = await pokemonsEventStore.getEvents('pikachu1');
+// 🙌 Will work!
+```
+
+:::info
+
+You can choose to build an event storage adapter that suits your usage. However, we highly recommend using an [off-the-shelf adapter](../4-packages.md#-event-storage-adapters) (if the storage solution that you use does not have an adapter yet, feel free to create/upvote an issue, or contribute 🤗).
+
+:::
+
+With an adapter in place, you can [fetch events and aggregates](./4-fetching-events.md) and [push new events](./5-pushing-events.md) — covered in the next pages.
+
 <details>
 <summary>
   <b>🔧 Reference</b>
@@ -54,7 +91,7 @@ const pokemonsEventStore = new EventStore({
 - <code>eventTypes <i>(EventType[])</i></code>: The list of event types in the event store
 - <code>reduce <i>(EventType[])</i></code>: A <a href="../aggregates-reducers">reducer function</a> that can be applied to the store event types
 - <code>onEventPushed <i>(?(pushEventResponse: PushEventResponse) => Promise&lt;void&gt;)</i></code>: To run a callback after events are pushed (input is exactly the return value of the <code>pushEvent</code> method)
-- <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="../fetching-events">fetching events</a>
+- <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="#providing-a-storage-adapter">providing a storage adapter</a>
 
 > ☝️ The return type of the `reducer` is used to infer the `Aggregate` type of the `EventStore`, so it is important to type it explicitely.
 
@@ -90,7 +127,7 @@ const onEventPushed = pokemonsEventStore.onEventPushed;
 // => undefined (we did not provide one in this example)
 ```
 
-- <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="../fetching-events">fetching events</a>
+- <code>eventStorageAdapter <i>(?EventStorageAdapter)</i></code>: See <a href="#providing-a-storage-adapter">providing a storage adapter</a>
 
 ```ts
 const eventStorageAdapter = pokemonsEventStore.eventStorageAdapter;
@@ -120,13 +157,13 @@ expect(() => pokemonsEventStore.getEventStorageAdapter()).toThrow(
 const myPikachuAggregate = pokemonsEventStore.buildAggregate(myPikachuEvents);
 ```
 
-- <code>groupEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => GroupedEvent)</i></code>: See <a href="../joining-data">joining data</a>.
+- <code>groupEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => GroupedEvent)</i></code>: See <a href="../joining-data">event groups / transactions</a>.
 
 ---
 
 **Async Methods:**
 
-The following methods interact with the data layer of your event store through its [`EventStorageAdapter`](./4-fetching-events.md). They will throw an `UndefinedEventStorageAdapterError` if you did not provide one.
+The following methods interact with the data layer of your event store through its [`EventStorageAdapter`](#providing-a-storage-adapter). They will throw an `UndefinedEventStorageAdapterError` if you did not provide one.
 
 - <code>getEvents <i>((aggregateId: string, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Retrieves the events of an aggregate, ordered by <code>version</code>. Returns an empty array if no event is found for this <code>aggregateId</code>.
 

@@ -16,6 +16,8 @@ In Hamstore, we distinguish three types of message:
 
 In Hamstore, they are implemented by the `AggregateExistsMessage`, `NotificationMessage` and `StateCarryingMessage` TS types:
 
+## AggregateExists messages
+
 ```ts
 // AggregateExistsMessage
 import type {
@@ -36,6 +38,8 @@ type PokemonAggregateExistsMessage = EventStoreAggregateExistsMessage<
   typeof pokemonsEventStore
 >;
 ```
+
+## Notification messages
 
 ```ts
 // NotificationMessage
@@ -60,6 +64,8 @@ type PokemonEventNotificationMessage = EventStoreNotificationMessage<
   typeof pokemonsEventStore
 >;
 ```
+
+## State-carrying messages
 
 ```ts
 // StateCarryingMessage
