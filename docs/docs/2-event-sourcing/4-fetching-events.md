@@ -17,13 +17,24 @@ const { events } = await pokemonsEventStore.getEvents('pikachu1');
 // => typed as PokemonEventDetail[] 🙌
 ```
 
-You can narrow the range with `minVersion` / `maxVersion`, cap the result with `limit`, or read newest-first with `reverse` — for instance, to grab only the latest event:
+You can narrow the range with `minVersion` / `maxVersion`, cap the result with `limit`, or read newest-first with `reverse`. For instance, to read a slice of an aggregate's history:
 
 ```ts
-const { events: lastEvent } = await pokemonsEventStore.getEvents('pikachu1', {
+const { events } = await pokemonsEventStore.getEvents('pikachu1', {
+  minVersion: 2,
+  maxVersion: 5,
+});
+// => events at versions 2 to 5
+```
+
+Or, if you only need the latest event, read newest-first and cap at 1 — cheaper than `getAggregate`, which fetches the whole history and folds it through the reducer:
+
+```ts
+const { events: [lastEvent] } = await pokemonsEventStore.getEvents('pikachu1', {
   reverse: true,
   limit: 1,
 });
+// => lastEvent: PokemonEventDetail | undefined
 ```
 
 ## Fetching an aggregate
@@ -43,7 +54,7 @@ The aggregate is `undefined` when no events exist for that id yet. Pass `maxVers
 Because `getAggregate` returns `undefined` for an unknown id, callers have to handle that case. When your code can't meaningfully continue without the aggregate, reach for `getExistingAggregate` instead: it behaves the same but throws an `AggregateNotFoundError` when no events exist, so `aggregate` and `lastEvent` are guaranteed to be defined:
 
 ```ts
-const { aggregate } =
+const { aggregate, lastEvent } =
   await pokemonsEventStore.getExistingAggregate('pikachu1');
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
