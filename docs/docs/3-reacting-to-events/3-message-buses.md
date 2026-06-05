@@ -14,7 +14,7 @@ You can use the `AggregateExistsMessageBus`, `NotificationMessageBus` or `StateC
 import { NotificationMessageBus } from '@hamstore/core';
 
 const appMessageBus = new NotificationMessageBus({
-  messageBusId: 'APP_MESSAGE_BUSES',
+  messageBusId: 'APP_MESSAGE_BUS',
   sourceEventStores: [pokemonsEventStore, trainersEventStore...],
 });
 
@@ -97,7 +97,7 @@ const pokemonMessagesListener = async (
 
 ```ts
 const appMessageBusId = appMessageBus.messageChannelId;
-// => 'APP_MESSAGE_BUSES'
+// => 'APP_MESSAGE_BUS'
 ```
 
 - <code>sourceEventStores <i>(EventStore[])</i></code>
