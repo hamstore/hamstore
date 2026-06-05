@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Aggregates
 
-Eventhough entities are stored as series of events, we still want to use a **simpler and stable interface to represent their states at a point in time** rather than directly using events. In Hamstore, it is implemented by a TS type called `Aggregate`.
+Even though entities are stored as series of events, we still want to use a **simpler and stable interface to represent their states at a point in time** rather than directly using events. In Hamstore, it is implemented by a TS type called `Aggregate`.
 
 :::note
 

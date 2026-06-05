@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Defining a message queue
 
-[Message Queues](https://en.wikipedia.org/wiki/Message_queue) store the published messages until they are handled by a **worker**. The worker is unique and predictible. It consumes all messages indifferently of their content.
+[Message Queues](https://en.wikipedia.org/wiki/Message_queue) store the published messages until they are handled by a **worker**. The worker is unique and predictable. It consumes all messages indifferently of their content.
 
 ![Message Queue](../../assets/docSchemas/messageQueue.png)
 
@@ -37,8 +37,6 @@ await appMessageQueue.publishMessage({
 Similarly to event stores, `MessageQueue` classes provide a boilerplate-free and type-safe interface to publish messages, but are NOT responsible for actually doing so. This is the responsibility of the `MessageQueueAdapter`, that will connect it to your actual messaging solution:
 
 ```ts
-import { EventStore } from '@hamstore/core';
-
 await messageQueue.publishMessage(...);
 // ❌ Will throw an `UndefinedMessageChannelAdapterError`
 

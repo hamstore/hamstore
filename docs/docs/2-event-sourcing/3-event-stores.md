@@ -317,7 +317,7 @@ type PokemonsEventStoreId = EventStoreId<typeof pokemonsEventStore>;
 // => 'POKEMONS'
 ```
 
-- `EventStoreEventTypes`: Returns the `EventStore` list of events types
+- `EventStoreEventTypes`: Returns the `EventStore` list of event types
 
 ```ts
 import type { EventStoreEventTypes } from '@hamstore/core';

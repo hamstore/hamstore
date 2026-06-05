@@ -63,7 +63,7 @@ await EventStore.pushEventGroup(
 
 ## Trade-offs vs. data streams
 
-Compared to data streams, connected event stores have the advantage of simplicity, performances and costs. However, they **strongly decouple your storage and messaging solutions**: Make sure to anticipate any issue that might arise (consistency, non-caught errors etc.).
+Compared to data streams, connected event stores have the advantage of simplicity, performance and costs. However, they **strongly decouple your storage and messaging solutions**: Make sure to anticipate any issue that might arise (consistency, uncaught errors etc.).
 
 ![Connected Event Store](../../assets/docSchemas/connectedEventStore.png)
 

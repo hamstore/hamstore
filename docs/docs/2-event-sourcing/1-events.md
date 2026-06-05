@@ -43,7 +43,7 @@ type PokemonAppearedEventDetail = {
 
 ## Declaring event types
 
-Events are generally classified in **events types** (not to confuse with TS types). Hamstore lets you declare them via the `EventType` class:
+Events are generally classified in **event types** (not to confuse with TS types). Hamstore lets you declare them via the `EventType` class:
 
 ```ts
 import { EventType } from '@hamstore/core';
