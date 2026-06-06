@@ -2,9 +2,14 @@
 sidebar_position: 5
 ---
 
-# ✍️ Commands: Pushing Events
+# ✍️ Pushing Events
 
-## Defining a command
+Modifying application state means pushing new events to your event stores. There are two tools for this, and the rest of the page is organised around them:
+
+- **[`AggregateHandle`](#pushing-events-with-an-aggregatehandle)** — the recommended, boilerplate-free way to write to a single aggregate.
+- **[Commands](#defining-a-command)** — the unit that wraps a write (validation + the optimistic-concurrency retry loop), and the place a handle is typically opened.
+
+## Defining a command {#defining-a-command}
 
 Modifying the state of your application (i.e. pushing new events to your event stores) is done by executing **commands**. They typically consist in:
 
@@ -112,7 +117,7 @@ The handle is **immutable**: `pikachu.aggregate` always reflects the read it was
 - <code>handle.pushEvent(input, opt?)</code>: Pushes **one** event and commits it. Returns `{ event, nextAggregate }`.
 - <code>handle.pushEvents([input | fn, ...], opt?)</code>: Pushes **multiple** events on the aggregate **atomically** (all-or-nothing) and commits them. Returns `{ events, nextAggregate }`.
 
-`aggregateId` and `version` are filled in from the handle (you can still override them in `input`), so you only provide `type` / `payload` / `metadata`:
+`aggregateId` and `version` are filled in from the handle, so you only provide `type` / `payload` / `metadata`. The singular `pushEvent` still lets you override `aggregateId` / `version` in `input`; the chained `pushEvents` rejects those overrides (it owns sequential version assignment) and rejects an empty list:
 
 ```ts
 const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
@@ -159,6 +164,52 @@ await EventStore.pushEventGroup(
 `groupEvent` does **not** chain: calling it twice on the same handle produces two events pinned at the **same** `nextVersion`, which collide loudly on push (`EventAlreadyExistsError` on the duplicate `(aggregateId, version)`). When one aggregate contributes more than one event to the group, use `groupEvents([...])` instead.
 
 :::
+
+<details>
+<summary>
+  <b>🔧 Reference</b>
+</summary>
+
+A handle is **obtained from an `EventStore`** (or `ConnectedEventStore`) via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
+
+**Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle fills those in. The singular <code>pushEvent</code> / <code>groupEvent</code> still let you override <code>version</code> / <code>aggregateId</code> in the input; the chained <code>pushEvents</code> / <code>groupEvents</code> **reject** those overrides (the handle owns sequential version assignment) and **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events.
+
+**`opt`** is <code>&#123; validate?: ValidateEventDetail &#125;</code> on every method. There is deliberately no <code>force</code> option.
+
+---
+
+**Properties:**
+
+- <code>aggregateId <i>(string)</i></code>: The id of the aggregate this handle writes to.
+- <code>aggregate <i>(?Aggregate)</i></code>: The aggregate at the version the handle was opened with — always reflects that read and is never rolled forward (the handle is immutable). <code>undefined</code> for an aggregate that does not exist yet.
+- <code>nextVersion <i>(number)</i></code>: The version the next pushed event will get, i.e. <code>(aggregate?.version ?? 0) + 1</code> — so <code>1</code> for a brand-new aggregate.
+
+---
+
+**Self-committing methods (single aggregate):**
+
+- <code>pushEvent <i>((input, opt?) => Promise&lt;&#123; event, nextAggregate &#125;&gt;)</i></code>: Pushes **one** event and commits it. <code>nextAggregate</code> is always defined.
+- <code>pushEvents <i>(([input | fn, ...], opt?) => Promise&lt;&#123; events, nextAggregate &#125;&gt;)</i></code>: Pushes **multiple** chained events on the aggregate **atomically** and commits them. <code>nextAggregate</code> is rebuilt from the committed events.
+
+**Group-building methods (cross-aggregate, do not commit):**
+
+- <code>groupEvent <i>((input, opt?) => GroupedEvent)</i></code>: Builds **one** <code>GroupedEvent</code> for this aggregate, to pass to <code>EventStore.pushEventGroup</code>. Does not chain.
+- <code>groupEvents <i>(([input | fn, ...], opt?) => GroupedEvent[])</i></code>: Builds **multiple chained** <code>GroupedEvent</code>s on this aggregate.
+
+```ts
+const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
+
+pikachu.aggregateId; //  => 'pikachu1'
+pikachu.nextVersion; //  => e.g. 4
+
+// Self-committing:
+const { nextAggregate } = await pikachu.pushEvent({ type: 'POKEMON_LEVELED_UP' });
+
+// Build a grouped event for a cross-aggregate transaction:
+const grouped = pikachu.groupEvent({ type: 'POKEMON_LEVELED_UP' });
+```
+
+</details>
 
 ## 🔧 Direct (low-level) pushing {#direct-low-level-pushing}
 
