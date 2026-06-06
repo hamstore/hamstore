@@ -254,9 +254,20 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
 }
 
 /**
- * @internal — shared open-operations delegated to by `EventStore` and
- * `ConnectedEventStore` (so each only carries one-line methods and the
- * publish-routing rebind comes for free from passing the right `store`).
+ * Read an aggregate from `store` (via its lean `getAggregate`) and wrap it in an
+ * {@link AggregateHandle}. This is the building block that `EventStore` and
+ * `ConnectedEventStore` `openAggregate` delegate to — a class that
+ * `implements EventStore` can reuse it to implement `openAggregate` in one line
+ * rather than reimplementing the read + handle construction:
+ *
+ * ```ts
+ * openAggregate(id: string, options?: GetAggregateOptions) {
+ *   return readHandle(this, EventStore.pushEventGroup, id, options);
+ * }
+ * ```
+ *
+ * Passing `this` is what makes the handle's reads and its commit route through
+ * the store you call it on (so e.g. a `ConnectedEventStore` keeps publishing).
  */
 export const readHandle = async <ES extends EventStore>(
   store: ES,
@@ -274,7 +285,10 @@ export const readHandle = async <ES extends EventStore>(
   });
 };
 
-/** @internal */
+/**
+ * Like {@link readHandle}, but throws {@link AggregateNotFoundError} if the
+ * aggregate does not exist. Backs `openExistingAggregate`.
+ */
 export const readExistingHandle = async <ES extends EventStore>(
   store: ES,
   commitGroup: EventGroupPusher,
@@ -293,7 +307,11 @@ export const readExistingHandle = async <ES extends EventStore>(
   return handle;
 };
 
-/** @internal */
+/**
+ * Synchronously wrap an aggregate you already hold (no I/O) in an
+ * {@link AggregateHandle}. Backs `openAggregateFrom`; useful for replay /
+ * first-event / "I already read it" paths.
+ */
 export const handleFrom = <ES extends EventStore>(
   store: ES,
   commitGroup: EventGroupPusher,

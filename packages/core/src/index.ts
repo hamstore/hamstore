@@ -25,6 +25,9 @@ export {
   eventAlreadyExistsErrorCode,
   EventStore,
   AggregateHandle,
+  readHandle,
+  readExistingHandle,
+  handleFrom,
 } from './eventStore';
 export type {
   AggregateHandleEventInput,
