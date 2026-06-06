@@ -6,6 +6,12 @@ import { GroupedEvent } from '~/event/groupedEvent';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
+import {
+  AggregateHandle,
+  handleFrom,
+  readExistingHandle,
+  readHandle,
+} from './aggregateHandle';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
 import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
@@ -22,6 +28,7 @@ import type {
   AggregateGetter,
   AggregateAndEventsGetter,
   AggregateSimulator,
+  GetAggregateOptions,
   Reducer,
   ValidateEventDetail,
 } from './types';
@@ -209,6 +216,44 @@ export class EventStore<
   simulateAggregate: AggregateSimulator<$EVENT_DETAILS, AGGREGATE>;
   eventStorageAdapter?: EventStorageAdapter;
   getEventStorageAdapter: () => EventStorageAdapter;
+
+  /**
+   * Read an aggregate and wrap it in an immutable, version-pinned
+   * {@link AggregateHandle} that auto-fills `aggregateId`/`version`/
+   * `prevAggregate` on every push. Open a fresh handle per command attempt
+   * (a handle held across an optimistic-concurrency retry is stale).
+   */
+  openAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readHandle(this, EventStore.pushEventGroup, aggregateId, options);
+  }
+
+  /** Like {@link openAggregate}, but throws if the aggregate does not exist. */
+  openExistingAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readExistingHandle(
+      this,
+      EventStore.pushEventGroup,
+      aggregateId,
+      options,
+    );
+  }
+
+  /**
+   * Build a handle from already-known state (replay, bulk import) or from a
+   * blank slate (`aggregate: undefined` ⇒ first event at version 1). Does not
+   * read storage.
+   */
+  openAggregateFrom(args: {
+    aggregateId: string;
+    aggregate?: AGGREGATE;
+  }): AggregateHandle<this> {
+    return handleFrom(this, EventStore.pushEventGroup, args);
+  }
 
   constructor({
     eventStoreId,

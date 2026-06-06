@@ -271,6 +271,8 @@ const { aggregate, events, lastEvent } =
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
+- <code>openAggregate <i>((aggregateId: string, opt?: GetAggregateOptions) => Promise&lt;AggregateHandle&gt;)</i></code>, <code>openExistingAggregate <i>(...)</i></code>, <code>openAggregateFrom <i>((&#123; aggregateId, aggregate? &#125;) => AggregateHandle)</i></code>: Open an immutable, version-pinned write handle for a single aggregate. **This is the recommended way to push aggregate changes** — see [Pushing Events with an `AggregateHandle`](./5-pushing-events.md#pushing-events-with-an-aggregatehandle). The methods below (<code>pushEvent</code> / <code>groupEvent</code>) are the lower-level primitives the handle is built on; reach for them directly when you need explicit version control or a force push.
+
 - <code>pushEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Pushes a new event to the event store. The <code>timestamp</code> is optional (we keep it available as it can be useful in tests & migrations). If not provided, it is automatically set as <code>new Date().toISOString()</code>. Throws an <code>EventAlreadyExistsError</code> if an event already exists for the corresponding <code>aggregateId</code> and <code>version</code> (see section on <a href="../pushing-events">race conditions</a>).
 
   `OptionsObj` contains the following properties:

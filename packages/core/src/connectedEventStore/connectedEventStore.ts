@@ -1,16 +1,24 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
+import {
+  EventStore,
+  handleFrom,
+  readExistingHandle,
+  readHandle,
+} from '~/eventStore';
 import type {
   AggregateGetter,
+  AggregateHandle,
   AggregateIdsLister,
   AggregateSimulator,
   EventGrouper,
   EventPusher,
   AggregateAndEventsGetter,
   EventsGetter,
-  EventStore,
+  GetAggregateOptions,
   OnEventPushed,
   Reducer,
   SideEffectsSimulator,
@@ -155,6 +163,32 @@ export class ConnectedEventStore<
     eventStorageAdapter: EventStorageAdapter | undefined,
   ) {
     this.eventStore.eventStorageAdapter = eventStorageAdapter;
+  }
+
+  openAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readHandle(this, EventStore.pushEventGroup, aggregateId, options);
+  }
+
+  openExistingAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readExistingHandle(
+      this,
+      EventStore.pushEventGroup,
+      aggregateId,
+      options,
+    );
+  }
+
+  openAggregateFrom(args: {
+    aggregateId: string;
+    aggregate?: AGGREGATE;
+  }): AggregateHandle<this> {
+    return handleFrom(this, EventStore.pushEventGroup, args);
   }
 
   get eventStorageAdapter(): EventStorageAdapter | undefined {
