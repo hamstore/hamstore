@@ -10,20 +10,47 @@ Some commands can have an effect on **several event stores**, or on **several ag
 
 To not have your application in a corrupt state, it's important to make sure that **all those events are pushed or none**. In Hamstore, this can be done through the **event groups** API:
 
-- You can use the `groupEvent` method to build an array of events that are to be pushed together. It has the same input interface as `pushEvent` but synchronously returns a `GroupedEvent` class.
+- You build the grouped events to push together — each one synchronously returns a `GroupedEvent` class.
 - The `EventStore` class exposes a static `pushEventGroup` method that can be used to effectively push this event group.
+
+The recommended way to build the grouped events is from an [`AggregateHandle`](./5-pushing-events.md#pushing-events-with-an-aggregatehandle): `handle.groupEvent(...)` fills in `aggregateId` and the next `version` for you, so each store contributes its event without manual version bookkeeping:
+
+```ts
+const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
+const ash = await trainersEventStore.openExistingAggregate('ashKetchum');
+
+await EventStore.pushEventGroup(
+  // 👇 aggregateId + version filled in from the handle
+  pikachu.groupEvent({
+    type: 'CAUGHT_BY_TRAINER',
+    payload: { trainerId: 'ashKetchum' },
+  }),
+  ash.groupEvent({
+    type: 'POKEMON_CAUGHT',
+    payload: { pokemonId: 'pikachu1' },
+  }),
+);
+```
+
+When one aggregate contributes **more than one** event to the group, use `handle.groupEvents([...])` (which chains them on that aggregate) instead of calling `groupEvent` twice — two `groupEvent` calls on the same handle target the same version and collide on push.
+
+### Low-level event groups
+
+You can also build grouped events directly on the event store with `eventStore.groupEvent(...)` — it has the same input interface as [`pushEvent`](./5-pushing-events.md#direct-low-level-pushing) (you provide the `version` yourself), and accepts options like `{ force: true }` on `pushEventGroup`:
 
 ```ts
 await EventStore.pushEventGroup(
   pokemonsEventStore.groupEvent({
-    // 👇 Correctly typed
+    // 👇 Correctly typed, explicit version
     aggregateId: 'pikachu1',
+    version: lastVersion + 1,
     type: 'CAUGHT_BY_TRAINER',
     payload: { trainerId: 'ashKetchum' },
     ...
   }),
   trainersEventStore.groupEvent({
     aggregateId: 'ashKetchum',
+    version: lastVersion + 1,
     type: 'POKEMON_CAUGHT',
     payload: { pokemonId: 'pikachu1' },
     ...
