@@ -96,7 +96,7 @@ Fetching and pushing events non-simultaneously exposes your application to [race
 
 An **`AggregateHandle`** is an immutable, version-pinned write handle for a single aggregate. It removes the boilerplate of reading an aggregate, tracking its `version`, and threading `aggregateId` / `prevAggregate` through every push. It is the **recommended way to push aggregate changes**.
 
-You obtain one from an `EventStore` (or a [`ConnectedEventStore`](../3-reacting-to-events/4-connected-event-store.md)) through three getters:
+You obtain one from an `EventStore` through three getters:
 
 - <code>openAggregate(aggregateId, opt?)</code>: Reads the aggregate and returns a handle. `handle.aggregate` may be `undefined` (new aggregate).
 - <code>openExistingAggregate(aggregateId, opt?)</code>: Same, but throws an `AggregateNotFoundError` if the aggregate does not exist yet — so `handle.aggregate` is always defined.
@@ -170,7 +170,7 @@ await EventStore.pushEventGroup(
   <b>🔧 Reference</b>
 </summary>
 
-A handle is **obtained from an `EventStore`** (or `ConnectedEventStore`) via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
+A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
 
 **Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle fills those in. The singular <code>pushEvent</code> / <code>groupEvent</code> still let you override <code>version</code> / <code>aggregateId</code> in the input; the chained <code>pushEvents</code> / <code>groupEvents</code> **reject** those overrides (the handle owns sequential version assignment) and **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events.
 
