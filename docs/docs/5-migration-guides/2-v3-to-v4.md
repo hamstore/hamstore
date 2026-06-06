@@ -109,3 +109,57 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 ## What this unlocks
 
 `getAggregate` no longer being contractually required to expose the full event list lets the snapshot integration (next on the v4 roadmap) seed the aggregate from a snapshot and only fetch the trailing events on top of it — without forcing a misleading "partial" `events` array on every caller. Callers that genuinely need the full history opt into it explicitly via `getAggregateAndEvents`, which is also the right place to think about whether you need to load the full history at all.
+
+---
+
+# `AggregateHandle`: new `open*` methods on `EventStore`
+
+v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through three new `EventStore` methods: `openAggregate`, `openExistingAggregate`, and `openAggregateFrom`.
+
+`EventStore` is a class that also serves as the structural contract for event stores (hamstore's own `ConnectedEventStore` is declared `implements EventStore`). Adding instance methods to it **widens that contract**, which is the breaking part — though for almost all usage there is nothing to do:
+
+- **You instantiate `EventStore` directly (`new EventStore({ … })`) — no change.** The methods are concrete; this is purely additive.
+- **You subclass it (`class Mine extends EventStore`) — no change.** Subclasses inherit the new methods automatically, and because the bodies dispatch through `this`, they behave correctly (including any publishing your subclass wires up).
+- **You structurally implement it (`class Mine implements EventStore<…>`) — you must add the three methods.** This is the wrapper / decorator pattern (the same reason `ConnectedEventStore` grew them). This is the only case that requires a change.
+
+## Migration recipe (only for `implements EventStore`)
+
+The method bodies are fully generic over the store, so delegate to the exported helpers — this is exactly what `ConnectedEventStore` does:
+
+```ts
+import {
+  EventStore,
+  handleFrom,
+  readExistingHandle,
+  readHandle,
+  type AggregateHandle,
+  type GetAggregateOptions,
+} from '@hamstore/core';
+
+class MyEventStore implements EventStore</* … */> {
+  // … existing members …
+
+  openAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readHandle(this, EventStore.pushEventGroup, aggregateId, options);
+  }
+
+  openExistingAggregate(
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<this>> {
+    return readExistingHandle(this, EventStore.pushEventGroup, aggregateId, options);
+  }
+
+  openAggregateFrom(args: {
+    aggregateId: string;
+    aggregate?: MyAggregate;
+  }): AggregateHandle<this> {
+    return handleFrom(this, EventStore.pushEventGroup, args);
+  }
+}
+```
+
+Passing `this` to the helpers is what makes the handle route its reads — and the publish-side commit — through your store, so a wrapper keeps its event-publishing behaviour without any extra rebind.
