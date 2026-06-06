@@ -42,11 +42,19 @@ export type AggregateHandleEventInputOrFn<ES extends EventStore> =
 /**
  * Concrete (non-generic) view of {@link EventGroupPusher} that accepts a
  * dynamic array. The generic signature can't be called with a spread of a
- * runtime-length array (TS2556), so {@link AggregateHandle.pushEvents} narrows
- * to this for the commit.
+ * runtime-length array (TS2556), so {@link AggregateHandle} stores the group
+ * pusher narrowed to this for the commit.
+ *
+ * Storing the narrowed type (rather than `EventGroupPusher`) is also what keeps
+ * `AggregateHandle` — and therefore `EventStore` — structurally comparable
+ * across two copies of `@hamstore/core` (e.g. under `preserveSymlinks`): the
+ * full `EventGroupPusher` carries a `GroupedEvent | { force? }` union in a
+ * contravariant position whose comparison recurses through
+ * `GroupedEvent.eventStore` back into `EventStore` and trips a spurious
+ * incompatibility. `never[]` params avoid that recursion entirely.
  */
 type CommitGroupedEvents = (
-  ...groupedEvents: GroupedEvent[]
+  ...groupedEvents: never[]
 ) => Promise<{ eventGroup: { event: EventDetail }[] }>;
 
 /**
@@ -66,8 +74,14 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   readonly aggregate: EventStoreAggregate<ES> | undefined;
   readonly nextVersion: number;
 
-  private readonly store: ES;
-  private readonly commitGroup: EventGroupPusher;
+  // `store`/`commitGroup` are deliberately public (like `GroupedEvent`'s
+  // fields): TS `private`/`#` members are nominal, which would make two copies
+  // of `@hamstore/core` produce mutually-incompatible `AggregateHandle` (and
+  // thus `EventStore`) types. Treat them as internal.
+  /** @internal */
+  readonly store: ES;
+  /** @internal */
+  readonly commitGroup: CommitGroupedEvents;
 
   constructor({
     store,
@@ -81,13 +95,17 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     aggregate?: EventStoreAggregate<ES>;
   }) {
     this.store = store;
-    this.commitGroup = commitGroup;
+    this.commitGroup = commitGroup as unknown as CommitGroupedEvents;
     this.aggregateId = aggregateId;
     this.aggregate = aggregate;
     this.nextVersion = (aggregate?.version ?? 0) + 1;
   }
 
-  private fill(input: AggregateHandleEventInput<ES>, version: number) {
+  /** @internal */
+  fill(
+    input: AggregateHandleEventInput<ES>,
+    version: number,
+  ): Parameters<ES['groupEvent']>[0] {
     return {
       aggregateId: this.aggregateId,
       version,
@@ -99,16 +117,29 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
    * Fold a list of inputs into grouped events, walking a *local* aggregate copy
    * forward between steps. Pure with respect to the handle.
    */
-  private chain(
+  chain(
     inputs: AggregateHandleEventInputOrFn<ES>[],
     options?: { validate?: ValidateEventDetail },
-  ) {
+  ): { grouped: GroupedEvent[]; nextAggregate: EventStoreAggregate<ES> } {
+    if (inputs.length === 0) {
+      throw new Error(
+        'AggregateHandle: cannot push/group an empty list of events. Pass at least one event input.',
+      );
+    }
+
     let running = this.aggregate;
     let version = this.nextVersion;
     const grouped: GroupedEvent[] = [];
 
     for (const input of inputs) {
       const resolved = typeof input === 'function' ? input(running) : input;
+      const { version: versionOverride, aggregateId: aggregateIdOverride } =
+        resolved as { version?: number; aggregateId?: string };
+      if (versionOverride !== undefined || aggregateIdOverride !== undefined) {
+        throw new Error(
+          'AggregateHandle: per-event `version` / `aggregateId` overrides are not allowed in pushEvents / groupEvents — the handle assigns sequential versions for the chain. Use pushEvent / groupEvent for a single, overridable event.',
+        );
+      }
       const event = this.fill(resolved, version);
       grouped.push(
         this.store.groupEvent(event, {
@@ -178,15 +209,21 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     events: EventStoreEventDetails<ES>[];
     nextAggregate: EventStoreAggregate<ES>;
   }> {
-    const { grouped, nextAggregate } = this.chain(inputs, options);
+    const { grouped } = this.chain(inputs, options);
 
-    const commit = this.commitGroup as unknown as CommitGroupedEvents;
-    const { eventGroup } = await commit(...grouped);
+    const { eventGroup } = await this.commitGroup(...(grouped as never[]));
+    const events = eventGroup.map(({ event }) => event);
+
+    // Rebuild `nextAggregate` from the *committed* events (which carry the
+    // adapter-assigned `timestamp` etc.) rather than the pre-commit local fold,
+    // so it matches what was actually persisted.
+    const nextAggregate = this.store.buildAggregate(
+      events as never,
+      this.aggregate as never,
+    ) as EventStoreAggregate<ES>;
 
     return {
-      events: eventGroup.map(
-        ({ event }) => event,
-      ) as EventStoreEventDetails<ES>[],
+      events: events as EventStoreEventDetails<ES>[],
       nextAggregate,
     };
   }
