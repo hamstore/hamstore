@@ -37,7 +37,7 @@ const catchPokemonCommand = new Command({
     const { name, level } = commandInput;
     const pokemonId = generateUuid();
 
-    // 👇 New aggregate: no read needed, the handle pins version 1
+    // 👇 New aggregate: no read needed, the handle pins nextVersion = 1
     const pikachu = pokemonsEventStore.openAggregateFrom({
       aggregateId: pokemonId,
     });

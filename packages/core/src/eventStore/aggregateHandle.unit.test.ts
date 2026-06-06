@@ -129,12 +129,15 @@ describe('AggregateHandle', () => {
 
   describe('pushEvents', () => {
     it('chains dependent events and commits them atomically', async () => {
-      pushEventGroupMock.mockResolvedValue({
-        eventGroup: [
-          { event: { ...pikachuAppearedEvent, version: 2 } },
-          { event: { ...pikachuAppearedEvent, version: 3 } },
-        ],
-      });
+      // Echo back the committed events (like a real storage adapter), so the
+      // rebuilt `nextAggregate` reflects what was actually persisted.
+      pushEventGroupMock.mockImplementation(
+        (_options: { force?: boolean }, ...grouped: GroupedEvent[]) => ({
+          eventGroup: grouped.map(groupedEvent => ({
+            event: groupedEvent.event,
+          })),
+        }),
+      );
 
       const seen: Array<{ level: number; version: number } | undefined> = [];
 
@@ -243,6 +246,31 @@ describe('AggregateHandle', () => {
         version: 3,
         type: 'POKEMON_LEVELED_UP',
       });
+    });
+
+    it('rejects an empty list of inputs', () => {
+      const handle = pokemonsEventStore.openAggregateFrom({
+        aggregateId: pikachuId,
+      });
+
+      expect(() => handle.groupEvents([])).toThrow(/empty list of events/);
+    });
+
+    it('rejects per-event version / aggregateId overrides', () => {
+      const handle = pokemonsEventStore.openAggregateFrom({
+        aggregateId: pikachuId,
+      });
+
+      expect(() =>
+        handle.groupEvents([
+          { type: 'POKEMON_LEVELED_UP', version: 9 } as never,
+        ]),
+      ).toThrow(/overrides are not allowed/);
+      expect(() =>
+        handle.groupEvents([
+          { type: 'POKEMON_LEVELED_UP', aggregateId: 'other' } as never,
+        ]),
+      ).toThrow(/overrides are not allowed/);
     });
   });
 });
