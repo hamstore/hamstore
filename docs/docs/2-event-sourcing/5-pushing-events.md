@@ -117,7 +117,7 @@ The handle is **immutable**: `pikachu.aggregate` always reflects the read it was
 - <code>handle.pushEvent(input, opt?)</code>: Pushes **one** event and commits it. Returns `{ event, nextAggregate }`.
 - <code>handle.pushEvents([input | fn, ...], opt?)</code>: Pushes **multiple** events on the aggregate **atomically** (all-or-nothing) and commits them. Returns `{ events, nextAggregate }`.
 
-`aggregateId` and `version` are filled in from the handle, so you only provide `type` / `payload` / `metadata`. The singular `pushEvent` still lets you override `aggregateId` / `version` in `input`; the chained `pushEvents` rejects those overrides (it owns sequential version assignment) and rejects an empty list:
+`aggregateId` and `version` are always filled in from the handle, so you only provide `type` / `payload` / `metadata` — neither can be set in `input` (reach for the low-level [`eventStore.pushEvent`](#direct-low-level-pushing) if you need explicit control). `pushEvents` additionally rejects an empty list:
 
 ```ts
 const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
@@ -147,7 +147,7 @@ The handle **never force-pushes**: it exists to honour an expected version, so b
 When a command writes to **several aggregates** (across one or more event stores), the commit is owned by the static `EventStore.pushEventGroup` — the handle can't self-commit. Build the grouped events from each handle and push them together (see [Event Groups: Transactions](./6-joining-data.md)):
 
 - <code>handle.groupEvent(input, opt?)</code>: Builds **one** `GroupedEvent` for this aggregate — the common "N stores, one event each" case.
-- <code>handle.groupEvents([input | fn, ...], opt?)</code>: Builds **multiple chained** `GroupedEvent`s on one aggregate.
+- <code>handle.groupEvents([input | fn, ...], opt?)</code>: Builds **multiple chained** `GroupedEvent`s on one aggregate. The result is a fixed-size tuple the **same length** as its input, so it can be spread straight into `EventStore.pushEventGroup`.
 
 ```ts
 const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
@@ -172,7 +172,7 @@ await EventStore.pushEventGroup(
 
 A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
 
-**Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle fills those in. The singular <code>pushEvent</code> / <code>groupEvent</code> still let you override <code>version</code> / <code>aggregateId</code> in the input; the chained <code>pushEvents</code> / <code>groupEvents</code> **reject** those overrides (the handle owns sequential version assignment) and **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events.
+**Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle owns <code>aggregateId</code> / <code>version</code> and they **cannot** be set in the input (use the low-level <code>eventStore.pushEvent</code> for explicit control). The chained <code>pushEvents</code> / <code>groupEvents</code> additionally **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events, and the result is a fixed-size tuple the **same length** as the input.
 
 **`opt`** is <code>&#123; validate?: ValidateEventDetail &#125;</code> on every method. There is deliberately no <code>force</code> option.
 
@@ -189,12 +189,12 @@ A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <
 **Self-committing methods (single aggregate):**
 
 - <code>pushEvent <i>((input, opt?) => Promise&lt;&#123; event, nextAggregate &#125;&gt;)</i></code>: Pushes **one** event and commits it. <code>nextAggregate</code> is always defined.
-- <code>pushEvents <i>(([input | fn, ...], opt?) => Promise&lt;&#123; events, nextAggregate &#125;&gt;)</i></code>: Pushes **multiple** chained events on the aggregate **atomically** and commits them. <code>nextAggregate</code> is rebuilt from the committed events.
+- <code>pushEvents <i>(([input | fn, ...], opt?) => Promise&lt;&#123; events, nextAggregate &#125;&gt;)</i></code>: Pushes **multiple** chained events on the aggregate **atomically** and commits them. <code>events</code> is a fixed-size tuple the same length as the input; <code>nextAggregate</code> is rebuilt from the committed events.
 
 **Group-building methods (cross-aggregate, do not commit):**
 
 - <code>groupEvent <i>((input, opt?) => GroupedEvent)</i></code>: Builds **one** <code>GroupedEvent</code> for this aggregate, to pass to <code>EventStore.pushEventGroup</code>. Does not chain.
-- <code>groupEvents <i>(([input | fn, ...], opt?) => GroupedEvent[])</i></code>: Builds **multiple chained** <code>GroupedEvent</code>s on this aggregate.
+- <code>groupEvents <i>(([input | fn, ...], opt?) => [GroupedEvent, ...])</i></code>: Builds **multiple chained** <code>GroupedEvent</code>s on this aggregate. Returns a fixed-size tuple the same length as the input, so it can be spread straight into <code>EventStore.pushEventGroup</code>.
 
 ```ts
 const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
@@ -207,6 +207,11 @@ const { nextAggregate } = await pikachu.pushEvent({ type: 'POKEMON_LEVELED_UP' }
 
 // Build a grouped event for a cross-aggregate transaction:
 const grouped = pikachu.groupEvent({ type: 'POKEMON_LEVELED_UP' });
+
+// groupEvents returns a fixed-length tuple — spread it into pushEventGroup:
+await EventStore.pushEventGroup(
+  ...pikachu.groupEvents([{ type: 'POKEMON_LEVELED_UP' }, { type: 'POKEMON_EVOLVED' }]),
+);
 ```
 
 </details>

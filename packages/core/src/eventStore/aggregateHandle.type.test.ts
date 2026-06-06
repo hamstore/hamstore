@@ -45,12 +45,6 @@ const assertPushEventOutput: A.Equals<
 > = 1;
 assertPushEventOutput;
 
-const assertPushEventsOutput: A.Equals<
-  Awaited<ReturnType<PokemonHandle['pushEvents']>>,
-  { events: PokemonEventDetails[]; nextAggregate: PokemonAggregate }
-> = 1;
-assertPushEventsOutput;
-
 // --- GROUP EVENT / GROUP EVENTS ---
 
 const assertGroupEventOutput: A.Equals<
@@ -59,8 +53,44 @@ const assertGroupEventOutput: A.Equals<
 > = 1;
 assertGroupEventOutput;
 
-const assertGroupEventsOutput: A.Equals<
-  ReturnType<PokemonHandle['groupEvents']>,
-  GroupedEvent<PokemonEventDetails, PokemonAggregate>[]
+// --- CHAINED METHODS MIRROR THE INPUT LENGTH (fixed-size tuples) ---
+//
+// `pushEvents` / `groupEvents` are generic over a `const` tuple of inputs, so a
+// concrete N-element call returns an N-element tuple (not a `[]`). We observe
+// the *call-site* instantiation via the return type of a never-invoked probe —
+// a conditional-inference `extends (inputs: I) => infer R` would only see the
+// generic instantiated at its (open-ended) constraint.
+
+declare const handle: PokemonHandle;
+
+function groupEventsProbe() {
+  return handle.groupEvents([
+    { type: 'POKEMON_LEVELED_UP' },
+    { type: 'POKEMON_LEVELED_UP' },
+  ]);
+}
+
+function pushEventsProbe() {
+  return handle.pushEvents([
+    { type: 'POKEMON_LEVELED_UP' },
+    { type: 'POKEMON_LEVELED_UP' },
+  ]);
+}
+
+const assertGroupEventsTuple: A.Equals<
+  ReturnType<typeof groupEventsProbe>,
+  [
+    GroupedEvent<PokemonEventDetails, PokemonAggregate>,
+    GroupedEvent<PokemonEventDetails, PokemonAggregate>,
+  ]
 > = 1;
-assertGroupEventsOutput;
+assertGroupEventsTuple;
+
+const assertPushEventsTuple: A.Equals<
+  Awaited<ReturnType<typeof pushEventsProbe>>,
+  {
+    events: [PokemonEventDetails, PokemonEventDetails];
+    nextAggregate: PokemonAggregate;
+  }
+> = 1;
+assertPushEventsTuple;

@@ -29,6 +29,7 @@ export {
 export type {
   AggregateHandleEventInput,
   AggregateHandleEventInputOrFn,
+  AggregateHandleEventInputs,
   EventAlreadyExistsError,
   UndefinedEventStorageAdapterError,
   GetAggregateOptions,

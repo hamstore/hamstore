@@ -13,16 +13,15 @@ import type {
 
 /**
  * Event input accepted by an {@link AggregateHandle}. `aggregateId` and
- * `version` are auto-filled from the handle (overridable); `timestamp` stays
- * optional as everywhere else. Distributes over event-detail unions so the
- * `type`/`payload` correlation is preserved.
+ * `version` are owned by the handle and cannot be set here — reach for the
+ * low-level {@link EventStore.pushEvent} if you need explicit control over
+ * them. `timestamp` stays optional as everywhere else. Distributes over
+ * event-detail unions so the `type`/`payload` correlation is preserved.
  */
 export type AggregateHandleEventInput<ES extends EventStore> =
   EventStoreEventDetails<ES> extends infer EVENT_DETAIL
     ? EVENT_DETAIL extends EventDetail
       ? Omit<EVENT_DETAIL, 'aggregateId' | 'version' | 'timestamp'> & {
-          aggregateId?: string;
-          version?: number;
           timestamp?: string;
         }
       : never
@@ -38,6 +37,19 @@ export type AggregateHandleEventInputOrFn<ES extends EventStore> =
   | ((
       aggregate: EventStoreAggregate<ES> | undefined,
     ) => AggregateHandleEventInput<ES>);
+
+/**
+ * A **non-empty** list of inputs for the chained handle methods
+ * ({@link AggregateHandle.pushEvents} / {@link AggregateHandle.groupEvents}).
+ * Typed as a non-empty tuple so an empty call is a compile error; combined with
+ * a `const` type parameter at the call site, this lets the result mirror the
+ * input's length (a fixed-size tuple the caller can spread straight into
+ * {@link EventStore.pushEventGroup}).
+ */
+export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
+  AggregateHandleEventInputOrFn<ES>,
+  ...AggregateHandleEventInputOrFn<ES>[],
+];
 
 /**
  * Concrete (non-generic) view of {@link EventGroupPusher} that accepts a
@@ -106,10 +118,20 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     input: AggregateHandleEventInput<ES>,
     version: number,
   ): Parameters<ES['groupEvent']>[0] {
+    const { aggregateId, version: versionOverride } = input as {
+      aggregateId?: string;
+      version?: number;
+    };
+    if (aggregateId !== undefined || versionOverride !== undefined) {
+      throw new Error(
+        'AggregateHandle: `aggregateId` / `version` cannot be set on handle pushes — the handle owns them. Use the low-level `eventStore.pushEvent(...)` if you need explicit control.',
+      );
+    }
+
     return {
+      ...(input as object),
       aggregateId: this.aggregateId,
       version,
-      ...(input as object),
     } as Parameters<ES['groupEvent']>[0];
   }
 
@@ -118,7 +140,7 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
    * forward between steps. Pure with respect to the handle.
    */
   chain(
-    inputs: AggregateHandleEventInputOrFn<ES>[],
+    inputs: readonly AggregateHandleEventInputOrFn<ES>[],
     options?: { validate?: ValidateEventDetail },
   ): { grouped: GroupedEvent[]; nextAggregate: EventStoreAggregate<ES> } {
     if (inputs.length === 0) {
@@ -133,13 +155,6 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
 
     for (const input of inputs) {
       const resolved = typeof input === 'function' ? input(running) : input;
-      const { version: versionOverride, aggregateId: aggregateIdOverride } =
-        resolved as { version?: number; aggregateId?: string };
-      if (versionOverride !== undefined || aggregateIdOverride !== undefined) {
-        throw new Error(
-          'AggregateHandle: per-event `version` / `aggregateId` overrides are not allowed in pushEvents / groupEvents — the handle assigns sequential versions for the chain. Use pushEvent / groupEvent for a single, overridable event.',
-        );
-      }
       const event = this.fill(resolved, version);
       grouped.push(
         this.store.groupEvent(event, {
@@ -170,14 +185,18 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     }) as ReturnType<ES['groupEvent']>;
   }
 
-  /** Build chained grouped events for MULTIPLE events on this aggregate. */
-  groupEvents(
-    inputs: AggregateHandleEventInputOrFn<ES>[],
+  /**
+   * Build chained grouped events for MULTIPLE events on this aggregate. The
+   * result mirrors the input's length (a fixed-size tuple), so it can be spread
+   * straight into `EventStore.pushEventGroup`.
+   */
+  groupEvents<const Inputs extends AggregateHandleEventInputs<ES>>(
+    inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): ReturnType<ES['groupEvent']>[] {
-    return this.chain(inputs, options).grouped as ReturnType<
-      ES['groupEvent']
-    >[];
+  ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
+    return this.chain(inputs, options).grouped as unknown as {
+      -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
+    };
   }
 
   /** Push a single event for this aggregate and commit it. */
@@ -201,12 +220,15 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     };
   }
 
-  /** Push MULTIPLE events on this aggregate atomically and commit them. */
-  async pushEvents(
-    inputs: AggregateHandleEventInputOrFn<ES>[],
+  /**
+   * Push MULTIPLE events on this aggregate atomically and commit them. The
+   * returned `events` mirrors the input's length (a fixed-size tuple).
+   */
+  async pushEvents<const Inputs extends AggregateHandleEventInputs<ES>>(
+    inputs: Inputs,
     options: { validate?: ValidateEventDetail } = {},
   ): Promise<{
-    events: EventStoreEventDetails<ES>[];
+    events: { -readonly [K in keyof Inputs]: EventStoreEventDetails<ES> };
     nextAggregate: EventStoreAggregate<ES>;
   }> {
     const { grouped } = this.chain(inputs, options);
@@ -223,7 +245,9 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     ) as EventStoreAggregate<ES>;
 
     return {
-      events: events as EventStoreEventDetails<ES>[],
+      events: events as unknown as {
+        -readonly [K in keyof Inputs]: EventStoreEventDetails<ES>;
+      },
       nextAggregate,
     };
   }

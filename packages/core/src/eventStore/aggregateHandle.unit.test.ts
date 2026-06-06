@@ -114,16 +114,19 @@ describe('AggregateHandle', () => {
       );
     });
 
-    it('lets the caller override the auto-filled fields', async () => {
-      pushEventMock.mockResolvedValue({ event: pikachuCaughtEvent });
-
+    it('rejects version / aggregateId overrides in the input', async () => {
       const handle = await pokemonsEventStore.openAggregate(pikachuId);
-      await handle.pushEvent({ type: 'POKEMON_CAUGHT', version: 9 });
 
-      expect(pushEventMock).toHaveBeenCalledWith(
-        { aggregateId: pikachuId, version: 9, type: 'POKEMON_CAUGHT' },
-        { eventStoreId: pokemonsEventStore.eventStoreId, force: false },
-      );
+      await expect(
+        handle.pushEvent({ type: 'POKEMON_CAUGHT', version: 9 } as never),
+      ).rejects.toThrow(/cannot be set on handle pushes/);
+      await expect(
+        handle.pushEvent({
+          type: 'POKEMON_CAUGHT',
+          aggregateId: 'other',
+        } as never),
+      ).rejects.toThrow(/cannot be set on handle pushes/);
+      expect(pushEventMock).not.toHaveBeenCalled();
     });
   });
 
@@ -253,10 +256,12 @@ describe('AggregateHandle', () => {
         aggregateId: pikachuId,
       });
 
-      expect(() => handle.groupEvents([])).toThrow(/empty list of events/);
+      expect(() => handle.groupEvents([] as never)).toThrow(
+        /empty list of events/,
+      );
     });
 
-    it('rejects per-event version / aggregateId overrides', () => {
+    it('rejects version / aggregateId overrides', () => {
       const handle = pokemonsEventStore.openAggregateFrom({
         aggregateId: pikachuId,
       });
@@ -265,12 +270,16 @@ describe('AggregateHandle', () => {
         handle.groupEvents([
           { type: 'POKEMON_LEVELED_UP', version: 9 } as never,
         ]),
-      ).toThrow(/overrides are not allowed/);
+      ).toThrow(/cannot be set on handle pushes/);
       expect(() =>
         handle.groupEvents([
           { type: 'POKEMON_LEVELED_UP', aggregateId: 'other' } as never,
         ]),
-      ).toThrow(/overrides are not allowed/);
+      ).toThrow(/cannot be set on handle pushes/);
+      // singular groupEvent rejects too:
+      expect(() =>
+        handle.groupEvent({ type: 'POKEMON_LEVELED_UP', version: 9 } as never),
+      ).toThrow(/cannot be set on handle pushes/);
     });
   });
 });
