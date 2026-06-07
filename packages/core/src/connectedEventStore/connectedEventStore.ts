@@ -173,11 +173,12 @@ export class ConnectedEventStore<
     return AggregateHandle.openExisting(this, aggregateId, options);
   }
 
-  openAggregateFrom(args: {
-    aggregateId: string;
-    aggregate?: AGGREGATE;
-  }): AggregateHandle<this> {
-    return AggregateHandle.from({ store: this, ...args });
+  openAggregateFrom(aggregate: AGGREGATE): AggregateHandle<this> {
+    return AggregateHandle.from(this, aggregate);
+  }
+
+  openNewAggregate(aggregateId: string): AggregateHandle<this> {
+    return AggregateHandle.forNew(this, aggregateId);
   }
 
   get eventStorageAdapter(): EventStorageAdapter | undefined {

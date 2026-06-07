@@ -73,9 +73,10 @@ type CommitGroupedEvents = (
 /**
  * An immutable, version-pinned write handle for a single aggregate.
  *
- * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or
- * `openAggregateFrom` for replay / first-event). `aggregate` always reflects the
- * read it was opened with — the handle never rolls itself forward. Version,
+ * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or,
+ * without a read, `openAggregateFrom` for an aggregate you hold and
+ * `openNewAggregate` for a brand-new one). `aggregate` always reflects the read
+ * it was opened with — the handle never rolls itself forward. Version,
  * `aggregateId` and `prevAggregate` are auto-filled on every push.
  *
  * The handle pins an expected version, so it never force-pushes: bypassing the
@@ -166,24 +167,37 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   }
 
   /**
-   * Synchronously wrap an aggregate you already hold (no I/O). Backs
-   * `openAggregateFrom`; useful for replay / first-event / "I already read it"
-   * paths.
+   * Synchronously wrap an aggregate you already hold (no I/O) — the
+   * `aggregateId` and pinned version are taken from the aggregate itself. Backs
+   * `openAggregateFrom`; useful for replay / "I already read it" paths (e.g.
+   * from `getAggregateAndEvents`, a projection, or a simulation).
    */
-  static from<ES extends EventStore>({
-    store,
-    aggregateId,
-    aggregate,
-  }: {
-    store: ES;
-    aggregateId: string;
-    aggregate?: EventStoreAggregate<ES>;
-  }): AggregateHandle<ES> {
+  static from<ES extends EventStore>(
+    store: ES,
+    aggregate: EventStoreAggregate<ES>,
+  ): AggregateHandle<ES> {
+    return new AggregateHandle({
+      store,
+      commitGroup: pushEventGroup,
+      aggregateId: aggregate.aggregateId,
+      aggregate,
+    });
+  }
+
+  /**
+   * Synchronously open a handle for an aggregate that does not exist yet (no
+   * I/O) — pins `nextVersion = 1`. Backs `openNewAggregate`; useful for
+   * first-event / bulk-import paths where the read can be skipped because the
+   * aggregate is known to be new.
+   */
+  static forNew<ES extends EventStore>(
+    store: ES,
+    aggregateId: string,
+  ): AggregateHandle<ES> {
     return new AggregateHandle({
       store,
       commitGroup: pushEventGroup,
       aggregateId,
-      aggregate,
     });
   }
 

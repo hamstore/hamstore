@@ -275,7 +275,9 @@ const { aggregate, events, lastEvent } =
 
 - <code>openExistingAggregate <i>((aggregateId: string, opt?: GetAggregateOptions) => Promise&lt;AggregateHandle&gt;)</i></code>: Same as <code>openAggregate</code>, but throws an <code>AggregateNotFoundError</code> if no event exists for this <code>aggregateId</code> — so <code>handle.aggregate</code> is always defined.
 
-- <code>openAggregateFrom <i>((&#123; aggregateId, aggregate? &#125;) => AggregateHandle)</i></code>: Builds a handle from pieces you already hold, **without reading storage** (and synchronously, since it performs no I/O). Use it for the initial event of a new aggregate (omit <code>aggregate</code>, so the handle pins <code>nextVersion = 1</code>), or for replay / bulk-import flows that already have the aggregate in hand.
+- <code>openAggregateFrom <i>((aggregate: Aggregate) => AggregateHandle)</i></code>: Wraps an aggregate you already hold, **without reading storage** (and synchronously, since it performs no I/O) — <code>aggregateId</code> and the pinned version are taken from the aggregate itself. Use it for replay / bulk-import flows or any path where you already have the aggregate in hand (e.g. from <code>getAggregateAndEvents</code>, a projection, or a simulation).
+
+- <code>openNewAggregate <i>((aggregateId: string) => AggregateHandle)</i></code>: Opens a handle for an aggregate that does not exist yet, **without reading storage** (and synchronously) — the handle pins <code>nextVersion = 1</code>. Use it for the initial event of a new aggregate when the read can be skipped because the aggregate is known to be new.
 
 - <code>pushEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Pushes a new event to the event store. The <code>timestamp</code> is optional (we keep it available as it can be useful in tests & migrations). If not provided, it is automatically set as <code>new Date().toISOString()</code>. Throws an <code>EventAlreadyExistsError</code> if an event already exists for the corresponding <code>aggregateId</code> and <code>version</code> (see section on <a href="../pushing-events">race conditions</a>).
 

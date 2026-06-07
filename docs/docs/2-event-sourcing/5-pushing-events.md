@@ -43,9 +43,7 @@ const catchPokemonCommand = new Command({
     const pokemonId = generateUuid();
 
     // 👇 New aggregate: no read needed, the handle pins nextVersion = 1
-    const pikachu = pokemonsEventStore.openAggregateFrom({
-      aggregateId: pokemonId,
-    });
+    const pikachu = pokemonsEventStore.openNewAggregate(pokemonId);
 
     // 👇 aggregateId + version are filled in automatically
     await pikachu.pushEvent({
@@ -96,11 +94,12 @@ Fetching and pushing events non-simultaneously exposes your application to [race
 
 An **`AggregateHandle`** is an immutable, version-pinned write handle for a single aggregate. It removes the boilerplate of reading an aggregate, tracking its `version`, and threading `aggregateId` / `prevAggregate` through every push. It is the **recommended way to push aggregate changes**.
 
-You obtain one from an `EventStore` through three getters:
+You obtain one from an `EventStore` through four methods:
 
 - <code>openAggregate(aggregateId, opt?)</code>: Reads the aggregate and returns a handle. `handle.aggregate` may be `undefined` (new aggregate).
 - <code>openExistingAggregate(aggregateId, opt?)</code>: Same, but throws an `AggregateNotFoundError` if the aggregate does not exist yet — so `handle.aggregate` is always defined.
-- <code>openAggregateFrom(&#123; aggregateId, aggregate? &#125;)</code>: Builds a handle from pieces you already have, **without reading storage** — for the initial event of a new aggregate, or for replay / bulk-import flows that already hold the aggregate.
+- <code>openAggregateFrom(aggregate)</code>: Wraps an aggregate you already hold (replay, projection, simulation) **without reading storage** — `aggregateId` and the pinned version come from the aggregate itself.
+- <code>openNewAggregate(aggregateId)</code>: Opens a handle for an aggregate that does not exist yet (pins <code>nextVersion = 1</code>), **without reading storage** — for the initial event of a new aggregate.
 
 ```ts
 const pikachu = await pokemonsEventStore.openAggregate('pikachu1');
@@ -170,7 +169,7 @@ await EventStore.pushEventGroup(
   <b>🔧 Reference</b>
 </summary>
 
-A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
+A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openAggregateFrom</code> / <code>openNewAggregate</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
 
 **Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle owns <code>aggregateId</code> / <code>version</code> and they **cannot** be set in the input (use the low-level <code>eventStore.pushEvent</code> for explicit control). The chained <code>pushEvents</code> / <code>groupEvents</code> additionally **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events, and the result is a fixed-size tuple the **same length** as the input.
 
