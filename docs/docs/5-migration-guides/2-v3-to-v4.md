@@ -1,10 +1,13 @@
 ---
 sidebar_position: 2
+toc_max_heading_level: 2
 ---
 
 # From hamstore v3 to v4
 
 `@hamstore` v4 is the first major version after the fork from `@castore`. It introduces a series of breaking changes (snapshots, message bus shape tweaks, etc.); this page covers each one as it lands.
+
+## `getAggregate` split: lean read + new `getAggregateAndEvents`
 
 The first v4-breaking change splits `EventStore.getAggregate` into two methods:
 
@@ -13,9 +16,9 @@ The first v4-breaking change splits `EventStore.getAggregate` into two methods:
 
 This is a **preparational** change. On its own it is purely a method rename for callers that need `events`/`lastEvent`. The motivation is that the upcoming snapshot support lets `getAggregate` skip materialising the full event history altogether — when an aggregate is rebuilt from a snapshot, no events need to be loaded at all. Forcing every caller to consume `{ aggregate, events, lastEvent }` would either prevent that optimisation or make `events` semantically misleading (a partial list).
 
-## What changed
+### What changed
 
-### `EventStore.getAggregate` and `EventStore.getExistingAggregate`
+#### `EventStore.getAggregate` and `EventStore.getExistingAggregate`
 
 **Before (v3):**
 
@@ -42,7 +45,7 @@ const { aggregate } =
   await pokemonsEventStore.getExistingAggregate(pikachuId);
 ```
 
-### New: `getAggregateAndEvents` / `getExistingAggregateAndEvents`
+#### New: `getAggregateAndEvents` / `getExistingAggregateAndEvents`
 
 If you actually need `events` or `lastEvent` (e.g. to build a state-carrying message, to log how many events contributed to a state transition, or to write a projection that reacts to the underlying events), use the new methods:
 
@@ -71,7 +74,7 @@ const { aggregate, events } =
   });
 ```
 
-### `AggregateGetter` type
+#### `AggregateGetter` type
 
 The exported `AggregateGetter` type now corresponds to the lean `getAggregate` shape and no longer takes the `EVENT_DETAIL` type parameter. The full shape is exposed under a new type name:
 
@@ -87,7 +90,7 @@ type Full = AggregateAndEventsGetter<EventDetail, MyAggregate>;
 type ExistingFull = AggregateAndEventsGetter<EventDetail, MyAggregate, true>;
 ```
 
-## Migration recipe
+### Migration recipe
 
 A simple pass over your codebase:
 
@@ -106,13 +109,11 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 +  .mockResolvedValue({ aggregate });
 ```
 
-## What this unlocks
+### What this unlocks
 
 `getAggregate` no longer being contractually required to expose the full event list lets the snapshot integration (next on the v4 roadmap) seed the aggregate from a snapshot and only fetch the trailing events on top of it — without forcing a misleading "partial" `events` array on every caller. Callers that genuinely need the full history opt into it explicitly via `getAggregateAndEvents`, which is also the right place to think about whether you need to load the full history at all.
 
----
-
-# `AggregateHandle`: new `open*` methods on `EventStore`
+## `AggregateHandle`: new `open*` methods on `EventStore`
 
 v4 adds three methods to `EventStore` for working with [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md): `openAggregate`, `openExistingAggregate`, and `openNewAggregate`.
 
