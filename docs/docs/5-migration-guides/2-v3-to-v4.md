@@ -124,15 +124,12 @@ v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boi
 
 ## Migration recipe (only for `implements EventStore`)
 
-The method bodies are fully generic over the store, so delegate to the exported helpers — this is exactly what `ConnectedEventStore` does:
+The method bodies are fully generic over the store, so delegate to `AggregateHandle`'s static factories — this is exactly what `ConnectedEventStore` does:
 
 ```ts
 import {
-  EventStore,
-  handleFrom,
-  readExistingHandle,
-  readHandle,
-  type AggregateHandle,
+  AggregateHandle,
+  type EventStore,
   type GetAggregateOptions,
 } from '@hamstore/core';
 
@@ -143,23 +140,23 @@ class MyEventStore implements EventStore</* … */> {
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<this>> {
-    return readHandle(this, EventStore.pushEventGroup, aggregateId, options);
+    return AggregateHandle.open(this, aggregateId, options);
   }
 
   openExistingAggregate(
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<this>> {
-    return readExistingHandle(this, EventStore.pushEventGroup, aggregateId, options);
+    return AggregateHandle.openExisting(this, aggregateId, options);
   }
 
   openAggregateFrom(args: {
     aggregateId: string;
     aggregate?: MyAggregate;
   }): AggregateHandle<this> {
-    return handleFrom(this, EventStore.pushEventGroup, args);
+    return AggregateHandle.from({ store: this, ...args });
   }
 }
 ```
 
-Passing `this` to the helpers is what makes the handle route its reads — and the publish-side commit — through your store, so a wrapper keeps its event-publishing behaviour without any extra rebind.
+Passing the store to the factories is what makes the handle route its reads — and the publish-side commit — through it, so a wrapper keeps its event-publishing behaviour without any extra rebind.

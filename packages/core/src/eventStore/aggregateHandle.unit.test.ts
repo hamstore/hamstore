@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { GroupedEvent } from '~/event/groupedEvent';
 
+import { AggregateHandle } from './aggregateHandle';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import {
   eventStorageAdapterMock,
@@ -87,6 +88,43 @@ describe('AggregateHandle', () => {
       expect(getEventsMock).not.toHaveBeenCalled();
       expect(handle.aggregate).toBeUndefined();
       expect(handle.nextVersion).toBe(1);
+    });
+  });
+
+  describe('static factories', () => {
+    it('open reads the aggregate and pins the next version', async () => {
+      const handle = await AggregateHandle.open(pokemonsEventStore, pikachuId);
+
+      expect(getEventsMock).toHaveBeenCalledTimes(1);
+      expect(handle.aggregateId).toBe(pikachuId);
+      expect(handle.aggregate).toStrictEqual(
+        pokemonsEventStore.buildAggregate([pikachuAppearedEvent]),
+      );
+      expect(handle.nextVersion).toBe(2);
+    });
+
+    it('openExisting throws AggregateNotFoundError when the aggregate is missing', async () => {
+      getEventsMock.mockResolvedValue({ events: [] });
+
+      await expect(
+        AggregateHandle.openExisting(pokemonsEventStore, 'ghost'),
+      ).rejects.toBeInstanceOf(AggregateNotFoundError);
+    });
+
+    it('from wraps provided pieces without reading storage', () => {
+      const aggregate = pokemonsEventStore.buildAggregate([
+        pikachuAppearedEvent,
+      ]);
+
+      const handle = AggregateHandle.from({
+        store: pokemonsEventStore,
+        aggregateId: pikachuId,
+        aggregate,
+      });
+
+      expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregate).toStrictEqual(aggregate);
+      expect(handle.nextVersion).toBe(2);
     });
   });
 
