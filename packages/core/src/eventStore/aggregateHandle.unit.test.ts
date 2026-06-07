@@ -75,21 +75,6 @@ describe('AggregateHandle', () => {
     });
   });
 
-  describe('openAggregateFrom', () => {
-    it('wraps an aggregate without reading storage, deriving id + version', () => {
-      const aggregate = pokemonsEventStore.buildAggregate([
-        pikachuAppearedEvent,
-      ])!;
-
-      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
-
-      expect(getEventsMock).not.toHaveBeenCalled();
-      expect(handle.aggregateId).toBe(pikachuId);
-      expect(handle.aggregate).toStrictEqual(aggregate);
-      expect(handle.nextVersion).toBe(2);
-    });
-  });
-
   describe('static factories', () => {
     it('open reads the aggregate and pins the next version', async () => {
       const handle = await AggregateHandle.open(pokemonsEventStore, pikachuId);
@@ -222,7 +207,7 @@ describe('AggregateHandle', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
       ])!;
-      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
+      const handle = AggregateHandle.from(pokemonsEventStore, aggregate);
 
       const grouped = handle.groupEvent({ type: 'POKEMON_CAUGHT' });
 
@@ -241,7 +226,7 @@ describe('AggregateHandle', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
       ])!;
-      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
+      const handle = AggregateHandle.from(pokemonsEventStore, aggregate);
 
       handle.groupEvent({ type: 'POKEMON_CAUGHT' });
       handle.groupEvent({ type: 'POKEMON_LEVELED_UP' });
@@ -265,7 +250,7 @@ describe('AggregateHandle', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
       ])!;
-      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
+      const handle = AggregateHandle.from(pokemonsEventStore, aggregate);
 
       const grouped = handle.groupEvents([
         { type: 'POKEMON_LEVELED_UP' },

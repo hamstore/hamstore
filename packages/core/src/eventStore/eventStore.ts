@@ -93,6 +93,11 @@ export class EventStore<
    * {@link AggregateHandle} that auto-fills `aggregateId`/`version`/
    * `prevAggregate` on every push. Open a fresh handle per command attempt
    * (a handle held across an optimistic-concurrency retry is stale).
+   *
+   * For the unusual case where you already hold an aggregate (replay,
+   * projection, simulation) and want to skip the read, use the static
+   * {@link AggregateHandle.from} — it is deliberately not an instance method, as
+   * a pre-loaded aggregate is stale on retry and so does not belong in commands.
    */
   openAggregate(
     aggregateId: string,
@@ -116,21 +121,6 @@ export class EventStore<
    */
   openNewAggregate(aggregateId: string): AggregateHandle<this> {
     return AggregateHandle.forNew(this, aggregateId);
-  }
-
-  /**
-   * Wrap an aggregate you already hold (replay, projection, simulation) in a
-   * handle — `aggregateId` and the pinned version come from the aggregate
-   * itself. Does not read storage.
-   *
-   * Reserve this for non-command flows: in a command handler the aggregate
-   * should be read *inside* the command (via {@link openAggregate} /
-   * {@link openExistingAggregate}) so every optimistic-concurrency retry
-   * re-reads fresh state — wrapping a pre-loaded aggregate would replay a stale
-   * version on retry.
-   */
-  openAggregateFrom(aggregate: AGGREGATE): AggregateHandle<this> {
-    return AggregateHandle.from(this, aggregate);
   }
 
   constructor({
