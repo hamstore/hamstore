@@ -114,7 +114,7 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 
 # `AggregateHandle`: new `open*` methods on `EventStore`
 
-v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through four new `EventStore` methods: `openAggregate`, `openExistingAggregate`, `openAggregateFrom`, and `openNewAggregate`.
+v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through four new `EventStore` methods: `openAggregate`, `openExistingAggregate`, `openNewAggregate`, and `openAggregateFrom` (the last is for unusual, non-command flows only).
 
 `EventStore` is a class that also serves as the structural contract for event stores (hamstore's own `ConnectedEventStore` is declared `implements EventStore`). Adding instance methods to it **widens that contract**, which is the breaking part — though for almost all usage there is nothing to do:
 
@@ -150,12 +150,12 @@ class MyEventStore implements EventStore</* … */> {
     return AggregateHandle.openExisting(this, aggregateId, options);
   }
 
-  openAggregateFrom(aggregate: MyAggregate): AggregateHandle<this> {
-    return AggregateHandle.from(this, aggregate);
-  }
-
   openNewAggregate(aggregateId: string): AggregateHandle<this> {
     return AggregateHandle.forNew(this, aggregateId);
+  }
+
+  openAggregateFrom(aggregate: MyAggregate): AggregateHandle<this> {
+    return AggregateHandle.from(this, aggregate);
   }
 }
 ```

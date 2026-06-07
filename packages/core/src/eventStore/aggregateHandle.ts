@@ -74,9 +74,9 @@ type CommitGroupedEvents = (
  * An immutable, version-pinned write handle for a single aggregate.
  *
  * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or,
- * without a read, `openAggregateFrom` for an aggregate you hold and
- * `openNewAggregate` for a brand-new one). `aggregate` always reflects the read
- * it was opened with — the handle never rolls itself forward. Version,
+ * without a read, `openNewAggregate` for a brand-new one and `openAggregateFrom`
+ * for an aggregate you already hold). `aggregate` always reflects the read it
+ * was opened with — the handle never rolls itself forward. Version,
  * `aggregateId` and `prevAggregate` are auto-filled on every push.
  *
  * The handle pins an expected version, so it never force-pushes: bypassing the
@@ -167,24 +167,6 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   }
 
   /**
-   * Synchronously wrap an aggregate you already hold (no I/O) — the
-   * `aggregateId` and pinned version are taken from the aggregate itself. Backs
-   * `openAggregateFrom`; useful for replay / "I already read it" paths (e.g.
-   * from `getAggregateAndEvents`, a projection, or a simulation).
-   */
-  static from<ES extends EventStore>(
-    store: ES,
-    aggregate: EventStoreAggregate<ES>,
-  ): AggregateHandle<ES> {
-    return new AggregateHandle({
-      store,
-      commitGroup: pushEventGroup,
-      aggregateId: aggregate.aggregateId,
-      aggregate,
-    });
-  }
-
-  /**
    * Synchronously open a handle for an aggregate that does not exist yet (no
    * I/O) — pins `nextVersion = 1`. Backs `openNewAggregate`; useful for
    * first-event / bulk-import paths where the read can be skipped because the
@@ -198,6 +180,27 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
       store,
       commitGroup: pushEventGroup,
       aggregateId,
+    });
+  }
+
+  /**
+   * Synchronously wrap an aggregate you already hold (no I/O) — the
+   * `aggregateId` and pinned version are taken from the aggregate itself. Backs
+   * `openAggregateFrom`; useful for replay / "I already read it" paths (e.g.
+   * from `getAggregateAndEvents`, a projection, or a simulation). Reserve it for
+   * non-command flows — in a command, read the aggregate inside the command (via
+   * {@link AggregateHandle.open} / {@link AggregateHandle.openExisting}) so each
+   * optimistic-concurrency retry re-reads fresh state.
+   */
+  static from<ES extends EventStore>(
+    store: ES,
+    aggregate: EventStoreAggregate<ES>,
+  ): AggregateHandle<ES> {
+    return new AggregateHandle({
+      store,
+      commitGroup: pushEventGroup,
+      aggregateId: aggregate.aggregateId,
+      aggregate,
     });
   }
 

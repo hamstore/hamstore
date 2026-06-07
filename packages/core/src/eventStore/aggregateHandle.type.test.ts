@@ -19,17 +19,17 @@ const assertOpenAggregateOutput: A.Equals<
 > = 1;
 assertOpenAggregateOutput;
 
-const assertOpenAggregateFromOutput: A.Equals<
-  ReturnType<typeof pokemonsEventStore.openAggregateFrom>,
-  PokemonHandle
-> = 1;
-assertOpenAggregateFromOutput;
-
 const assertOpenNewAggregateOutput: A.Equals<
   ReturnType<typeof pokemonsEventStore.openNewAggregate>,
   PokemonHandle
 > = 1;
 assertOpenNewAggregateOutput;
+
+const assertOpenAggregateFromOutput: A.Equals<
+  ReturnType<typeof pokemonsEventStore.openAggregateFrom>,
+  PokemonHandle
+> = 1;
+assertOpenAggregateFromOutput;
 
 // --- STATIC FACTORIES preserve the concrete store subtype in the handle ---
 
@@ -45,17 +45,17 @@ const assertStaticOpenExistingOutput: A.Equals<
 > = 1;
 assertStaticOpenExistingOutput;
 
-const assertStaticFromOutput: A.Equals<
-  ReturnType<typeof AggregateHandle.from<typeof pokemonsEventStore>>,
-  PokemonHandle
-> = 1;
-assertStaticFromOutput;
-
 const assertStaticForNewOutput: A.Equals<
   ReturnType<typeof AggregateHandle.forNew<typeof pokemonsEventStore>>,
   PokemonHandle
 > = 1;
 assertStaticForNewOutput;
+
+const assertStaticFromOutput: A.Equals<
+  ReturnType<typeof AggregateHandle.from<typeof pokemonsEventStore>>,
+  PokemonHandle
+> = 1;
+assertStaticFromOutput;
 
 // --- HANDLE FIELDS ---
 
