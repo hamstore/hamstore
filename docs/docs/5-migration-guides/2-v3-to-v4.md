@@ -114,9 +114,15 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 
 # `AggregateHandle`: new `open*` methods on `EventStore`
 
+:::tip Who needs to act?
+**Only if you have a custom class declared `class … implements EventStore`** (a wrapper / decorator — the same pattern as hamstore's own `ConnectedEventStore`). That is the single breaking case, and the fix is mechanical: [add three one-line delegations](#migration-recipe-only-for-implements-eventstore).
+
+If you only use `new EventStore(…)` or `class … extends EventStore`, **there is nothing to do** — the rest of this section is just background.
+:::
+
 v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through three new `EventStore` methods: `openAggregate`, `openExistingAggregate`, and `openNewAggregate`. (A fourth case — wrapping an aggregate you already hold — lives only on the static `AggregateHandle.from(store, aggregate)`, not on `EventStore`, since it is for unusual non-command flows.)
 
-`EventStore` is a class that also serves as the structural contract for event stores (hamstore's own `ConnectedEventStore` is declared `implements EventStore`). Adding instance methods to it **widens that contract**, which is the breaking part — though for almost all usage there is nothing to do:
+`EventStore` is a class that also serves as the structural contract for event stores. Adding instance methods to it **widens that contract**, which is the breaking part — but it only bites the `implements` case:
 
 - **You instantiate `EventStore` directly (`new EventStore({ … })`) — no change.** The methods are concrete; this is purely additive.
 - **You subclass it (`class Mine extends EventStore`) — no change.** Subclasses inherit the new methods automatically, and because the bodies dispatch through `this`, they behave correctly (including any publishing your subclass wires up).

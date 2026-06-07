@@ -148,30 +148,40 @@ The handle **never force-pushes**: it exists to honour an expected version, so b
 
 ### Cross-aggregate writes (event groups)
 
-When a command writes to **several aggregates** (across one or more event stores), the commit is owned by the static `EventStore.pushEventGroup` — the handle can't self-commit. Build the grouped events from each handle and push them together (see [Event Groups: Transactions](./6-joining-data.md)):
+When a command writes to **several aggregates** (across one or more event stores), the handle can't self-commit — instead it **builds** grouped events that the static `EventStore.pushEventGroup` commits atomically. The handle exposes <code>handle.groupEvent(...)</code> (one event) and <code>handle.groupEvents([...])</code> (multiple chained events on one aggregate) for this.
 
-- <code>handle.groupEvent(input, opt?)</code>: Builds **one** `GroupedEvent` for this aggregate — the common "N stores, one event each" case.
-- <code>handle.groupEvents([input | fn, ...], opt?)</code>: Builds **multiple chained** `GroupedEvent`s on one aggregate. The result is a fixed-size tuple the **same length** as its input, so it can be spread straight into `EventStore.pushEventGroup`.
+See [Event Groups: Transactions](./6-joining-data.md) for the full explanation and examples; the two methods are also listed in the [`AggregateHandle` reference](#reference) at the bottom of this page.
+
+## 🔧 Direct (low-level) pushing {#direct-low-level-pushing}
+
+The `AggregateHandle` covers the vast majority of writes. The lower-level `EventStore` methods remain available for when you need **direct access** — explicit control over the version you push, or a **force push** (which the handle deliberately does not offer):
+
+- <code>eventStore.pushEvent(eventDetail, opt?)</code> — push a single event with an explicit `version`, optionally `{ force: true }`. See the [`EventStore` reference](./3-event-stores.md).
+- <code>eventStore.groupEvent(eventDetail, opt?)</code> + <code>EventStore.pushEventGroup(...)</code> — build and commit cross-aggregate groups directly. See [Event Groups: Transactions](./6-joining-data.md).
 
 ```ts
-const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
-const ash = await trainersEventStore.openExistingAggregate('ashKetchum');
-
-await EventStore.pushEventGroup(
-  pikachu.groupEvent({ type: 'CAUGHT_BY_TRAINER', payload: { trainerId: 'ashKetchum' } }),
-  ash.groupEvent({ type: 'POKEMON_CAUGHT', payload: { pokemonId: 'pikachu1' } }),
+// Force-pushing is only possible through the low-level API (use with care,
+// mainly in data migrations — it overrides any existing event at that version):
+await pokemonsEventStore.pushEvent(
+  {
+    aggregateId: 'pikachu1',
+    version: lastVersion + 1,
+    type: 'POKEMON_LEVELED_UP',
+    payload,
+  },
+  { force: true },
 );
 ```
 
-:::warning
+## Writing pure handlers
 
-`groupEvent` does **not** chain: calling it twice on the same handle produces two events pinned at the **same** `nextVersion`, which collide loudly on push (`EventAlreadyExistsError` on the duplicate `(aggregateId, version)`). When one aggregate contributes more than one event to the group, use `groupEvents([...])` instead.
+Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@hamstore/lib-react-visualizer).
 
-:::
+## Reference
 
 <details>
 <summary>
-  <b>🔧 Reference</b>
+  <b>🔧 <code>AggregateHandle</code></b>
 </summary>
 
 A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openNewAggregate</code> (each documented in the [`EventStore` reference](./3-event-stores.md)), or — for an aggregate you already hold — the static <code>AggregateHandle.from(store, aggregate)</code>. It is **immutable** and never force-pushes.
@@ -220,34 +230,9 @@ await EventStore.pushEventGroup(
 
 </details>
 
-## 🔧 Direct (low-level) pushing {#direct-low-level-pushing}
-
-The `AggregateHandle` covers the vast majority of writes. The lower-level `EventStore` methods remain available for when you need **direct access** — explicit control over the version you push, or a **force push** (which the handle deliberately does not offer):
-
-- <code>eventStore.pushEvent(eventDetail, opt?)</code> — push a single event with an explicit `version`, optionally `{ force: true }`. See the [`EventStore` reference](./3-event-stores.md).
-- <code>eventStore.groupEvent(eventDetail, opt?)</code> + <code>EventStore.pushEventGroup(...)</code> — build and commit cross-aggregate groups directly. See [Event Groups: Transactions](./6-joining-data.md).
-
-```ts
-// Force-pushing is only possible through the low-level API (use with care,
-// mainly in data migrations — it overrides any existing event at that version):
-await pokemonsEventStore.pushEvent(
-  {
-    aggregateId: 'pikachu1',
-    version: lastVersion + 1,
-    type: 'POKEMON_LEVELED_UP',
-    payload,
-  },
-  { force: true },
-);
-```
-
-## Writing pure handlers
-
-Command handlers should be, as much as possible, [pure functions](https://en.wikipedia.org/wiki/Pure_function). If they depend on impure functions like functions with unpredictable outputs (e.g. id generation), mutating effects, side effects or state dependency (e.g. external data fetching), you should pass them through the additional context arguments rather than directly importing and using them. This will make them easier to test and to re-use in different contexts, such as in the [React Visualizer](https://www.npmjs.com/package/@hamstore/lib-react-visualizer).
-
 <details>
 <summary>
-  <b>🔧 Reference</b>
+  <b>🔧 <code>Command</code></b>
 </summary>
 
 **Constructor:**

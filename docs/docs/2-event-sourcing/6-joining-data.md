@@ -13,7 +13,12 @@ To not have your application in a corrupt state, it's important to make sure tha
 - You build the grouped events to push together — each one synchronously returns a `GroupedEvent` class.
 - The `EventStore` class exposes a static `pushEventGroup` method that can be used to effectively push this event group.
 
-The recommended way to build the grouped events is from an [`AggregateHandle`](./5-pushing-events.md#pushing-events-with-an-aggregatehandle): `handle.groupEvent(...)` fills in `aggregateId` and the next `version` for you, so each store contributes its event without manual version bookkeeping:
+## Building grouped events from an `AggregateHandle`
+
+The recommended way to build the grouped events is from an [`AggregateHandle`](./5-pushing-events.md#pushing-events-with-an-aggregatehandle): the handle fills in `aggregateId` and the next `version` for you, so each store contributes its event without manual version bookkeeping. Unlike `pushEvent`/`pushEvents`, these methods **do not commit** — they only build the `GroupedEvent`s you then pass to `EventStore.pushEventGroup`:
+
+- <code>handle.groupEvent(input, opt?)</code>: Builds **one** `GroupedEvent` for this aggregate — the common "N stores, one event each" case.
+- <code>handle.groupEvents([input | fn, ...], opt?)</code>: Builds **multiple chained** `GroupedEvent`s on one aggregate. The result is a fixed-size tuple the **same length** as its input, so it can be spread straight into `EventStore.pushEventGroup`.
 
 ```ts
 const pikachu = await pokemonsEventStore.openExistingAggregate('pikachu1');
@@ -32,7 +37,18 @@ await EventStore.pushEventGroup(
 );
 ```
 
-When one aggregate contributes **more than one** event to the group, use `handle.groupEvents([...])` (which chains them on that aggregate) instead of calling `groupEvent` twice — two `groupEvent` calls on the same handle target the same version and collide on push.
+:::warning
+
+`groupEvent` does **not** chain: calling it twice on the same handle produces two events pinned at the **same** `nextVersion`, which collide loudly on push (`EventAlreadyExistsError` on the duplicate `(aggregateId, version)`). When one aggregate contributes **more than one** event to the group, use `groupEvents([...])` — it chains them on that aggregate and returns a tuple you spread into `pushEventGroup`:
+
+```ts
+await EventStore.pushEventGroup(
+  ...pikachu.groupEvents([{ type: 'POKEMON_LEVELED_UP' }, { type: 'POKEMON_EVOLVED' }]),
+  ash.groupEvent({ type: 'POKEMON_CAUGHT', payload: { pokemonId: 'pikachu1' } }),
+);
+```
+
+:::
 
 ### Low-level event groups
 
