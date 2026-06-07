@@ -44,11 +44,12 @@ export class EventStore<
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
 > {
   /**
-   * Commit a cross-aggregate group of events atomically. A re-assignment of the
-   * free {@link pushEventGroup} operation (kept here for the established
-   * `EventStore.pushEventGroup(...)` call site); it is `this`-free, so the
-   * `AggregateHandle` factories can share it without a runtime cycle.
+   * Commit a group of events across one or more aggregates atomically — either
+   * all of them are pushed, or none are (see
+   * [Event Groups](https://hamstore.github.io/hamstore/docs/event-sourcing/joining-data)).
    */
+  // Re-assignment of the `this`-free {@link pushEventGroup}, so the
+  // `AggregateHandle` factories can share it without a runtime import cycle.
   static pushEventGroup: EventGroupPusher = pushEventGroup;
 
   _types?: {
