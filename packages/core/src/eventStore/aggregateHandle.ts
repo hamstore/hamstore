@@ -6,11 +6,7 @@ import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import type { EventStore } from './eventStore';
 import type { EventStoreAggregate, EventStoreEventDetails } from './generics';
 import { pushEventGroup } from './pushEventGroup';
-import type {
-  EventGroupPusher,
-  GetAggregateOptions,
-  ValidateEventDetail,
-} from './types';
+import type { GetAggregateOptions, ValidateEventDetail } from './types';
 
 /**
  * Event input accepted by an {@link AggregateHandle}. `aggregateId` and
@@ -53,18 +49,10 @@ export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
 ];
 
 /**
- * Concrete (non-generic) view of {@link EventGroupPusher} that accepts a
- * dynamic array. The generic signature can't be called with a spread of a
- * runtime-length array (TS2556), so {@link AggregateHandle} stores the group
- * pusher narrowed to this for the commit.
- *
- * Storing the narrowed type (rather than `EventGroupPusher`) is also what keeps
- * `AggregateHandle` — and therefore `EventStore` — structurally comparable
- * across two copies of `@hamstore/core` (e.g. under `preserveSymlinks`): the
- * full `EventGroupPusher` carries a `GroupedEvent | { force? }` union in a
- * contravariant position whose comparison recurses through
- * `GroupedEvent.eventStore` back into `EventStore` and trips a spurious
- * incompatibility. `never[]` params avoid that recursion entirely.
+ * Concrete (non-generic) view of {@link pushEventGroup} for the commit call: its
+ * generic signature can't be called with a spread of a runtime-length array
+ * (TS2556), so {@link AggregateHandle.pushEvents} narrows it to this all-rest
+ * shape (`never[]` params) before spreading the grouped events in.
  */
 type CommitGroupedEvents = (
   ...groupedEvents: never[]
@@ -89,28 +77,23 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   readonly aggregate: EventStoreAggregate<ES> | undefined;
   readonly nextVersion: number;
 
-  // `store`/`commitGroup` are deliberately public (like `GroupedEvent`'s
-  // fields): TS `private`/`#` members are nominal, which would make two copies
-  // of `@hamstore/core` produce mutually-incompatible `AggregateHandle` (and
-  // thus `EventStore`) types. Treat them as internal.
+  // `store` is deliberately public (like `GroupedEvent`'s fields): TS
+  // `private`/`#` members are nominal, which would make two copies of
+  // `@hamstore/core` produce mutually-incompatible `AggregateHandle` (and thus
+  // `EventStore`) types. Treat it as internal.
   /** @internal */
   readonly store: ES;
-  /** @internal */
-  readonly commitGroup: CommitGroupedEvents;
 
   constructor({
     store,
-    commitGroup,
     aggregateId,
     aggregate,
   }: {
     store: ES;
-    commitGroup: EventGroupPusher;
     aggregateId: string;
     aggregate?: EventStoreAggregate<ES>;
   }) {
     this.store = store;
-    this.commitGroup = commitGroup as unknown as CommitGroupedEvents;
     this.aggregateId = aggregateId;
     this.aggregate = aggregate;
     this.nextVersion = (aggregate?.version ?? 0) + 1;
@@ -140,7 +123,6 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
 
     return new AggregateHandle({
       store,
-      commitGroup: pushEventGroup,
       aggregateId,
       aggregate: aggregate as EventStoreAggregate<ES>,
     });
@@ -179,7 +161,6 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   ): AggregateHandle<ES> {
     return new AggregateHandle({
       store,
-      commitGroup: pushEventGroup,
       aggregateId,
     });
   }
@@ -200,7 +181,6 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   ): AggregateHandle<ES> {
     return new AggregateHandle({
       store,
-      commitGroup: pushEventGroup,
       aggregateId: aggregate.aggregateId,
       aggregate,
     });
@@ -245,6 +225,10 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     let running = this.aggregate;
     let version = this.nextVersion;
     const grouped: GroupedEvent[] = [];
+    // One timestamp for the whole group — the events commit atomically. This
+    // fold is only a local roll-forward to derive each `prevAggregate`; the
+    // persisted timestamps are assigned by the storage adapter on commit.
+    const timestamp = new Date().toISOString();
 
     for (const input of inputs) {
       const resolved = typeof input === 'function' ? input(running) : input;
@@ -256,7 +240,7 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
         }) as GroupedEvent,
       );
       running = this.store.buildAggregate(
-        [{ timestamp: new Date().toISOString(), ...event }] as never,
+        [{ timestamp, ...event }] as never,
         running as never,
       ) as EventStoreAggregate<ES>;
       version += 1;
@@ -326,7 +310,8 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   }> {
     const { grouped } = this.chain(inputs, options);
 
-    const { eventGroup } = await this.commitGroup(...(grouped as never[]));
+    const commit = pushEventGroup as unknown as CommitGroupedEvents;
+    const { eventGroup } = await commit(...(grouped as never[]));
     const events = eventGroup.map(({ event }) => event);
 
     // Rebuild `nextAggregate` from the *committed* events (which carry the
