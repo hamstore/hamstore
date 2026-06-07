@@ -3,15 +3,9 @@ import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
-import {
-  EventStore,
-  handleFrom,
-  readExistingHandle,
-  readHandle,
-} from '~/eventStore';
+import { AggregateHandle, EventStore } from '~/eventStore';
 import type {
   AggregateGetter,
-  AggregateHandle,
   AggregateIdsLister,
   AggregateSimulator,
   EventGrouper,
@@ -169,26 +163,21 @@ export class ConnectedEventStore<
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<this>> {
-    return readHandle(this, EventStore.pushEventGroup, aggregateId, options);
+    return AggregateHandle.open(this, aggregateId, options);
   }
 
   openExistingAggregate(
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<this>> {
-    return readExistingHandle(
-      this,
-      EventStore.pushEventGroup,
-      aggregateId,
-      options,
-    );
+    return AggregateHandle.openExisting(this, aggregateId, options);
   }
 
   openAggregateFrom(args: {
     aggregateId: string;
     aggregate?: AGGREGATE;
   }): AggregateHandle<this> {
-    return handleFrom(this, EventStore.pushEventGroup, args);
+    return AggregateHandle.from({ store: this, ...args });
   }
 
   get eventStorageAdapter(): EventStorageAdapter | undefined {

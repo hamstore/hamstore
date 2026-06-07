@@ -5,6 +5,7 @@ import type { GroupedEvent } from '~/event/groupedEvent';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import type { EventStore } from './eventStore';
 import type { EventStoreAggregate, EventStoreEventDetails } from './generics';
+import { pushEventGroup } from './pushEventGroup';
 import type {
   EventGroupPusher,
   GetAggregateOptions,
@@ -111,6 +112,79 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     this.aggregateId = aggregateId;
     this.aggregate = aggregate;
     this.nextVersion = (aggregate?.version ?? 0) + 1;
+  }
+
+  /**
+   * Read an aggregate from `store` (via its lean `getAggregate`) and wrap it in
+   * a handle. This is the primitive that `EventStore.openAggregate` delegates
+   * to — a class that `implements EventStore` (rather than `extends`-ing it)
+   * can reuse it to implement `openAggregate` in one line:
+   *
+   * ```ts
+   * openAggregate(id: string, options?: GetAggregateOptions) {
+   *   return AggregateHandle.open(this, id, options);
+   * }
+   * ```
+   *
+   * Passing the store is what makes the handle's reads and its commit route
+   * through it (so e.g. a `ConnectedEventStore` keeps publishing).
+   */
+  static async open<ES extends EventStore>(
+    store: ES,
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<ES>> {
+    const { aggregate } = await store.getAggregate(aggregateId, options);
+
+    return new AggregateHandle({
+      store,
+      commitGroup: pushEventGroup,
+      aggregateId,
+      aggregate: aggregate as EventStoreAggregate<ES>,
+    });
+  }
+
+  /**
+   * Like {@link AggregateHandle.open}, but throws {@link AggregateNotFoundError}
+   * if the aggregate does not exist. Backs `openExistingAggregate`.
+   */
+  static async openExisting<ES extends EventStore>(
+    store: ES,
+    aggregateId: string,
+    options?: GetAggregateOptions,
+  ): Promise<AggregateHandle<ES>> {
+    const handle = await AggregateHandle.open(store, aggregateId, options);
+
+    if (handle.aggregate === undefined) {
+      throw new AggregateNotFoundError({
+        aggregateId,
+        eventStoreId: store.eventStoreId,
+      });
+    }
+
+    return handle;
+  }
+
+  /**
+   * Synchronously wrap an aggregate you already hold (no I/O). Backs
+   * `openAggregateFrom`; useful for replay / first-event / "I already read it"
+   * paths.
+   */
+  static from<ES extends EventStore>({
+    store,
+    aggregateId,
+    aggregate,
+  }: {
+    store: ES;
+    aggregateId: string;
+    aggregate?: EventStoreAggregate<ES>;
+  }): AggregateHandle<ES> {
+    return new AggregateHandle({
+      store,
+      commitGroup: pushEventGroup,
+      aggregateId,
+      aggregate,
+    });
   }
 
   /** @internal */
@@ -252,68 +326,3 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     };
   }
 }
-
-/**
- * Read an aggregate from `store` (via its lean `getAggregate`) and wrap it in an
- * {@link AggregateHandle}. This is the building block that `EventStore` and
- * `ConnectedEventStore` `openAggregate` delegate to — a class that
- * `implements EventStore` can reuse it to implement `openAggregate` in one line
- * rather than reimplementing the read + handle construction:
- *
- * ```ts
- * openAggregate(id: string, options?: GetAggregateOptions) {
- *   return readHandle(this, EventStore.pushEventGroup, id, options);
- * }
- * ```
- *
- * Passing `this` is what makes the handle's reads and its commit route through
- * the store you call it on (so e.g. a `ConnectedEventStore` keeps publishing).
- */
-export const readHandle = async <ES extends EventStore>(
-  store: ES,
-  commitGroup: EventGroupPusher,
-  aggregateId: string,
-  options?: GetAggregateOptions,
-): Promise<AggregateHandle<ES>> => {
-  const { aggregate } = await store.getAggregate(aggregateId, options);
-
-  return new AggregateHandle({
-    store,
-    commitGroup,
-    aggregateId,
-    aggregate: aggregate as EventStoreAggregate<ES>,
-  });
-};
-
-/**
- * Like {@link readHandle}, but throws {@link AggregateNotFoundError} if the
- * aggregate does not exist. Backs `openExistingAggregate`.
- */
-export const readExistingHandle = async <ES extends EventStore>(
-  store: ES,
-  commitGroup: EventGroupPusher,
-  aggregateId: string,
-  options?: GetAggregateOptions,
-): Promise<AggregateHandle<ES>> => {
-  const handle = await readHandle(store, commitGroup, aggregateId, options);
-
-  if (handle.aggregate === undefined) {
-    throw new AggregateNotFoundError({
-      aggregateId,
-      eventStoreId: store.eventStoreId,
-    });
-  }
-
-  return handle;
-};
-
-/**
- * Synchronously wrap an aggregate you already hold (no I/O) in an
- * {@link AggregateHandle}. Backs `openAggregateFrom`; useful for replay /
- * first-event / "I already read it" paths.
- */
-export const handleFrom = <ES extends EventStore>(
-  store: ES,
-  commitGroup: EventGroupPusher,
-  args: { aggregateId: string; aggregate?: EventStoreAggregate<ES> },
-): AggregateHandle<ES> => new AggregateHandle({ store, commitGroup, ...args });
