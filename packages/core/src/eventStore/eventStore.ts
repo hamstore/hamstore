@@ -110,15 +110,21 @@ export class EventStore<
   }
 
   /**
-   * Build a handle from already-known state (replay, bulk import) or from a
-   * blank slate (`aggregate: undefined` ⇒ first event at version 1). Does not
-   * read storage.
+   * Wrap an aggregate you already hold (replay, projection, simulation) in a
+   * handle — `aggregateId` and the pinned version come from the aggregate
+   * itself. Does not read storage.
    */
-  openAggregateFrom(args: {
-    aggregateId: string;
-    aggregate?: AGGREGATE;
-  }): AggregateHandle<this> {
-    return AggregateHandle.from({ store: this, ...args });
+  openAggregateFrom(aggregate: AGGREGATE): AggregateHandle<this> {
+    return AggregateHandle.from(this, aggregate);
+  }
+
+  /**
+   * Open a handle for an aggregate that does not exist yet (first event at
+   * version 1). Does not read storage — use when the aggregate is known to be
+   * new (first-event / bulk-import paths).
+   */
+  openNewAggregate(aggregateId: string): AggregateHandle<this> {
+    return AggregateHandle.forNew(this, aggregateId);
   }
 
   constructor({

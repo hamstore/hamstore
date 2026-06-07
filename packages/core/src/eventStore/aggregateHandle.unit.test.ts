@@ -65,27 +65,26 @@ describe('AggregateHandle', () => {
   });
 
   describe('openAggregateFrom', () => {
-    it('builds a handle from provided pieces without reading storage', () => {
+    it('wraps an aggregate without reading storage, deriving id + version', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
-      ]);
+      ])!;
 
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-        aggregate,
-      });
+      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
 
       expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe(pikachuId);
       expect(handle.aggregate).toStrictEqual(aggregate);
       expect(handle.nextVersion).toBe(2);
     });
+  });
 
-    it('pins version 1 for a brand-new aggregate', () => {
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: 'new-1',
-      });
+  describe('openNewAggregate', () => {
+    it('pins version 1 for a brand-new aggregate without reading storage', () => {
+      const handle = pokemonsEventStore.openNewAggregate('new-1');
 
       expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe('new-1');
       expect(handle.aggregate).toBeUndefined();
       expect(handle.nextVersion).toBe(1);
     });
@@ -111,20 +110,26 @@ describe('AggregateHandle', () => {
       ).rejects.toBeInstanceOf(AggregateNotFoundError);
     });
 
-    it('from wraps provided pieces without reading storage', () => {
+    it('from wraps an aggregate without reading storage, deriving id + version', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
-      ]);
+      ])!;
 
-      const handle = AggregateHandle.from({
-        store: pokemonsEventStore,
-        aggregateId: pikachuId,
-        aggregate,
-      });
+      const handle = AggregateHandle.from(pokemonsEventStore, aggregate);
 
       expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe(pikachuId);
       expect(handle.aggregate).toStrictEqual(aggregate);
       expect(handle.nextVersion).toBe(2);
+    });
+
+    it('forNew pins version 1 without reading storage', () => {
+      const handle = AggregateHandle.forNew(pokemonsEventStore, 'new-1');
+
+      expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe('new-1');
+      expect(handle.aggregate).toBeUndefined();
+      expect(handle.nextVersion).toBe(1);
     });
   });
 
@@ -216,11 +221,8 @@ describe('AggregateHandle', () => {
     it('builds ONE grouped event pinned at the next version', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
-      ]);
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-        aggregate,
-      });
+      ])!;
+      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
 
       const grouped = handle.groupEvent({ type: 'POKEMON_CAUGHT' });
 
@@ -238,11 +240,8 @@ describe('AggregateHandle', () => {
     it('does NOT chain: two calls target the same version (collide loudly)', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
-      ]);
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-        aggregate,
-      });
+      ])!;
+      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
 
       handle.groupEvent({ type: 'POKEMON_CAUGHT' });
       handle.groupEvent({ type: 'POKEMON_LEVELED_UP' });
@@ -265,11 +264,8 @@ describe('AggregateHandle', () => {
     it('chains multiple grouped events on one aggregate', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
-      ]);
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-        aggregate,
-      });
+      ])!;
+      const handle = pokemonsEventStore.openAggregateFrom(aggregate);
 
       const grouped = handle.groupEvents([
         { type: 'POKEMON_LEVELED_UP' },
@@ -290,9 +286,7 @@ describe('AggregateHandle', () => {
     });
 
     it('rejects an empty list of inputs', () => {
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-      });
+      const handle = pokemonsEventStore.openNewAggregate(pikachuId);
 
       expect(() => handle.groupEvents([] as never)).toThrow(
         /empty list of events/,
@@ -300,9 +294,7 @@ describe('AggregateHandle', () => {
     });
 
     it('rejects version / aggregateId overrides', () => {
-      const handle = pokemonsEventStore.openAggregateFrom({
-        aggregateId: pikachuId,
-      });
+      const handle = pokemonsEventStore.openNewAggregate(pikachuId);
 
       expect(() =>
         handle.groupEvents([
