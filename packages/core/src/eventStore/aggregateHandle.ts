@@ -74,9 +74,10 @@ type CommitGroupedEvents = (
  * An immutable, version-pinned write handle for a single aggregate.
  *
  * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or,
- * without a read, `openNewAggregate` for a brand-new one and `openAggregateFrom`
- * for an aggregate you already hold). `aggregate` always reflects the read it
- * was opened with — the handle never rolls itself forward. Version,
+ * without a read, `openNewAggregate` for a brand-new one). For the unusual case
+ * of an aggregate you already hold, use the static {@link AggregateHandle.from}
+ * — there is deliberately no instance method for it. `aggregate` always reflects
+ * the read it was opened with — the handle never rolls itself forward. Version,
  * `aggregateId` and `prevAggregate` are auto-filled on every push.
  *
  * The handle pins an expected version, so it never force-pushes: bypassing the
@@ -185,10 +186,11 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
 
   /**
    * Synchronously wrap an aggregate you already hold (no I/O) — the
-   * `aggregateId` and pinned version are taken from the aggregate itself. Backs
-   * `openAggregateFrom`; useful for replay / "I already read it" paths (e.g.
-   * from `getAggregateAndEvents`, a projection, or a simulation). Reserve it for
-   * non-command flows — in a command, read the aggregate inside the command (via
+   * `aggregateId` and pinned version are taken from the aggregate itself. Useful
+   * for replay / "I already read it" paths (e.g. from `getAggregateAndEvents`, a
+   * projection, or a simulation). This is the **least common** factory and
+   * deliberately has no `EventStore` instance method: reserve it for non-command
+   * flows — in a command, read the aggregate inside the command (via
    * {@link AggregateHandle.open} / {@link AggregateHandle.openExisting}) so each
    * optimistic-concurrency retry re-reads fresh state.
    */

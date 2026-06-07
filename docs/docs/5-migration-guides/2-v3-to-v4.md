@@ -114,13 +114,13 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 
 # `AggregateHandle`: new `open*` methods on `EventStore`
 
-v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through four new `EventStore` methods: `openAggregate`, `openExistingAggregate`, `openNewAggregate`, and `openAggregateFrom` (the last is for unusual, non-command flows only).
+v4 adds [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md) — the boilerplate-free, recommended way to read an aggregate and push further events onto it — exposed through three new `EventStore` methods: `openAggregate`, `openExistingAggregate`, and `openNewAggregate`. (A fourth case — wrapping an aggregate you already hold — lives only on the static `AggregateHandle.from(store, aggregate)`, not on `EventStore`, since it is for unusual non-command flows.)
 
 `EventStore` is a class that also serves as the structural contract for event stores (hamstore's own `ConnectedEventStore` is declared `implements EventStore`). Adding instance methods to it **widens that contract**, which is the breaking part — though for almost all usage there is nothing to do:
 
 - **You instantiate `EventStore` directly (`new EventStore({ … })`) — no change.** The methods are concrete; this is purely additive.
 - **You subclass it (`class Mine extends EventStore`) — no change.** Subclasses inherit the new methods automatically, and because the bodies dispatch through `this`, they behave correctly (including any publishing your subclass wires up).
-- **You structurally implement it (`class Mine implements EventStore<…>`) — you must add the four methods.** This is the wrapper / decorator pattern (the same reason `ConnectedEventStore` grew them). This is the only case that requires a change.
+- **You structurally implement it (`class Mine implements EventStore<…>`) — you must add the three methods.** This is the wrapper / decorator pattern (the same reason `ConnectedEventStore` grew them). This is the only case that requires a change.
 
 ## Migration recipe (only for `implements EventStore`)
 
@@ -152,10 +152,6 @@ class MyEventStore implements EventStore</* … */> {
 
   openNewAggregate(aggregateId: string): AggregateHandle<this> {
     return AggregateHandle.forNew(this, aggregateId);
-  }
-
-  openAggregateFrom(aggregate: MyAggregate): AggregateHandle<this> {
-    return AggregateHandle.from(this, aggregate);
   }
 }
 ```

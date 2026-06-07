@@ -94,15 +94,16 @@ Fetching and pushing events non-simultaneously exposes your application to [race
 
 An **`AggregateHandle`** is an immutable, version-pinned write handle for a single aggregate. It removes the boilerplate of reading an aggregate, tracking its `version`, and threading `aggregateId` / `prevAggregate` through every push. It is the **recommended way to push aggregate changes**.
 
-You obtain one from an `EventStore` through four methods:
+You obtain one from an `EventStore` through three methods:
 
 - <code>openAggregate(aggregateId, opt?)</code>: Reads the aggregate and returns a handle. `handle.aggregate` may be `undefined` (new aggregate).
 - <code>openExistingAggregate(aggregateId, opt?)</code>: Same, but throws an `AggregateNotFoundError` if the aggregate does not exist yet — so `handle.aggregate` is always defined.
 - <code>openNewAggregate(aggregateId)</code>: Opens a handle for an aggregate that does not exist yet (pins <code>nextVersion = 1</code>), **without reading storage** — for the initial event of a new aggregate.
-- <code>openAggregateFrom(aggregate)</code>: Wraps an aggregate you already hold (replay, projection, simulation) **without reading storage** — `aggregateId` and the pinned version come from the aggregate itself. This is the least common method; reserve it for the unusual cases below.
+
+For the unusual case where you **already hold** an aggregate (replay, projection, simulation) and want to skip the read, there is a static factory <code>AggregateHandle.from(store, aggregate)</code> — `aggregateId` and the pinned version come from the aggregate itself. It is deliberately **not** an `EventStore` method (see the warning below).
 
 :::warning Inside a command, open the handle from a read
-In a [command](#defining-a-command) the aggregate should be read **inside** the handler (via `openAggregate` / `openExistingAggregate`) so that every [retry](#race-conditions--retries) re-reads fresh state. Don't load an aggregate up front and pass it in via `openAggregateFrom` — the handle would replay a stale version on retry. `openAggregateFrom` is for non-command flows (replay, projection, simulation) where you already hold a current aggregate.
+In a [command](#defining-a-command) the aggregate should be read **inside** the handler (via `openAggregate` / `openExistingAggregate`) so that every [retry](#race-conditions--retries) re-reads fresh state. Don't load an aggregate up front and pass it in via `AggregateHandle.from` — the handle would replay a stale version on retry. `AggregateHandle.from` is for non-command flows (replay, projection, simulation) where you already hold a current aggregate; that is why it lives only on `AggregateHandle`, not on the `EventStore`.
 :::
 
 ```ts
@@ -173,7 +174,7 @@ await EventStore.pushEventGroup(
   <b>🔧 Reference</b>
 </summary>
 
-A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openNewAggregate</code> / <code>openAggregateFrom</code> — each documented in the [`EventStore` reference](./3-event-stores.md). It is **immutable** and never force-pushes.
+A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <code>openExistingAggregate</code> / <code>openNewAggregate</code> (each documented in the [`EventStore` reference](./3-event-stores.md)), or — for an aggregate you already hold — the static <code>AggregateHandle.from(store, aggregate)</code>. It is **immutable** and never force-pushes.
 
 **Event input:** every method takes an event detail with <code>aggregateId</code>, <code>version</code> and <code>timestamp</code> **omitted** — the handle owns <code>aggregateId</code> / <code>version</code> and they **cannot** be set in the input (use the low-level <code>eventStore.pushEvent</code> for explicit control). The chained <code>pushEvents</code> / <code>groupEvents</code> additionally **reject** an empty list. In the chained forms, an entry may also be a function <code>(prevAggregate) => input</code> that receives a local aggregate folded through the earlier events, and the result is a fixed-size tuple the **same length** as the input.
 
