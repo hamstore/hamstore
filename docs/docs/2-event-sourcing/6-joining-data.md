@@ -55,18 +55,22 @@ await EventStore.pushEventGroup(
 You can also build grouped events directly on the event store with `eventStore.groupEvent(...)` — it has the same input interface as [`pushEvent`](./5-pushing-events.md#direct-low-level-pushing) (you provide the `version` yourself), and accepts options like `{ force: true }` on `pushEventGroup`:
 
 ```ts
+// 👇 Each aggregate has its OWN version — track one per store, never a shared one
+const pikachuVersion = pikachu.version; // e.g. 3
+const ashVersion = ash.version; // e.g. 7
+
 await EventStore.pushEventGroup(
   pokemonsEventStore.groupEvent({
     // 👇 Correctly typed, explicit version
     aggregateId: 'pikachu1',
-    version: lastVersion + 1,
+    version: pikachuVersion + 1,
     type: 'CAUGHT_BY_TRAINER',
     payload: { trainerId: 'ashKetchum' },
     ...
   }),
   trainersEventStore.groupEvent({
     aggregateId: 'ashKetchum',
-    version: lastVersion + 1,
+    version: ashVersion + 1,
     type: 'POKEMON_CAUGHT',
     payload: { pokemonId: 'pikachu1' },
     ...
