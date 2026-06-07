@@ -64,6 +64,17 @@ describe('AggregateHandle', () => {
     });
   });
 
+  describe('openNewAggregate', () => {
+    it('pins version 1 for a brand-new aggregate without reading storage', () => {
+      const handle = pokemonsEventStore.openNewAggregate('new-1');
+
+      expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe('new-1');
+      expect(handle.aggregate).toBeUndefined();
+      expect(handle.nextVersion).toBe(1);
+    });
+  });
+
   describe('openAggregateFrom', () => {
     it('wraps an aggregate without reading storage, deriving id + version', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
@@ -76,17 +87,6 @@ describe('AggregateHandle', () => {
       expect(handle.aggregateId).toBe(pikachuId);
       expect(handle.aggregate).toStrictEqual(aggregate);
       expect(handle.nextVersion).toBe(2);
-    });
-  });
-
-  describe('openNewAggregate', () => {
-    it('pins version 1 for a brand-new aggregate without reading storage', () => {
-      const handle = pokemonsEventStore.openNewAggregate('new-1');
-
-      expect(getEventsMock).not.toHaveBeenCalled();
-      expect(handle.aggregateId).toBe('new-1');
-      expect(handle.aggregate).toBeUndefined();
-      expect(handle.nextVersion).toBe(1);
     });
   });
 
@@ -110,6 +110,15 @@ describe('AggregateHandle', () => {
       ).rejects.toBeInstanceOf(AggregateNotFoundError);
     });
 
+    it('forNew pins version 1 without reading storage', () => {
+      const handle = AggregateHandle.forNew(pokemonsEventStore, 'new-1');
+
+      expect(getEventsMock).not.toHaveBeenCalled();
+      expect(handle.aggregateId).toBe('new-1');
+      expect(handle.aggregate).toBeUndefined();
+      expect(handle.nextVersion).toBe(1);
+    });
+
     it('from wraps an aggregate without reading storage, deriving id + version', () => {
       const aggregate = pokemonsEventStore.buildAggregate([
         pikachuAppearedEvent,
@@ -121,15 +130,6 @@ describe('AggregateHandle', () => {
       expect(handle.aggregateId).toBe(pikachuId);
       expect(handle.aggregate).toStrictEqual(aggregate);
       expect(handle.nextVersion).toBe(2);
-    });
-
-    it('forNew pins version 1 without reading storage', () => {
-      const handle = AggregateHandle.forNew(pokemonsEventStore, 'new-1');
-
-      expect(getEventsMock).not.toHaveBeenCalled();
-      expect(handle.aggregateId).toBe('new-1');
-      expect(handle.aggregate).toBeUndefined();
-      expect(handle.nextVersion).toBe(1);
     });
   });
 

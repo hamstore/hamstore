@@ -110,21 +110,27 @@ export class EventStore<
   }
 
   /**
-   * Wrap an aggregate you already hold (replay, projection, simulation) in a
-   * handle — `aggregateId` and the pinned version come from the aggregate
-   * itself. Does not read storage.
-   */
-  openAggregateFrom(aggregate: AGGREGATE): AggregateHandle<this> {
-    return AggregateHandle.from(this, aggregate);
-  }
-
-  /**
    * Open a handle for an aggregate that does not exist yet (first event at
    * version 1). Does not read storage — use when the aggregate is known to be
    * new (first-event / bulk-import paths).
    */
   openNewAggregate(aggregateId: string): AggregateHandle<this> {
     return AggregateHandle.forNew(this, aggregateId);
+  }
+
+  /**
+   * Wrap an aggregate you already hold (replay, projection, simulation) in a
+   * handle — `aggregateId` and the pinned version come from the aggregate
+   * itself. Does not read storage.
+   *
+   * Reserve this for non-command flows: in a command handler the aggregate
+   * should be read *inside* the command (via {@link openAggregate} /
+   * {@link openExistingAggregate}) so every optimistic-concurrency retry
+   * re-reads fresh state — wrapping a pre-loaded aggregate would replay a stale
+   * version on retry.
+   */
+  openAggregateFrom(aggregate: AGGREGATE): AggregateHandle<this> {
+    return AggregateHandle.from(this, aggregate);
   }
 
   constructor({
