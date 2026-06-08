@@ -119,7 +119,7 @@ v4 adds three methods to `EventStore` for working with [`AggregateHandle`](../2-
 
 This only affects you if you have a class declared `implements EventStore` (a wrapper / decorator, like `ConnectedEventStore`) — it must add the three methods. `new EventStore(…)` and `class … extends EventStore` need no change.
 
-Delegate to `AggregateHandle`'s static factories — exactly what `ConnectedEventStore` does:
+Declare them as instance properties assigned in the constructor and delegate to `AggregateHandle`'s static factories — exactly what `ConnectedEventStore` does, matching how the store's other members (`getEvents`, `pushEvent`, …) are typed:
 
 ```ts
 import {
@@ -131,24 +131,33 @@ import {
 class MyEventStore implements EventStore</* … */> {
   // … existing members …
 
-  openAggregate(
+  openAggregate: (
     aggregateId: string,
     options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.open(this, aggregateId, options);
-  }
+  ) => Promise<AggregateHandle<this>>;
 
-  openExistingAggregate(
+  openExistingAggregate: (
     aggregateId: string,
     options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.openExisting(this, aggregateId, options);
-  }
+  ) => Promise<AggregateHandle<this, true>>;
 
-  openNewAggregate(aggregateId: string): AggregateHandle<this> {
-    return AggregateHandle.forNew(this, aggregateId);
+  openNewAggregate: (aggregateId: string) => AggregateHandle<this>;
+
+  constructor(/* … */) {
+    // … existing assignments …
+
+    this.openAggregate = (aggregateId, options) =>
+      AggregateHandle.open(this, aggregateId, options);
+
+    this.openExistingAggregate = (aggregateId, options) =>
+      AggregateHandle.openExisting(this, aggregateId, options);
+
+    this.openNewAggregate = aggregateId =>
+      AggregateHandle.forNew(this, aggregateId);
   }
 }
 ```
+
+The `, true` on `openExistingAggregate`'s return is the existence flag: it marks the handle's `aggregate` as statically defined (the same flag `getExistingAggregate` uses), so callers don't need a `!` or undefined check.
 
 Passing the store to the factories is what makes the handle route its reads — and the publish-side commit — through it, so a wrapper keeps its event-publishing behaviour without any extra rebind.
