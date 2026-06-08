@@ -9,6 +9,7 @@ import type {
   AggregateIdsLister,
   AggregateOpener,
   AggregateSimulator,
+  ExistingAggregateOpener,
   EventGrouper,
   EventPusher,
   AggregateAndEventsGetter,
@@ -97,7 +98,7 @@ export class ConnectedEventStore<
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
   openAggregate: AggregateOpener<this>;
-  openExistingAggregate: AggregateOpener<this>;
+  openExistingAggregate: ExistingAggregateOpener<this>;
   openNewAggregate: NewAggregateOpener<this>;
 
   eventStore: EventStore<

@@ -10,6 +10,7 @@ import {
 } from './eventStore.fixtures.test';
 
 type PokemonHandle = AggregateHandle<typeof pokemonsEventStore>;
+type ExistingPokemonHandle = AggregateHandle<typeof pokemonsEventStore, true>;
 
 // --- OPEN AGGREGATE binds the handle to the store ---
 
@@ -19,11 +20,41 @@ const assertOpenAggregateOutput: A.Equals<
 > = 1;
 assertOpenAggregateOutput;
 
+// `openExistingAggregate` tightens the handle to one with a defined `aggregate`
+// (the same `EXISTS` flag `getExistingAggregate` uses), so no `!`/guard needed.
+const assertOpenExistingAggregateOutput: A.Equals<
+  ReturnType<typeof pokemonsEventStore.openExistingAggregate>,
+  Promise<ExistingPokemonHandle>
+> = 1;
+assertOpenExistingAggregateOutput;
+
 const assertOpenNewAggregateOutput: A.Equals<
   ReturnType<typeof pokemonsEventStore.openNewAggregate>,
   PokemonHandle
 > = 1;
 assertOpenNewAggregateOutput;
+
+// --- `aggregate` DEFINEDNESS follows the EXISTS flag, statically ---
+
+const assertOpenAggregateMaybeUndefined: A.Equals<
+  Awaited<ReturnType<typeof pokemonsEventStore.openAggregate>>['aggregate'],
+  PokemonAggregate | undefined
+> = 1;
+assertOpenAggregateMaybeUndefined;
+
+const assertOpenExistingAggregateDefined: A.Equals<
+  Awaited<
+    ReturnType<typeof pokemonsEventStore.openExistingAggregate>
+  >['aggregate'],
+  PokemonAggregate
+> = 1;
+assertOpenExistingAggregateDefined;
+
+const assertOpenNewAggregateMaybeUndefined: A.Equals<
+  ReturnType<typeof pokemonsEventStore.openNewAggregate>['aggregate'],
+  PokemonAggregate | undefined
+> = 1;
+assertOpenNewAggregateMaybeUndefined;
 
 // --- STATIC FACTORIES preserve the concrete store subtype in the handle ---
 
@@ -35,7 +66,7 @@ assertStaticOpenOutput;
 
 const assertStaticOpenExistingOutput: A.Equals<
   ReturnType<typeof AggregateHandle.openExisting<typeof pokemonsEventStore>>,
-  Promise<PokemonHandle>
+  Promise<ExistingPokemonHandle>
 > = 1;
 assertStaticOpenExistingOutput;
 
@@ -45,11 +76,19 @@ const assertStaticForNewOutput: A.Equals<
 > = 1;
 assertStaticForNewOutput;
 
+// `from` is handed a defined aggregate, so it also yields the `EXISTS = true`
+// handle (a defined `aggregate`).
 const assertStaticFromOutput: A.Equals<
   ReturnType<typeof AggregateHandle.from<typeof pokemonsEventStore>>,
-  PokemonHandle
+  ExistingPokemonHandle
 > = 1;
 assertStaticFromOutput;
+
+const assertExistingHandleAggregateDefined: A.Equals<
+  ExistingPokemonHandle['aggregate'],
+  PokemonAggregate
+> = 1;
+assertExistingHandleAggregateDefined;
 
 // --- HANDLE FIELDS ---
 

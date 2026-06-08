@@ -60,6 +60,17 @@ export type AggregateOpener<ES extends EventStore> = (
 ) => Promise<AggregateHandle<ES>>;
 
 /**
+ * Like {@link AggregateOpener}, but the returned handle is statically known to
+ * hold a defined `aggregate` (it throws otherwise) — the type of
+ * {@link EventStore.openExistingAggregate}. Mirrors how `getExistingAggregate`
+ * tightens `getAggregate`.
+ */
+export type ExistingAggregateOpener<ES extends EventStore> = (
+  aggregateId: string,
+  options?: GetAggregateOptions,
+) => Promise<AggregateHandle<ES, true>>;
+
+/**
  * Synchronously opens a handle for an aggregate that does not exist yet (no
  * read) — the type of {@link EventStore.openNewAggregate}. See
  * {@link AggregateHandle.forNew}.
@@ -82,9 +93,17 @@ export type NewAggregateOpener<ES extends EventStore> = (
  * optimistic-concurrency check would defeat its purpose. Use the low-level
  * {@link EventStore.pushEvent} with `{ force: true }` for that.
  */
-export class AggregateHandle<ES extends EventStore = EventStore> {
+export class AggregateHandle<
+  ES extends EventStore = EventStore,
+  // When `true`, `aggregate` is statically known to be defined — the same
+  // existence flag `AggregateGetter` uses for `getExistingAggregate`. Set by
+  // `openExisting` / `from`; left `false` (maybe-undefined) by `open` / `forNew`.
+  EXISTS extends boolean = false,
+> {
   readonly aggregateId: string;
-  readonly aggregate: EventStoreAggregate<ES> | undefined;
+  readonly aggregate: EXISTS extends true
+    ? EventStoreAggregate<ES>
+    : EventStoreAggregate<ES> | undefined;
   readonly nextVersion: number;
 
   // `store` is deliberately public (like `GroupedEvent`'s fields): TS
@@ -105,7 +124,7 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   }) {
     this.store = store;
     this.aggregateId = aggregateId;
-    this.aggregate = aggregate;
+    this.aggregate = aggregate as AggregateHandle<ES, EXISTS>['aggregate'];
     this.nextVersion = (aggregate?.version ?? 0) + 1;
   }
 
@@ -146,17 +165,23 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
     store: ES,
     aggregateId: string,
     options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<ES>> {
-    const handle = await AggregateHandle.open(store, aggregateId, options);
+  ): Promise<AggregateHandle<ES, true>> {
+    const { aggregate } = await store.getAggregate(aggregateId, options);
 
-    if (handle.aggregate === undefined) {
+    if (aggregate === undefined) {
       throw new AggregateNotFoundError({
         aggregateId,
         eventStoreId: store.eventStoreId,
       });
     }
 
-    return handle;
+    // Verified defined above — construct the `EXISTS = true` handle directly so
+    // its `aggregate` is statically known to be present (no cast needed).
+    return new AggregateHandle<ES, true>({
+      store,
+      aggregateId,
+      aggregate: aggregate as EventStoreAggregate<ES>,
+    });
   }
 
   /**
@@ -188,8 +213,8 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   static from<ES extends EventStore>(
     store: ES,
     aggregate: EventStoreAggregate<ES>,
-  ): AggregateHandle<ES> {
-    return new AggregateHandle({
+  ): AggregateHandle<ES, true> {
+    return new AggregateHandle<ES, true>({
       store,
       aggregateId: aggregate.aggregateId,
       aggregate,
