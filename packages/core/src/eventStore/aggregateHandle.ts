@@ -218,6 +218,7 @@ export class AggregateHandle<
   fill(
     input: AggregateHandleEventInput<ES>,
     version: number,
+    timestamp?: string,
   ): Parameters<ES['groupEvent']>[0] {
     const { aggregateId, version: versionOverride } = input as {
       aggregateId?: string;
@@ -230,6 +231,8 @@ export class AggregateHandle<
     }
 
     return {
+      // A `timestamp` on `input` still wins — it spreads after this.
+      ...(timestamp !== undefined ? { timestamp } : {}),
       // `input` is a generic distributive conditional type, which TS won't
       // confirm is spreadable (TS2698) even though it always resolves to one.
       ...(input as object),
@@ -256,16 +259,17 @@ export class AggregateHandle<
 
     let version = this.nextVersion;
     const grouped: ReturnType<ES['groupEvent']>[] = [];
-    // One timestamp for the whole group — the events commit atomically. This
-    // fold is only a local roll-forward to derive each `prevAggregate`; the
-    // persisted timestamps are assigned by the storage adapter on commit.
+    // One shared timestamp for the whole group (the events commit atomically).
+    // Stamping it on the events — rather than letting the adapter assign one —
+    // makes the value folded into each `prevAggregate` exactly what gets
+    // persisted and published, so timestamp-reading reducers see no drift.
     const timestamp = new Date().toISOString();
 
     const fold = (
       input: AggregateHandleEventInput<ES>,
       prevAggregate: EventStoreAggregate<ES> | undefined,
     ): EventStoreAggregate<ES> => {
-      const event = this.fill(input, version);
+      const event = this.fill(input, version, timestamp);
       grouped.push(
         this.store.groupEvent(event, {
           ...options,
@@ -275,7 +279,7 @@ export class AggregateHandle<
       version += 1;
 
       return this.store.buildAggregate(
-        [{ timestamp, ...event }],
+        [event],
         prevAggregate,
       ) as EventStoreAggregate<ES>;
     };
