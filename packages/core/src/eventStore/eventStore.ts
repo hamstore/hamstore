@@ -7,7 +7,11 @@ import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
 import { AggregateHandle } from './aggregateHandle';
-import type { AggregateOpener, NewAggregateOpener } from './aggregateHandle';
+import type {
+  AggregateOpener,
+  ExistingAggregateOpener,
+  NewAggregateOpener,
+} from './aggregateHandle';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import { pushEventGroup } from './pushEventGroup';
@@ -103,7 +107,7 @@ export class EventStore<
   openAggregate: AggregateOpener<this>;
 
   /** Like {@link openAggregate}, but throws if the aggregate does not exist. */
-  openExistingAggregate: AggregateOpener<this>;
+  openExistingAggregate: ExistingAggregateOpener<this>;
 
   /**
    * Open a handle for an aggregate that does not exist yet (first event at
