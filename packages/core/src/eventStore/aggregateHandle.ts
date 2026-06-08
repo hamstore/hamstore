@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */
 import type { EventDetail } from '~/event/eventDetail';
 
-import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import type { EventStore } from './eventStore';
 import type { EventStoreAggregate, EventStoreEventDetails } from './generics';
 import { pushEventGroup } from './pushEventGroup';
@@ -161,25 +160,20 @@ export class AggregateHandle<
   }
 
   /**
-   * Like {@link AggregateHandle.open}, but throws {@link AggregateNotFoundError}
-   * if the aggregate does not exist. Backs `openExistingAggregate`.
+   * Like {@link AggregateHandle.open}, but throws `AggregateNotFoundError` if
+   * the aggregate does not exist. Backs `openExistingAggregate`.
    */
   static async openExisting<ES extends EventStore>(
     store: ES,
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<ES, true>> {
-    const { aggregate } = await store.getAggregate(aggregateId, options);
+    // Delegate the read + not-found throw to the store's `getExistingAggregate`
+    // (the existence-tightened counterpart of `getAggregate`), so the
+    // not-found semantics live in one place. Its result is statically defined,
+    // so the `EXISTS = true` handle needs no guard.
+    const { aggregate } = await store.getExistingAggregate(aggregateId, options);
 
-    if (aggregate === undefined) {
-      throw new AggregateNotFoundError({
-        aggregateId,
-        eventStoreId: store.eventStoreId,
-      });
-    }
-
-    // Verified defined above — construct the `EXISTS = true` handle directly so
-    // its `aggregate` is statically known to be present (no cast needed).
     return new AggregateHandle<ES, true>({
       store,
       aggregateId,
