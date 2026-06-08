@@ -271,6 +271,14 @@ const { aggregate, events, lastEvent } =
 // => 'aggregate' and 'lastEvent' are always defined 🙌
 ```
 
+- <code>openAggregate <i>((aggregateId: string, opt?: GetAggregateOptions) => Promise&lt;AggregateHandle&gt;)</i></code>: Reads the aggregate and returns an immutable, version-pinned [`AggregateHandle`](./5-pushing-events.md#pushing-events-with-an-aggregatehandle) for it. <code>handle.aggregate</code> may be <code>undefined</code> when the aggregate does not exist yet (i.e. before its first event). **This is the recommended way to push aggregate changes** — the lower-level <code>pushEvent</code> / <code>groupEvent</code> methods below are the primitives the handle is built on; reach for them directly only when you need explicit version control or a force push.
+
+  For the unusual case where you **already hold** an aggregate (replay, projection, simulation) and want to skip the read, use the static <code>AggregateHandle.from(store, aggregate)</code> — it is deliberately **not** an `EventStore` method, since a pre-loaded aggregate is stale on [retry](./5-pushing-events.md#race-conditions--retries) and so does not belong inside a [command](./5-pushing-events.md#defining-a-command).
+
+- <code>openExistingAggregate <i>((aggregateId: string, opt?: GetAggregateOptions) => Promise&lt;AggregateHandle&gt;)</i></code>: Same as <code>openAggregate</code>, but throws an <code>AggregateNotFoundError</code> if no event exists for this <code>aggregateId</code> — so <code>handle.aggregate</code> is always defined.
+
+- <code>openNewAggregate <i>((aggregateId: string) => AggregateHandle)</i></code>: Opens a handle for an aggregate that does not exist yet, **without reading storage** (and synchronously) — the handle pins <code>nextVersion = 1</code>. Use it for the initial event of a new aggregate when the read can be skipped because the aggregate is known to be new.
+
 - <code>pushEvent <i>((eventDetail: EventDetail, opt?: OptionsObj) => Promise&lt;ResponseObj&gt;)</i></code>: Pushes a new event to the event store. The <code>timestamp</code> is optional (we keep it available as it can be useful in tests & migrations). If not provided, it is automatically set as <code>new Date().toISOString()</code>. Throws an <code>EventAlreadyExistsError</code> if an event already exists for the corresponding <code>aggregateId</code> and <code>version</code> (see section on <a href="../pushing-events">race conditions</a>).
 
   `OptionsObj` contains the following properties:

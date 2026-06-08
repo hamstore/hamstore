@@ -32,9 +32,7 @@ export const startPokemonGameCommand = new JSONSchemaCommand({
 
     const trainerId = generateUuid();
 
-    await eventStore.pushEvent({
-      aggregateId: trainerId,
-      version: 1,
+    await eventStore.openNewAggregate(trainerId).pushEvent({
       type: 'GAME_STARTED',
       payload: {
         trainerName,
