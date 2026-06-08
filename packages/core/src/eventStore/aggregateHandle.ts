@@ -26,13 +26,13 @@ export type AggregateHandleEventInput<ES extends EventStore> =
 /**
  * Either a ready event input, or a function of the aggregate folded through the
  * preceding events in the same call (lets a later event depend on earlier ones
- * without mutating the handle).
+ * without mutating the handle). The aggregate is always defined: this form is
+ * only valid from the second input onward (see {@link AggregateHandleEventInputs}),
+ * by which point at least one event has been folded.
  */
 export type AggregateHandleEventInputOrFn<ES extends EventStore> =
   | AggregateHandleEventInput<ES>
-  | ((
-      aggregate: EventStoreAggregate<ES> | undefined,
-    ) => AggregateHandleEventInput<ES>);
+  | ((aggregate: EventStoreAggregate<ES>) => AggregateHandleEventInput<ES>);
 
 /**
  * A **non-empty** list of inputs for the chained handle methods
@@ -41,9 +41,13 @@ export type AggregateHandleEventInputOrFn<ES extends EventStore> =
  * a `const` type parameter at the call site, this lets the result mirror the
  * input's length (a fixed-size tuple the caller can spread straight into
  * {@link EventStore.pushEventGroup}).
+ *
+ * The first input must be a plain input (not a function): the first event has
+ * no predecessor in the call to depend on, and pinning it lets every later
+ * function input receive a *defined* aggregate.
  */
 export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
-  AggregateHandleEventInputOrFn<ES>,
+  AggregateHandleEventInput<ES>,
   ...AggregateHandleEventInputOrFn<ES>[],
 ];
 
@@ -261,7 +265,6 @@ export class AggregateHandle<
       );
     }
 
-    let running = this.aggregate;
     let version = this.nextVersion;
     const grouped: ReturnType<ES['groupEvent']>[] = [];
     // One timestamp for the whole group — the events commit atomically. This
@@ -269,27 +272,40 @@ export class AggregateHandle<
     // persisted timestamps are assigned by the storage adapter on commit.
     const timestamp = new Date().toISOString();
 
-    for (const input of inputs) {
-      const resolved = typeof input === 'function' ? input(running) : input;
-      const event = this.fill(resolved, version);
+    const fold = (
+      input: AggregateHandleEventInput<ES>,
+      prevAggregate: EventStoreAggregate<ES> | undefined,
+    ): EventStoreAggregate<ES> => {
+      const event = this.fill(input, version);
       grouped.push(
         this.store.groupEvent(event, {
           ...options,
-          ...(running === undefined ? {} : { prevAggregate: running }),
+          ...(prevAggregate === undefined ? {} : { prevAggregate }),
         }) as ReturnType<ES['groupEvent']>,
       );
-      running = this.store.buildAggregate(
-        [{ timestamp, ...event }] as never,
-        running as never,
-      ) as EventStoreAggregate<ES>;
       version += 1;
+
+      return this.store.buildAggregate(
+        [{ timestamp, ...event }] as never,
+        prevAggregate as never,
+      ) as EventStoreAggregate<ES>;
+    };
+
+    // Fold the (mandatory, plain) first input against the handle's opened
+    // aggregate — the only step where the previous aggregate may be undefined.
+    // From here on `running` is defined, so the function inputs in the rest can
+    // take a defined aggregate (and need no cast).
+    const [firstInput, ...restInputs] = inputs;
+    let running = fold(firstInput, this.aggregate);
+    for (const input of restInputs) {
+      running = fold(typeof input === 'function' ? input(running) : input, running);
     }
 
     return {
       grouped: grouped as {
         -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
       },
-      nextAggregate: running as EventStoreAggregate<ES>,
+      nextAggregate: running,
     };
   }
 

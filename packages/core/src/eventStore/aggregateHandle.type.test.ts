@@ -159,3 +159,31 @@ const assertPushEventsTuple: A.Equals<
   }
 > = 1;
 assertPushEventsTuple;
+
+// --- FUNCTION INPUTS RECEIVE A DEFINED AGGREGATE ---
+//
+// A function input folds against the aggregate built from the preceding events
+// in the same call. Since the first input must be a plain input, by the time
+// any function runs at least one event has been folded, so its parameter is a
+// defined `PokemonAggregate` (no `| undefined`) — even on a maybe-handle.
+
+handle.groupEvents([
+  { type: 'POKEMON_LEVELED_UP' },
+  (aggregate) => {
+    const assertFnAggregateDefined: A.Equals<
+      typeof aggregate,
+      PokemonAggregate
+    > = 1;
+    assertFnAggregateDefined;
+
+    return { type: 'POKEMON_LEVELED_UP' };
+  },
+]);
+
+// A function is NOT allowed as the FIRST input — the first event has no
+// predecessor in the call to depend on.
+handle.groupEvents([
+  // @ts-expect-error - first input must be a plain input, not a function
+  () => ({ type: 'POKEMON_LEVELED_UP' }),
+  { type: 'POKEMON_LEVELED_UP' },
+]);
