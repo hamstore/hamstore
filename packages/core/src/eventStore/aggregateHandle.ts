@@ -230,6 +230,8 @@ export class AggregateHandle<
     }
 
     return {
+      // `input` is a generic distributive conditional type, which TS won't
+      // confirm is spreadable (TS2698) even though it always resolves to one.
       ...(input as object),
       aggregateId: this.aggregateId,
       version,
