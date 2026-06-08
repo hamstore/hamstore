@@ -20,39 +20,23 @@ export const catchPokemonCommand = new JSONSchemaCommand({
     const { pokemonId, trainerId } = input;
     const [pokemonsStore, trainersStore] = eventStores;
 
-    const [{ aggregate: pokemonAggregate }, { aggregate: trainerAggregate }] =
-      await Promise.all([
-        pokemonsStore.getAggregate(pokemonId),
-        trainersStore.getAggregate(trainerId),
-      ]);
+    const [pokemon, trainer] = await Promise.all([
+      pokemonsStore.openExistingAggregate(pokemonId),
+      trainersStore.openExistingAggregate(trainerId),
+    ]);
 
-    if (pokemonAggregate === undefined) {
-      throw new Error('Pokemon not found');
-    }
-
-    if (trainerAggregate === undefined) {
-      throw new Error('Trainer not found');
-    }
-
-    const { version: pokemonVersion, status: pokemonStatus } = pokemonAggregate;
-    if (pokemonStatus === 'caught') {
+    if (pokemon.aggregate.status === 'caught') {
       throw new Error('Pokemon already caught');
     }
 
-    const { version: trainerVersion } = trainerAggregate;
-
     await EventStore.pushEventGroup(
-      pokemonsStore.groupEvent({
-        aggregateId: pokemonId,
-        version: pokemonVersion + 1,
+      pokemon.groupEvent({
         type: 'CAUGHT_BY_TRAINER',
         payload: {
           trainerId,
         },
       }),
-      trainersStore.groupEvent({
-        aggregateId: trainerId,
-        version: trainerVersion + 1,
+      trainer.groupEvent({
         type: 'POKEMON_CAUGHT',
         payload: {
           pokemonId,
