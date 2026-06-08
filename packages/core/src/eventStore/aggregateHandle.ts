@@ -274,7 +274,7 @@ export class AggregateHandle<
       grouped.push(
         this.store.groupEvent(event, {
           ...options,
-          ...(prevAggregate === undefined ? {} : { prevAggregate }),
+          prevAggregate,
         }) as ReturnType<ES['groupEvent']>,
       );
       version += 1;
@@ -310,9 +310,7 @@ export class AggregateHandle<
   ): ReturnType<ES['groupEvent']> {
     return this.store.groupEvent(this.fill(input, this.nextVersion), {
       ...options,
-      ...(this.aggregate === undefined
-        ? {}
-        : { prevAggregate: this.aggregate }),
+      prevAggregate: this.aggregate,
     }) as ReturnType<ES['groupEvent']>;
   }
 
