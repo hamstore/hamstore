@@ -168,10 +168,6 @@ export class AggregateHandle<
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<ES, true>> {
-    // Delegate the read + not-found throw to the store's `getExistingAggregate`
-    // (the existence-tightened counterpart of `getAggregate`), so the
-    // not-found semantics live in one place. Its result is statically defined,
-    // so the `EXISTS = true` handle needs no guard.
     const { aggregate } = await store.getExistingAggregate(aggregateId, options);
 
     return new AggregateHandle<ES, true>({
