@@ -173,7 +173,7 @@ describe('AggregateHandle', () => {
       const seen: Array<{ level: number; version: number } | undefined> = [];
 
       const handle = await pokemonsEventStore.openAggregate(pikachuId);
-      const { events, nextAggregate } = await handle.pushEvents([
+      const { events, eventGroup, nextAggregate } = await handle.pushEvents([
         { type: 'POKEMON_LEVELED_UP' },
         prevAggregate => {
           seen.push(
@@ -190,6 +190,11 @@ describe('AggregateHandle', () => {
       // One atomic commit through the group pusher.
       expect(pushEventGroupMock).toHaveBeenCalledTimes(1);
       expect(events).toHaveLength(2);
+
+      // The raw `pushEventGroup` result is forwarded unchanged: one entry per
+      // committed event, each pairing the event with its per-event aggregate.
+      expect(eventGroup).toHaveLength(2);
+      expect(eventGroup.map(({ event }) => event)).toStrictEqual(events);
 
       // The dependent fn sees the aggregate folded through the first event:
       // pikachu started at level 42 (version 1), so after one level-up it is

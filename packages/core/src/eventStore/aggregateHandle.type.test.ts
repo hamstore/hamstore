@@ -151,10 +151,18 @@ const assertGroupEventsTuple: A.Equals<
 > = 1;
 assertGroupEventsTuple;
 
+// One `eventGroup` entry: the committed event paired with its (optional)
+// per-event aggregate, exactly as `EventStore.pushEventGroup` returns it.
+type PushEventsGroupEntry = {
+  event: PokemonEventDetails;
+  nextAggregate?: PokemonAggregate;
+};
+
 const assertPushEventsTuple: A.Equals<
   Awaited<ReturnType<typeof pushEventsProbe>>,
   {
     events: [PokemonEventDetails, PokemonEventDetails];
+    eventGroup: [PushEventsGroupEntry, PushEventsGroupEntry];
     nextAggregate: PokemonAggregate;
   }
 > = 1;
@@ -187,3 +195,4 @@ handle.groupEvents([
   () => ({ type: 'POKEMON_LEVELED_UP' }),
   { type: 'POKEMON_LEVELED_UP' },
 ]);
+

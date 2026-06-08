@@ -249,10 +249,7 @@ export class AggregateHandle<
   chain<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): {
-    grouped: { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> };
-    nextAggregate: EventStoreAggregate<ES>;
-  } {
+  ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
     if (inputs.length === 0) {
       throw new Error(
         'AggregateHandle: cannot push/group an empty list of events. Pass at least one event input.',
@@ -295,11 +292,8 @@ export class AggregateHandle<
       running = fold(typeof input === 'function' ? input(running) : input, running);
     }
 
-    return {
-      grouped: grouped as {
-        -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
-      },
-      nextAggregate: running,
+    return grouped as {
+      -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
     };
   }
 
@@ -323,7 +317,7 @@ export class AggregateHandle<
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
   ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
-    return this.chain(inputs, options).grouped;
+    return this.chain(inputs, options);
   }
 
   /** Push a single event for this aggregate and commit it. */
@@ -348,17 +342,27 @@ export class AggregateHandle<
   }
 
   /**
-   * Push MULTIPLE events on this aggregate atomically and commit them. The
-   * returned `events` mirrors the input's length (a fixed-size tuple).
+   * Push MULTIPLE events on this aggregate atomically and commit them. Returns:
+   * - `events` — the committed event details, mirroring the input's length;
+   * - `eventGroup` — the raw {@link EventStore.pushEventGroup} result (each
+   *   entry pairs the committed `event` with its `nextAggregate`);
+   * - `nextAggregate` — the aggregate rebuilt from the committed events, so it
+   *   matches what a later `getAggregate` read returns.
    */
   async pushEvents<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options: { validate?: ValidateEventDetail } = {},
   ): Promise<{
     events: { -readonly [K in keyof Inputs]: EventStoreEventDetails<ES> };
+    eventGroup: {
+      -readonly [K in keyof Inputs]: {
+        event: EventStoreEventDetails<ES>;
+        nextAggregate?: EventStoreAggregate<ES>;
+      };
+    };
     nextAggregate: EventStoreAggregate<ES>;
   }> {
-    const { grouped } = this.chain(inputs, options);
+    const grouped = this.chain(inputs, options);
 
     const { eventGroup } = await pushEventGroup({}, ...grouped);
     const events = eventGroup.map(({ event }) => event);
@@ -374,6 +378,12 @@ export class AggregateHandle<
     return {
       events: events as {
         -readonly [K in keyof Inputs]: EventStoreEventDetails<ES>;
+      },
+      eventGroup: eventGroup as {
+        -readonly [K in keyof Inputs]: {
+          event: EventStoreEventDetails<ES>;
+          nextAggregate?: EventStoreAggregate<ES>;
+        };
       },
       nextAggregate,
     };

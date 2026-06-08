@@ -119,7 +119,7 @@ The handle is **immutable**: `pikachu.aggregate` always reflects the read it was
 ### Single-aggregate writes (self-committing)
 
 - <code>handle.pushEvent(input, opt?)</code>: Pushes **one** event and commits it. Returns `{ event, nextAggregate }`.
-- <code>handle.pushEvents([input | fn, ...], opt?)</code>: Pushes **multiple** events on the aggregate **atomically** (all-or-nothing) and commits them. Returns `{ events, nextAggregate }`.
+- <code>handle.pushEvents([input | fn, ...], opt?)</code>: Pushes **multiple** events on the aggregate **atomically** (all-or-nothing) and commits them. Returns `{ events, eventGroup, nextAggregate }` — `eventGroup` is the raw `pushEventGroup` result (each entry pairs the committed `event` with its per-event aggregate).
 
 `aggregateId` and `version` are always filled in from the handle, so you only provide `type` / `payload` / `metadata` — neither can be set in `input` (reach for the low-level [`eventStore.pushEvent`](#direct-low-level-pushing) if you need explicit control). `pushEvents` additionally rejects an empty list:
 
@@ -203,7 +203,7 @@ A handle is **obtained from an `EventStore`** via <code>openAggregate</code> / <
 **Self-committing methods (single aggregate):**
 
 - <code>pushEvent <i>((input, opt?) => Promise&lt;&#123; event, nextAggregate &#125;&gt;)</i></code>: Pushes **one** event and commits it. <code>nextAggregate</code> is always defined.
-- <code>pushEvents <i>(([input | fn, ...], opt?) => Promise&lt;&#123; events, nextAggregate &#125;&gt;)</i></code>: Pushes **multiple** chained events on the aggregate **atomically** and commits them. <code>events</code> is a fixed-size tuple the same length as the input; <code>nextAggregate</code> is rebuilt from the committed events.
+- <code>pushEvents <i>(([input | fn, ...], opt?) => Promise&lt;&#123; events, eventGroup, nextAggregate &#125;&gt;)</i></code>: Pushes **multiple** chained events on the aggregate **atomically** and commits them. <code>events</code> is a fixed-size tuple the same length as the input; <code>eventGroup</code> is the raw <code>pushEventGroup</code> result (each entry pairs the committed <code>event</code> with its per-event aggregate); <code>nextAggregate</code> is rebuilt from the committed events.
 
 **Group-building methods (cross-aggregate, do not commit):**
 
