@@ -285,10 +285,6 @@ export class AggregateHandle<
       version += 1;
     }
 
-    // `grouped` is built by walking `inputs` 1:1, so it mirrors the tuple's
-    // length and element type. The lone assertion narrows the runtime array to
-    // that tuple shape (the checker can't prove a pushed-to array's length) —
-    // carrying the precise element type lets the call sites drop their casts.
     return {
       grouped: grouped as {
         -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
@@ -368,9 +364,6 @@ export class AggregateHandle<
     ) as EventStoreAggregate<ES>;
 
     return {
-      // `events` is an array (`.map` erases tuple length), so the assertion only
-      // re-narrows it to the length-mirroring tuple — its element type already
-      // matches, so no `as unknown` bridge is needed.
       events: events as {
         -readonly [K in keyof Inputs]: EventStoreEventDetails<ES>;
       },
