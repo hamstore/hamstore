@@ -49,16 +49,6 @@ export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
 ];
 
 /**
- * Concrete (non-generic) view of {@link pushEventGroup} for the commit call: its
- * generic signature can't be called with a spread of a runtime-length array
- * (TS2556), so {@link AggregateHandle.pushEvents} narrows it to this all-rest
- * shape (`never[]` params) before spreading the grouped events in.
- */
-type CommitGroupedEvents = (
-  ...groupedEvents: never[]
-) => Promise<{ eventGroup: { event: EventDetail }[] }>;
-
-/**
  * An immutable, version-pinned write handle for a single aggregate.
  *
  * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or,
@@ -215,7 +205,10 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   chain(
     inputs: readonly AggregateHandleEventInputOrFn<ES>[],
     options?: { validate?: ValidateEventDetail },
-  ): { grouped: GroupedEvent[]; nextAggregate: EventStoreAggregate<ES> } {
+  ): {
+    grouped: [GroupedEvent, ...GroupedEvent[]];
+    nextAggregate: EventStoreAggregate<ES>;
+  } {
     if (inputs.length === 0) {
       throw new Error(
         'AggregateHandle: cannot push/group an empty list of events. Pass at least one event input.',
@@ -246,7 +239,13 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
       version += 1;
     }
 
-    return { grouped, nextAggregate: running as EventStoreAggregate<ES> };
+    // Non-empty by construction (we threw above on an empty `inputs`), typed as
+    // a tuple so it can be spread into `pushEventGroup` (a runtime array can't:
+    // its rest param is a non-empty tuple, TS2556).
+    return {
+      grouped: grouped as [GroupedEvent, ...GroupedEvent[]],
+      nextAggregate: running as EventStoreAggregate<ES>,
+    };
   }
 
   /** Build ONE grouped event for a cross-aggregate `EventStore.pushEventGroup`. */
@@ -310,8 +309,7 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   }> {
     const { grouped } = this.chain(inputs, options);
 
-    const commit = pushEventGroup as unknown as CommitGroupedEvents;
-    const { eventGroup } = await commit(...(grouped as never[]));
+    const { eventGroup } = await pushEventGroup({}, ...grouped);
     const events = eventGroup.map(({ event }) => event);
 
     // Rebuild `nextAggregate` from the *committed* events (which carry the
