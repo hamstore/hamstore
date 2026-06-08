@@ -7,6 +7,7 @@ import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
 import { AggregateHandle } from './aggregateHandle';
+import type { AggregateOpener, NewAggregateOpener } from './aggregateHandle';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
 import { pushEventGroup } from './pushEventGroup';
@@ -22,7 +23,6 @@ import type {
   AggregateGetter,
   AggregateAndEventsGetter,
   AggregateSimulator,
-  GetAggregateOptions,
   Reducer,
 } from './types';
 
@@ -100,29 +100,17 @@ export class EventStore<
    * {@link AggregateHandle.from} — it is deliberately not an instance method, as
    * a pre-loaded aggregate is stale on retry and so does not belong in commands.
    */
-  openAggregate(
-    aggregateId: string,
-    options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.open(this, aggregateId, options);
-  }
+  openAggregate: AggregateOpener<this>;
 
   /** Like {@link openAggregate}, but throws if the aggregate does not exist. */
-  openExistingAggregate(
-    aggregateId: string,
-    options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.openExisting(this, aggregateId, options);
-  }
+  openExistingAggregate: AggregateOpener<this>;
 
   /**
    * Open a handle for an aggregate that does not exist yet (first event at
    * version 1). Does not read storage — use when the aggregate is known to be
    * new (first-event / bulk-import paths).
    */
-  openNewAggregate(aggregateId: string): AggregateHandle<this> {
-    return AggregateHandle.forNew(this, aggregateId);
-  }
+  openNewAggregate: NewAggregateOpener<this>;
 
   constructor({
     eventStoreId,
@@ -344,5 +332,14 @@ export class EventStore<
 
       return this.buildAggregate(sortedEventsWithSideEffects);
     };
+
+    this.openAggregate = (aggregateId, options) =>
+      AggregateHandle.open(this, aggregateId, options);
+
+    this.openExistingAggregate = (aggregateId, options) =>
+      AggregateHandle.openExisting(this, aggregateId, options);
+
+    this.openNewAggregate = aggregateId =>
+      AggregateHandle.forNew(this, aggregateId);
   }
 }
