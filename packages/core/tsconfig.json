@@ -4,6 +4,7 @@
     "baseUrl": "src",
     "composite": true,
     "emitDeclarationOnly": true,
+    "stripInternal": true,
     "outDir": "./dist/types"
   },
   "exclude": [

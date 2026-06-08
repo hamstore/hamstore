@@ -201,6 +201,8 @@ export class AggregateHandle<ES extends EventStore = EventStore> {
   /**
    * Fold a list of inputs into grouped events, walking a *local* aggregate copy
    * forward between steps. Pure with respect to the handle.
+   *
+   * @internal
    */
   chain(
     inputs: readonly AggregateHandleEventInputOrFn<ES>[],
