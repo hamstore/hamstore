@@ -196,6 +196,12 @@ describe('AggregateHandle', () => {
       expect(eventGroup).toHaveLength(2);
       expect(eventGroup.map(({ event }) => event)).toStrictEqual(events);
 
+      // The committed events carry the handle-stamped timestamp, shared across
+      // the batch — so what was folded locally matches what gets persisted.
+      const { timestamp } = events[0];
+      expect(timestamp).toEqual(expect.any(String));
+      expect(events.every(event => event.timestamp === timestamp)).toBe(true);
+
       // The dependent fn sees the aggregate folded through the first event:
       // pikachu started at level 42 (version 1), so after one level-up it is
       // level 43 at version 2.
@@ -263,15 +269,25 @@ describe('AggregateHandle', () => {
       ]);
 
       expect(grouped).toHaveLength(2);
+
+      // The handle stamps each chained event, and the whole batch shares ONE
+      // timestamp (so the value folded into each `prevAggregate` is exactly the
+      // one persisted/published, not an adapter-assigned per-event time).
+      const timestamp = groupEventMock.mock.calls[0]?.[0]?.timestamp;
+      expect(timestamp).toEqual(expect.any(String));
+      expect(groupEventMock.mock.calls[1]?.[0]?.timestamp).toBe(timestamp);
+
       expect(groupEventMock).toHaveBeenNthCalledWith(1, {
         aggregateId: pikachuId,
         version: 2,
         type: 'POKEMON_LEVELED_UP',
+        timestamp,
       });
       expect(groupEventMock).toHaveBeenNthCalledWith(2, {
         aggregateId: pikachuId,
         version: 3,
         type: 'POKEMON_LEVELED_UP',
+        timestamp,
       });
     });
 
