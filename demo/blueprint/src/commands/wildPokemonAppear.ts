@@ -33,9 +33,7 @@ export const wildPokemonAppearCommand = new JSONSchemaCommand({
 
     const pokemonId = generateUuid();
 
-    await eventStore.pushEvent({
-      aggregateId: pokemonId,
-      version: 1,
+    await eventStore.openNewAggregate(pokemonId).pushEvent({
       type: 'APPEARED',
       payload: {
         name: pokemonName,
