@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import type { EventDetail } from '~/event/eventDetail';
-import type { GroupedEvent } from '~/event/groupedEvent';
 
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
 import type { EventStore } from './eventStore';
@@ -249,11 +248,11 @@ export class AggregateHandle<
    *
    * @internal
    */
-  chain(
-    inputs: readonly AggregateHandleEventInputOrFn<ES>[],
+  chain<const Inputs extends AggregateHandleEventInputs<ES>>(
+    inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
   ): {
-    grouped: [GroupedEvent, ...GroupedEvent[]];
+    grouped: { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> };
     nextAggregate: EventStoreAggregate<ES>;
   } {
     if (inputs.length === 0) {
@@ -264,7 +263,7 @@ export class AggregateHandle<
 
     let running = this.aggregate;
     let version = this.nextVersion;
-    const grouped: GroupedEvent[] = [];
+    const grouped: ReturnType<ES['groupEvent']>[] = [];
     // One timestamp for the whole group — the events commit atomically. This
     // fold is only a local roll-forward to derive each `prevAggregate`; the
     // persisted timestamps are assigned by the storage adapter on commit.
@@ -277,7 +276,7 @@ export class AggregateHandle<
         this.store.groupEvent(event, {
           ...options,
           ...(running === undefined ? {} : { prevAggregate: running }),
-        }) as GroupedEvent,
+        }) as ReturnType<ES['groupEvent']>,
       );
       running = this.store.buildAggregate(
         [{ timestamp, ...event }] as never,
@@ -286,11 +285,14 @@ export class AggregateHandle<
       version += 1;
     }
 
-    // Non-empty by construction (we threw above on an empty `inputs`), typed as
-    // a tuple so it can be spread into `pushEventGroup` (a runtime array can't:
-    // its rest param is a non-empty tuple, TS2556).
+    // `grouped` is built by walking `inputs` 1:1, so it mirrors the tuple's
+    // length and element type. The lone assertion narrows the runtime array to
+    // that tuple shape (the checker can't prove a pushed-to array's length) —
+    // carrying the precise element type lets the call sites drop their casts.
     return {
-      grouped: grouped as [GroupedEvent, ...GroupedEvent[]],
+      grouped: grouped as {
+        -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
+      },
       nextAggregate: running as EventStoreAggregate<ES>,
     };
   }
@@ -317,9 +319,7 @@ export class AggregateHandle<
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
   ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
-    return this.chain(inputs, options).grouped as unknown as {
-      -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
-    };
+    return this.chain(inputs, options).grouped;
   }
 
   /** Push a single event for this aggregate and commit it. */
@@ -368,7 +368,10 @@ export class AggregateHandle<
     ) as EventStoreAggregate<ES>;
 
     return {
-      events: events as unknown as {
+      // `events` is an array (`.map` erases tuple length), so the assertion only
+      // re-narrows it to the length-mirroring tuple — its element type already
+      // matches, so no `as unknown` bridge is needed.
+      events: events as {
         -readonly [K in keyof Inputs]: EventStoreEventDetails<ES>;
       },
       nextAggregate,
