@@ -58,6 +58,9 @@ describe('event store', () => {
         'getAggregateAndEvents',
         'getExistingAggregateAndEvents',
         'simulateAggregate',
+        'openAggregate',
+        'openExistingAggregate',
+        'openNewAggregate',
       ]),
     );
 

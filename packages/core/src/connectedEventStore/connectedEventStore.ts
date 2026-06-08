@@ -7,12 +7,13 @@ import { AggregateHandle, EventStore } from '~/eventStore';
 import type {
   AggregateGetter,
   AggregateIdsLister,
+  AggregateOpener,
   AggregateSimulator,
   EventGrouper,
   EventPusher,
   AggregateAndEventsGetter,
   EventsGetter,
-  GetAggregateOptions,
+  NewAggregateOpener,
   OnEventPushed,
   Reducer,
   SideEffectsSimulator,
@@ -95,6 +96,9 @@ export class ConnectedEventStore<
   >;
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
+  openAggregate: AggregateOpener<this>;
+  openExistingAggregate: AggregateOpener<this>;
+  openNewAggregate: NewAggregateOpener<this>;
 
   eventStore: EventStore<
     EVENT_STORE_ID,
@@ -149,6 +153,15 @@ export class ConnectedEventStore<
       return response;
     };
 
+    this.openAggregate = (aggregateId, options) =>
+      AggregateHandle.open(this, aggregateId, options);
+
+    this.openExistingAggregate = (aggregateId, options) =>
+      AggregateHandle.openExisting(this, aggregateId, options);
+
+    this.openNewAggregate = aggregateId =>
+      AggregateHandle.forNew(this, aggregateId);
+
     this.eventStore = eventStore;
     this.messageChannel = messageChannel;
   }
@@ -157,24 +170,6 @@ export class ConnectedEventStore<
     eventStorageAdapter: EventStorageAdapter | undefined,
   ) {
     this.eventStore.eventStorageAdapter = eventStorageAdapter;
-  }
-
-  openAggregate(
-    aggregateId: string,
-    options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.open(this, aggregateId, options);
-  }
-
-  openExistingAggregate(
-    aggregateId: string,
-    options?: GetAggregateOptions,
-  ): Promise<AggregateHandle<this>> {
-    return AggregateHandle.openExisting(this, aggregateId, options);
-  }
-
-  openNewAggregate(aggregateId: string): AggregateHandle<this> {
-    return AggregateHandle.forNew(this, aggregateId);
   }
 
   get eventStorageAdapter(): EventStorageAdapter | undefined {

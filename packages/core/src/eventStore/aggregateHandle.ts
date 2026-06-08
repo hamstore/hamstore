@@ -49,6 +49,26 @@ export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
 ];
 
 /**
+ * Reads an aggregate and wraps it in an {@link AggregateHandle} — the type of
+ * {@link EventStore.openAggregate} / `openExistingAggregate`. Generic over the
+ * store so the handle preserves the concrete store type (the polymorphic `this`
+ * at the call site), e.g. a `ConnectedEventStore` keeps publishing through it.
+ */
+export type AggregateOpener<ES extends EventStore> = (
+  aggregateId: string,
+  options?: GetAggregateOptions,
+) => Promise<AggregateHandle<ES>>;
+
+/**
+ * Synchronously opens a handle for an aggregate that does not exist yet (no
+ * read) — the type of {@link EventStore.openNewAggregate}. See
+ * {@link AggregateHandle.forNew}.
+ */
+export type NewAggregateOpener<ES extends EventStore> = (
+  aggregateId: string,
+) => AggregateHandle<ES>;
+
+/**
  * An immutable, version-pinned write handle for a single aggregate.
  *
  * Obtained from {@link EventStore.openAggregate} / `openExistingAggregate` (or,
