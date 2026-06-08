@@ -277,8 +277,8 @@ export class AggregateHandle<
       version += 1;
 
       return this.store.buildAggregate(
-        [{ timestamp, ...event }] as never,
-        prevAggregate as never,
+        [{ timestamp, ...event }],
+        prevAggregate,
       ) as EventStoreAggregate<ES>;
     };
 
@@ -371,8 +371,8 @@ export class AggregateHandle<
     // adapter-assigned `timestamp` etc.) rather than the pre-commit local fold,
     // so it matches what was actually persisted.
     const nextAggregate = this.store.buildAggregate(
-      events as never,
-      this.aggregate as never,
+      events,
+      this.aggregate,
     ) as EventStoreAggregate<ES>;
 
     return {
