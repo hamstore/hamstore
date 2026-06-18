@@ -121,12 +121,11 @@ v4 adds **Aggregate Handles** — an immutable, version-pinned write handle for 
 
 Nothing forces you to change existing code — handles are purely additive. But they collapse the usual *fetch → check → bump `version` → push* dance into opening a handle and pushing through it. The handle owns the aggregate's `id` and pins its expected `version`, so you stop threading those by hand. Two conversions from the demo:
 
-**Single aggregate.** `openExistingAggregate` throws `AggregateNotFoundError` instead of returning `undefined`, so the existence guard goes away, and the version bump is implicit:
+**Single aggregate.** `openExistingAggregate` mirrors v3's `getExistingAggregate` (both throw if the aggregate is missing), but the handle pins the aggregate's `id` and `version`, so the explicit `aggregateId` and `version + 1` disappear:
 
 ```ts
 // Before
-const { aggregate } = await pokemonsEventStore.getAggregate(pokemonId);
-if (aggregate === undefined) throw new Error('Pokemon not found');
+const { aggregate } = await pokemonsEventStore.getExistingAggregate(pokemonId);
 if (aggregate.level === 99) throw new Error('Pokemon level maxed out');
 
 await pokemonsEventStore.pushEvent({
@@ -149,11 +148,9 @@ await pikachu.pushEvent({ type: 'LEVELLED_UP' });
 ```ts
 // Before
 const [{ aggregate: pokemon }, { aggregate: trainer }] = await Promise.all([
-  pokemonsEventStore.getAggregate(pokemonId),
-  trainersEventStore.getAggregate(trainerId),
+  pokemonsEventStore.getExistingAggregate(pokemonId),
+  trainersEventStore.getExistingAggregate(trainerId),
 ]);
-if (pokemon === undefined) throw new Error('Pokemon not found');
-if (trainer === undefined) throw new Error('Trainer not found');
 if (pokemon.status === 'caught') throw new Error('Pokemon already caught');
 
 await EventStore.pushEventGroup(
