@@ -56,7 +56,7 @@ export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
  * per input); `-readonly` lets a `const`/readonly input tuple yield a mutable
  * result the caller can spread straight into {@link EventStore.pushEventGroup}.
  */
-type PerInput<Inputs extends readonly unknown[], T> = {
+type MapInputs<Inputs extends readonly unknown[], T> = {
   -readonly [K in keyof Inputs]: T;
 };
 
@@ -261,7 +261,7 @@ export class AggregateHandle<
   chain<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): PerInput<Inputs, ReturnType<ES['groupEvent']>> {
+  ): MapInputs<Inputs, ReturnType<ES['groupEvent']>> {
     if (inputs.length === 0) {
       throw new Error(
         'AggregateHandle: cannot push/group an empty list of events. Pass at least one event input.',
@@ -304,7 +304,7 @@ export class AggregateHandle<
       },
     );
 
-    return events as PerInput<Inputs, ReturnType<ES['groupEvent']>>;
+    return events as MapInputs<Inputs, ReturnType<ES['groupEvent']>>;
   }
 
   /** Build ONE grouped event for a cross-aggregate `EventStore.pushEventGroup`. */
@@ -326,7 +326,7 @@ export class AggregateHandle<
   groupEvents<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): PerInput<Inputs, ReturnType<ES['groupEvent']>> {
+  ): MapInputs<Inputs, ReturnType<ES['groupEvent']>> {
     return this.chain(inputs, options);
   }
 
@@ -363,8 +363,8 @@ export class AggregateHandle<
     inputs: Inputs,
     options: { validate?: ValidateEventDetail } = {},
   ): Promise<{
-    events: PerInput<Inputs, EventStoreEventDetails<ES>>;
-    eventGroup: PerInput<
+    events: MapInputs<Inputs, EventStoreEventDetails<ES>>;
+    eventGroup: MapInputs<
       Inputs,
       { event: EventStoreEventDetails<ES>; nextAggregate?: EventStoreAggregate<ES> }
     >;
@@ -384,8 +384,8 @@ export class AggregateHandle<
     ) as EventStoreAggregate<ES>;
 
     return {
-      events: events as PerInput<Inputs, EventStoreEventDetails<ES>>,
-      eventGroup: eventGroup as PerInput<
+      events: events as MapInputs<Inputs, EventStoreEventDetails<ES>>,
+      eventGroup: eventGroup as MapInputs<
         Inputs,
         { event: EventStoreEventDetails<ES>; nextAggregate?: EventStoreAggregate<ES> }
       >,
