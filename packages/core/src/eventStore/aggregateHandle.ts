@@ -258,44 +258,42 @@ export class AggregateHandle<
       );
     }
 
-    let version = this.nextVersion;
-    const grouped: ReturnType<ES['groupEvent']>[] = [];
     // One shared timestamp for the whole group (the events commit atomically).
     // Stamping it on the events — rather than letting the adapter assign one —
     // makes the value folded into each `prevAggregate` exactly what gets
     // persisted and published, so timestamp-reading reducers see no drift.
     const timestamp = new Date().toISOString();
 
-    const fold = (
-      input: AggregateHandleEventInput<ES>,
-      prevAggregate: EventStoreAggregate<ES> | undefined,
-    ): EventStoreAggregate<ES> => {
-      const event = this.fill(input, version, timestamp);
-      grouped.push(
-        this.store.groupEvent(event, {
-          ...options,
-          prevAggregate,
-        }) as ReturnType<ES['groupEvent']>,
-      );
-      version += 1;
+    const { events } = inputs.reduce(
+      (acc, input) => {
+        // A function input runs only after the first (always-plain) input has
+        // been folded, so `acc.aggregate` is a real built aggregate by then;
+        // the `!` asserts that definedness for the function parameter.
+        const resolved =
+          typeof input === 'function' ? input(acc.aggregate!) : input;
+        const event = this.fill(resolved, acc.version, timestamp);
+        acc.events.push(
+          this.store.groupEvent(event, {
+            ...options,
+            prevAggregate: acc.aggregate,
+          }) as ReturnType<ES['groupEvent']>,
+        );
+        acc.version += 1;
+        acc.aggregate = this.store.buildAggregate(
+          [event],
+          acc.aggregate,
+        ) as EventStoreAggregate<ES>;
 
-      return this.store.buildAggregate(
-        [event],
-        prevAggregate,
-      ) as EventStoreAggregate<ES>;
-    };
+        return acc;
+      },
+      {
+        events: [] as ReturnType<ES['groupEvent']>[],
+        version: this.nextVersion,
+        aggregate: this.aggregate as EventStoreAggregate<ES> | undefined,
+      },
+    );
 
-    // Fold the (mandatory, plain) first input against the handle's opened
-    // aggregate — the only step where the previous aggregate may be undefined.
-    // From here on `running` is defined, so the function inputs in the rest can
-    // take a defined aggregate (and need no cast).
-    const [firstInput, ...restInputs] = inputs;
-    let running = fold(firstInput, this.aggregate);
-    for (const input of restInputs) {
-      running = fold(typeof input === 'function' ? input(running) : input, running);
-    }
-
-    return grouped as {
+    return events as {
       -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
     };
   }
