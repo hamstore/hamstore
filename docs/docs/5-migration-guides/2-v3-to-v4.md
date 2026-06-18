@@ -73,7 +73,7 @@ const { aggregate, events } =
 
 ### `AggregateGetter` type
 
-The exported `AggregateGetter` type now corresponds to the lean `getAggregate` shape and no longer takes the `EVENT_DETAIL` type parameter. The legacy shape is exposed under a new type name:
+The exported `AggregateGetter` type now corresponds to the lean `getAggregate` shape and no longer takes the `EVENT_DETAIL` type parameter. The full shape is exposed under a new type name:
 
 ```ts
 // v3
