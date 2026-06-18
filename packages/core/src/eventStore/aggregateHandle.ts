@@ -122,11 +122,15 @@ export class AggregateHandle<
   }: {
     store: ES;
     aggregateId: string;
-    aggregate?: EventStoreAggregate<ES>;
+    // Non-optional and typed as the `EXISTS`-conditional field type: callers
+    // pass `undefined` for new aggregates (`open`/`forNew`) and a defined one
+    // for existing ones (`openExisting`/`from`). This lets the assignment below
+    // be cast-free.
+    aggregate: AggregateHandle<ES, EXISTS>['aggregate'];
   }) {
     this.store = store;
     this.aggregateId = aggregateId;
-    this.aggregate = aggregate as AggregateHandle<ES, EXISTS>['aggregate'];
+    this.aggregate = aggregate;
     this.nextVersion = (aggregate?.version ?? 0) + 1;
   }
 
@@ -155,7 +159,7 @@ export class AggregateHandle<
     return new AggregateHandle({
       store,
       aggregateId,
-      aggregate: aggregate as EventStoreAggregate<ES>,
+      aggregate,
     });
   }
 
@@ -173,7 +177,7 @@ export class AggregateHandle<
     return new AggregateHandle<ES, true>({
       store,
       aggregateId,
-      aggregate: aggregate as EventStoreAggregate<ES>,
+      aggregate,
     });
   }
 
@@ -190,6 +194,7 @@ export class AggregateHandle<
     return new AggregateHandle({
       store,
       aggregateId,
+      aggregate: undefined,
     });
   }
 
