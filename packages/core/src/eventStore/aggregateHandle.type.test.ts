@@ -21,7 +21,7 @@ const assertOpenAggregateOutput: A.Equals<
 assertOpenAggregateOutput;
 
 // `openExistingAggregate` tightens the handle to one with a defined `aggregate`
-// (the same `EXISTS` flag `getExistingAggregate` uses), so no `!`/guard needed.
+// (the same `SHOULD_EXIST` flag `getExistingAggregate` uses), so no `!`/guard needed.
 const assertOpenExistingAggregateOutput: A.Equals<
   ReturnType<typeof pokemonsEventStore.openExistingAggregate>,
   Promise<ExistingPokemonHandle>
@@ -34,7 +34,7 @@ const assertOpenNewAggregateOutput: A.Equals<
 > = 1;
 assertOpenNewAggregateOutput;
 
-// --- `aggregate` DEFINEDNESS follows the EXISTS flag, statically ---
+// --- `aggregate` DEFINEDNESS follows the SHOULD_EXIST flag, statically ---
 
 const assertOpenAggregateMaybeUndefined: A.Equals<
   Awaited<ReturnType<typeof pokemonsEventStore.openAggregate>>['aggregate'],
@@ -76,7 +76,7 @@ const assertStaticForNewOutput: A.Equals<
 > = 1;
 assertStaticForNewOutput;
 
-// `from` is handed a defined aggregate, so it also yields the `EXISTS = true`
+// `from` is handed a defined aggregate, so it also yields the `SHOULD_EXIST = true`
 // handle (a defined `aggregate`).
 const assertStaticFromOutput: A.Equals<
   ReturnType<typeof AggregateHandle.from<typeof pokemonsEventStore>>,

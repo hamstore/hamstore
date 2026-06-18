@@ -98,12 +98,12 @@ export type NewAggregateOpener<ES extends EventStore> = (
 export class AggregateHandle<
   ES extends EventStore = EventStore,
   // When `true`, `aggregate` is statically known to be defined — the same
-  // existence flag `AggregateGetter` uses for `getExistingAggregate`. Set by
-  // `openExisting` / `from`; left `false` (maybe-undefined) by `open` / `forNew`.
-  EXISTS extends boolean = false,
+  // `SHOULD_EXIST` flag `AggregateGetter` uses for `getExistingAggregate`. Set
+  // by `openExisting` / `from`; left `false` (maybe-undefined) by `open` / `forNew`.
+  SHOULD_EXIST extends boolean = false,
 > {
   readonly aggregateId: string;
-  readonly aggregate: EXISTS extends true
+  readonly aggregate: SHOULD_EXIST extends true
     ? EventStoreAggregate<ES>
     : EventStoreAggregate<ES> | undefined;
   readonly nextVersion: number;
@@ -122,7 +122,7 @@ export class AggregateHandle<
   }: {
     store: ES;
     aggregateId: string;
-    aggregate: AggregateHandle<ES, EXISTS>['aggregate'];
+    aggregate: AggregateHandle<ES, SHOULD_EXIST>['aggregate'];
   }) {
     this.store = store;
     this.aggregateId = aggregateId;
