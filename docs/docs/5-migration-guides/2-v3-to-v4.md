@@ -113,13 +113,14 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 
 `getAggregate` no longer being contractually required to expose the full event list lets the snapshot integration (next on the v4 roadmap) seed the aggregate from a snapshot and only fetch the trailing events on top of it — without forcing a misleading "partial" `events` array on every caller. Callers that genuinely need the full history opt into it explicitly via `getAggregateAndEvents`, which is also the right place to think about whether you need to load the full history at all.
 
-## `AggregateHandle`: new `open*` methods on `EventStore`
+## `AggregateHandle`: a new write API (breaking for `implements EventStore`)
 
-v4 adds three methods to `EventStore` for working with [`AggregateHandle`](../2-event-sourcing/5-pushing-events.md): `openAggregate`, `openExistingAggregate`, and `openNewAggregate`.
+v4 adds **Aggregate Handles** — an immutable, version-pinned write handle for a single aggregate that removes the fetch → increment → push boilerplate from commands and cross-aggregate writes. You open one through three new `EventStore` methods — `openAggregate`, `openExistingAggregate`, `openNewAggregate` — then push through it (`pushEvent` / `pushEvents` / `groupEvent` / `groupEvents`). See the [`AggregateHandle` reference](../2-event-sourcing/5-pushing-events.md) for the full API; you're encouraged to start using them.
 
-This only affects you if you have a class declared `implements EventStore` (a wrapper / decorator, like `ConnectedEventStore`) — it must add the three methods. `new EventStore(…)` and `class … extends EventStore` need no change.
+Adopting them is optional — but the three new methods widen the `EventStore` contract, which is breaking **only** in one case:
 
-Declare them as instance properties assigned in the constructor and delegate to `AggregateHandle`'s static factories — exactly what `ConnectedEventStore` does, matching how the store's other members (`getEvents`, `pushEvent`, …) are typed:
+- **`new EventStore(…)` and `class … extends EventStore` → no change.** The methods are concrete and inherited.
+- **`class … implements EventStore` (a wrapper / decorator, like `ConnectedEventStore`) → must add the three methods.** Declare them as instance properties assigned in the constructor and delegate to `AggregateHandle`'s static factories — exactly what `ConnectedEventStore` does, matching how the store's other members (`getEvents`, `pushEvent`, …) are typed:
 
 ```ts
 import {
