@@ -51,6 +51,16 @@ export type AggregateHandleEventInputs<ES extends EventStore> = readonly [
 ];
 
 /**
+ * A mutable tuple mirroring `Inputs`' length, with every position typed `T`.
+ * Homomorphic over `Inputs`, so the result keeps the input's arity (one `T`
+ * per input); `-readonly` lets a `const`/readonly input tuple yield a mutable
+ * result the caller can spread straight into {@link EventStore.pushEventGroup}.
+ */
+type PerInput<Inputs extends readonly unknown[], T> = {
+  -readonly [K in keyof Inputs]: T;
+};
+
+/**
  * Reads an aggregate and wraps it in an {@link AggregateHandle} — the type of
  * {@link EventStore.openAggregate} / `openExistingAggregate`. Generic over the
  * store so the handle preserves the concrete store type (the polymorphic `this`
@@ -251,7 +261,7 @@ export class AggregateHandle<
   chain<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
+  ): PerInput<Inputs, ReturnType<ES['groupEvent']>> {
     if (inputs.length === 0) {
       throw new Error(
         'AggregateHandle: cannot push/group an empty list of events. Pass at least one event input.',
@@ -294,9 +304,7 @@ export class AggregateHandle<
       },
     );
 
-    return events as {
-      -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']>;
-    };
+    return events as PerInput<Inputs, ReturnType<ES['groupEvent']>>;
   }
 
   /** Build ONE grouped event for a cross-aggregate `EventStore.pushEventGroup`. */
@@ -318,7 +326,7 @@ export class AggregateHandle<
   groupEvents<const Inputs extends AggregateHandleEventInputs<ES>>(
     inputs: Inputs,
     options?: { validate?: ValidateEventDetail },
-  ): { -readonly [K in keyof Inputs]: ReturnType<ES['groupEvent']> } {
+  ): PerInput<Inputs, ReturnType<ES['groupEvent']>> {
     return this.chain(inputs, options);
   }
 
@@ -355,13 +363,11 @@ export class AggregateHandle<
     inputs: Inputs,
     options: { validate?: ValidateEventDetail } = {},
   ): Promise<{
-    events: { -readonly [K in keyof Inputs]: EventStoreEventDetails<ES> };
-    eventGroup: {
-      -readonly [K in keyof Inputs]: {
-        event: EventStoreEventDetails<ES>;
-        nextAggregate?: EventStoreAggregate<ES>;
-      };
-    };
+    events: PerInput<Inputs, EventStoreEventDetails<ES>>;
+    eventGroup: PerInput<
+      Inputs,
+      { event: EventStoreEventDetails<ES>; nextAggregate?: EventStoreAggregate<ES> }
+    >;
     nextAggregate: EventStoreAggregate<ES>;
   }> {
     const grouped = this.chain(inputs, options);
@@ -378,15 +384,11 @@ export class AggregateHandle<
     ) as EventStoreAggregate<ES>;
 
     return {
-      events: events as {
-        -readonly [K in keyof Inputs]: EventStoreEventDetails<ES>;
-      },
-      eventGroup: eventGroup as {
-        -readonly [K in keyof Inputs]: {
-          event: EventStoreEventDetails<ES>;
-          nextAggregate?: EventStoreAggregate<ES>;
-        };
-      },
+      events: events as PerInput<Inputs, EventStoreEventDetails<ES>>,
+      eventGroup: eventGroup as PerInput<
+        Inputs,
+        { event: EventStoreEventDetails<ES>; nextAggregate?: EventStoreAggregate<ES> }
+      >,
       nextAggregate,
     };
   }
