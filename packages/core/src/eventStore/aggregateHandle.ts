@@ -266,22 +266,23 @@ export class AggregateHandle<
 
     const { events } = inputs.reduce(
       (acc, input) => {
+        const { aggregate: prevAggregate } = acc;
         // A function input runs only after the first (always-plain) input has
-        // been folded, so `acc.aggregate` is a real built aggregate by then;
+        // been folded, so `prevAggregate` is a real built aggregate by then;
         // the `!` asserts that definedness for the function parameter.
         const resolved =
-          typeof input === 'function' ? input(acc.aggregate!) : input;
+          typeof input === 'function' ? input(prevAggregate!) : input;
         const event = this.fill(resolved, acc.version, timestamp);
         acc.events.push(
           this.store.groupEvent(event, {
             ...options,
-            prevAggregate: acc.aggregate,
+            prevAggregate,
           }) as ReturnType<ES['groupEvent']>,
         );
         acc.version += 1;
         acc.aggregate = this.store.buildAggregate(
           [event],
-          acc.aggregate,
+          prevAggregate,
         ) as EventStoreAggregate<ES>;
 
         return acc;
