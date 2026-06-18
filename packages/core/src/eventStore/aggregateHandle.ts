@@ -122,10 +122,6 @@ export class AggregateHandle<
   }: {
     store: ES;
     aggregateId: string;
-    // Non-optional and typed as the `EXISTS`-conditional field type: callers
-    // pass `undefined` for new aggregates (`open`/`forNew`) and a defined one
-    // for existing ones (`openExisting`/`from`). This lets the assignment below
-    // be cast-free.
     aggregate: AggregateHandle<ES, EXISTS>['aggregate'];
   }) {
     this.store = store;
