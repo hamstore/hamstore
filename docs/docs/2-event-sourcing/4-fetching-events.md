@@ -39,7 +39,7 @@ const { events: [lastEvent] } = await pokemonsEventStore.getEvents('pikachu1', {
 
 ## Fetching an aggregate
 
-Most of the time you don't want the raw events — you want the **current state**. `getAggregate` fetches the events and folds them through the store's [reducer](./2-aggregates-reducers.md) for you, returning the `aggregate` (plus the `events` and `lastEvent`, should you need them):
+Most of the time you don't want the raw events — you want the **current state**. `getAggregate` fetches the events and folds them through the store's [reducer](./2-aggregates-reducers.md) for you, returning just the `aggregate`:
 
 ```ts
 const { aggregate: pikachu } =
@@ -51,12 +51,30 @@ The aggregate is `undefined` when no events exist for that id yet. Pass `maxVers
 
 ### Requiring existence
 
-Because `getAggregate` returns `undefined` for an unknown id, callers have to handle that case. When your code can't meaningfully continue without the aggregate, reach for `getExistingAggregate` instead: it behaves the same but throws an `AggregateNotFoundError` when no events exist, so `aggregate` and `lastEvent` are guaranteed to be defined:
+Because `getAggregate` returns `undefined` for an unknown id, callers have to handle that case. When your code can't meaningfully continue without the aggregate, reach for `getExistingAggregate` instead: it behaves the same but throws an `AggregateNotFoundError` when no events exist, so `aggregate` is guaranteed to be defined:
 
 ```ts
-const { aggregate, lastEvent } =
+const { aggregate } =
   await pokemonsEventStore.getExistingAggregate('pikachu1');
-// => 'aggregate' and 'lastEvent' are always defined 🙌
+// => 'aggregate' is always defined 🙌
+```
+
+### Also need the events?
+
+`getAggregate` returns **only** the aggregate. When you also need the events that produced it — say, to publish a [state-carrying message](../3-reacting-to-events/1-messages.md) or to count how many events contributed — use `getAggregateAndEvents` (or its throwing sibling `getExistingAggregateAndEvents`), which returns the `events` and `lastEvent` alongside the `aggregate`:
+
+```ts
+const { aggregate, events, lastEvent } =
+  await pokemonsEventStore.getAggregateAndEvents('pikachu1');
+// => aggregate + the full history that produced it
+```
+
+Pass `fromVersion` to narrow the returned `events` to a known checkpoint — the `aggregate` is still built from the full history, regardless:
+
+```ts
+const { events } = await pokemonsEventStore.getAggregateAndEvents('pikachu1', {
+  fromVersion: lastProcessedVersion + 1,
+});
 ```
 
 ## Listing aggregates
