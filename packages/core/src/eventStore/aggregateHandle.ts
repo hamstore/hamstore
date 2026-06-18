@@ -170,7 +170,7 @@ export class AggregateHandle<
   ): Promise<AggregateHandle<ES, true>> {
     const { aggregate } = await store.getExistingAggregate(aggregateId, options);
 
-    return new AggregateHandle<ES, true>({
+    return new AggregateHandle({
       store,
       aggregateId,
       aggregate,
@@ -208,7 +208,7 @@ export class AggregateHandle<
     store: ES,
     aggregate: EventStoreAggregate<ES>,
   ): AggregateHandle<ES, true> {
-    return new AggregateHandle<ES, true>({
+    return new AggregateHandle({
       store,
       aggregateId: aggregate.aggregateId,
       aggregate,
