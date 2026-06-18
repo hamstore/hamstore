@@ -117,7 +117,78 @@ If you mock `getAggregate` in tests with `vi.spyOn(...).mockResolvedValue({ aggr
 
 v4 adds **Aggregate Handles** — an immutable, version-pinned write handle for a single aggregate that removes the fetch → increment → push boilerplate from commands and cross-aggregate writes. You open one through three new `EventStore` methods — `openAggregate`, `openExistingAggregate`, `openNewAggregate` — then push through it (`pushEvent` / `pushEvents` / `groupEvent` / `groupEvents`). See the [`AggregateHandle` reference](../2-event-sourcing/5-pushing-events.md) for the full API; you're encouraged to start using them.
 
-Adopting them is optional — but the three new methods widen the `EventStore` contract, which is breaking **only** in one case:
+### Adopting handles (optional, recommended)
+
+Nothing forces you to change existing code — handles are purely additive. But they collapse the usual *fetch → check → bump `version` → push* dance into opening a handle and pushing through it. The handle owns the aggregate's `id` and pins its expected `version`, so you stop threading those by hand. Two conversions from the demo:
+
+**Single aggregate.** `openExistingAggregate` throws `AggregateNotFoundError` instead of returning `undefined`, so the existence guard goes away, and the version bump is implicit:
+
+```ts
+// Before
+const { aggregate } = await pokemonsEventStore.getAggregate(pokemonId);
+if (aggregate === undefined) throw new Error('Pokemon not found');
+if (aggregate.level === 99) throw new Error('Pokemon level maxed out');
+
+await pokemonsEventStore.pushEvent({
+  aggregateId: pokemonId,
+  version: aggregate.version + 1,
+  type: 'LEVELLED_UP',
+});
+```
+
+```ts
+// After
+const pikachu = await pokemonsEventStore.openExistingAggregate(pokemonId);
+if (pikachu.aggregate.level === 99) throw new Error('Pokemon level maxed out');
+
+await pikachu.pushEvent({ type: 'LEVELLED_UP' });
+```
+
+**Across aggregates.** Each handle owns its own `aggregateId` and `version`, so a grouped write drops the repeated `aggregateId` and every `version + 1`:
+
+```ts
+// Before
+const [{ aggregate: pokemon }, { aggregate: trainer }] = await Promise.all([
+  pokemonsEventStore.getAggregate(pokemonId),
+  trainersEventStore.getAggregate(trainerId),
+]);
+if (pokemon === undefined) throw new Error('Pokemon not found');
+if (trainer === undefined) throw new Error('Trainer not found');
+if (pokemon.status === 'caught') throw new Error('Pokemon already caught');
+
+await EventStore.pushEventGroup(
+  pokemonsEventStore.groupEvent({
+    aggregateId: pokemonId,
+    version: pokemon.version + 1,
+    type: 'CAUGHT_BY_TRAINER',
+    payload: { trainerId },
+  }),
+  trainersEventStore.groupEvent({
+    aggregateId: trainerId,
+    version: trainer.version + 1,
+    type: 'POKEMON_CAUGHT',
+    payload: { pokemonId },
+  }),
+);
+```
+
+```ts
+// After
+const [pokemon, trainer] = await Promise.all([
+  pokemonsEventStore.openExistingAggregate(pokemonId),
+  trainersEventStore.openExistingAggregate(trainerId),
+]);
+if (pokemon.aggregate.status === 'caught') throw new Error('Pokemon already caught');
+
+await EventStore.pushEventGroup(
+  pokemon.groupEvent({ type: 'CAUGHT_BY_TRAINER', payload: { trainerId } }),
+  trainer.groupEvent({ type: 'POKEMON_CAUGHT', payload: { pokemonId } }),
+);
+```
+
+### Breaking change: `class … implements EventStore`
+
+The three new methods widen the `EventStore` contract, which is breaking **only** in one case:
 
 - **`new EventStore(…)` and `class … extends EventStore` → no change.** The methods are concrete and inherited.
 - **`class … implements EventStore` (a wrapper / decorator, like `ConnectedEventStore`) → must add the three methods.** Declare them as instance properties assigned in the constructor and delegate to `AggregateHandle`'s static factories — exactly what `ConnectedEventStore` does, matching how the store's other members (`getEvents`, `pushEvent`, …) are typed:
