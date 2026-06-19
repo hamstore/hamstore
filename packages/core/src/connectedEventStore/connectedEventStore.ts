@@ -1,16 +1,20 @@
+/* eslint-disable max-lines */
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
+import { AggregateHandle, EventStore } from '~/eventStore';
 import type {
   AggregateGetter,
   AggregateIdsLister,
+  AggregateOpener,
   AggregateSimulator,
+  ExistingAggregateOpener,
   EventGrouper,
   EventPusher,
   AggregateAndEventsGetter,
   EventsGetter,
-  EventStore,
+  NewAggregateOpener,
   OnEventPushed,
   Reducer,
   SideEffectsSimulator,
@@ -93,6 +97,9 @@ export class ConnectedEventStore<
   >;
   simulateAggregate: AggregateSimulator<$EVENT_DETAIL, AGGREGATE>;
   getEventStorageAdapter: () => EventStorageAdapter;
+  openAggregate: AggregateOpener<this>;
+  openExistingAggregate: ExistingAggregateOpener<this>;
+  openNewAggregate: NewAggregateOpener<this>;
 
   eventStore: EventStore<
     EVENT_STORE_ID,
@@ -146,6 +153,15 @@ export class ConnectedEventStore<
 
       return response;
     };
+
+    this.openAggregate = (aggregateId, options) =>
+      AggregateHandle.open(this, aggregateId, options);
+
+    this.openExistingAggregate = (aggregateId, options) =>
+      AggregateHandle.openExisting(this, aggregateId, options);
+
+    this.openNewAggregate = aggregateId =>
+      AggregateHandle.forNew(this, aggregateId);
 
     this.eventStore = eventStore;
     this.messageChannel = messageChannel;

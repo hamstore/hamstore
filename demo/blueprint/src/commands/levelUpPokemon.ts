@@ -26,29 +26,13 @@ export const levelUpPokemonCommand = new JSONSchemaCommand({
     const { pokemonId } = input;
     const [eventStore] = eventStores;
 
-    const { aggregate } = await eventStore.getAggregate(pokemonId);
+    const pikachu = await eventStore.openExistingAggregate(pokemonId);
 
-    if (aggregate === undefined) {
-      throw new Error('Pokemon not found');
-    }
-
-    const { version, level } = aggregate;
-    if (level === 99) {
+    if (pikachu.aggregate.level === 99) {
       throw new Error('Pokemon level maxed out');
     }
 
-    const { nextAggregate } = await eventStore.pushEvent(
-      {
-        aggregateId: pokemonId,
-        version: version + 1,
-        type: 'LEVELLED_UP',
-      },
-      { prevAggregate: aggregate },
-    );
-
-    if (nextAggregate === undefined) {
-      throw new Error();
-    }
+    const { nextAggregate } = await pikachu.pushEvent({ type: 'LEVELLED_UP' });
 
     return { nextLevel: nextAggregate.level };
   },

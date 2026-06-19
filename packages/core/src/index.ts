@@ -24,8 +24,12 @@ export {
   isEventAlreadyExistsError,
   eventAlreadyExistsErrorCode,
   EventStore,
+  AggregateHandle,
 } from './eventStore';
 export type {
+  AggregateHandleEventInput,
+  AggregateHandleEventInputOrFn,
+  AggregateHandleEventInputs,
   EventAlreadyExistsError,
   UndefinedEventStorageAdapterError,
   GetAggregateOptions,

@@ -1,11 +1,14 @@
+/* eslint-disable max-lines */
 import { vi } from 'vitest';
 
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import { EventStore } from '~/eventStore/eventStore';
 import {
   eventStorageAdapterMock,
+  getEventsMock,
   pikachuAppearedEvent,
   pikachuCaughtEvent,
+  pikachuId,
   pikachuLeveledUpEvent,
   PokemonEventDetails,
   pokemonsEventStore,
@@ -145,6 +148,38 @@ describe('ConnectedEventStore', () => {
       expect(publishPushedEventMock).toHaveBeenCalledWith(
         pokemonsEventStoreWithNotificationMessageQueue,
         { event: charizardLeveledUpEvent },
+      );
+    });
+  });
+
+  describe('openAggregate', () => {
+    it('routes a handle push through the connected store so it publishes', async () => {
+      getEventsMock.mockResolvedValue({ events: [pikachuAppearedEvent] });
+      pushEvent.mockResolvedValue({ event: pikachuCaughtEvent });
+
+      const handle =
+        await pokemonsEventStoreWithNotificationMessageQueue.openAggregate(
+          pikachuId,
+        );
+
+      // The handle must be bound to the CONNECTED store, not the bare one —
+      // otherwise the push would skip publishPushedEvent entirely.
+      await handle.pushEvent({ type: 'POKEMON_CAUGHT' });
+
+      expect(pushEvent).toHaveBeenCalledOnce();
+      expect(pushEvent).toHaveBeenCalledWith(
+        { aggregateId: pikachuId, version: 2, type: 'POKEMON_CAUGHT' },
+        {
+          prevAggregate: pokemonsEventStore.buildAggregate([
+            pikachuAppearedEvent,
+          ]),
+        },
+      );
+
+      expect(publishPushedEventMock).toHaveBeenCalledOnce();
+      expect(publishPushedEventMock).toHaveBeenCalledWith(
+        pokemonsEventStoreWithNotificationMessageQueue,
+        { event: pikachuCaughtEvent },
       );
     });
   });

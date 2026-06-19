@@ -2,20 +2,25 @@
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import type { EventType, EventTypeDetails } from '~/event/eventType';
-import { GroupedEvent } from '~/event/groupedEvent';
+import type { GroupedEvent } from '~/event/groupedEvent';
 import type { EventStorageAdapter } from '~/eventStorageAdapter';
 import type { $Contravariant } from '~/utils';
 
+import { AggregateHandle } from './aggregateHandle';
+import type {
+  AggregateOpener,
+  ExistingAggregateOpener,
+  NewAggregateOpener,
+} from './aggregateHandle';
 import { AggregateNotFoundError } from './errors/aggregateNotFound';
-import { EventDetailParserNotDefinedError } from './errors/eventDetailParserNotDefined';
-import { EventDetailTypeDoesNotExistError } from './errors/eventDetailTypeDoesNotExist';
 import { UndefinedEventStorageAdapterError } from './errors/undefinedEventStorageAdapter';
+import { pushEventGroup } from './pushEventGroup';
+import { resolveEventValidation } from './resolveEventValidation';
 import type {
   AggregateIdsLister,
   EventPusher,
   OnEventPushed,
   EventGroupPusher,
-  EventGroupPusherResponse,
   EventsGetter,
   EventGrouper,
   SideEffectsSimulator,
@@ -23,46 +28,7 @@ import type {
   AggregateAndEventsGetter,
   AggregateSimulator,
   Reducer,
-  ValidateEventDetail,
 } from './types';
-
-const resolveEventValidation = async (
-  candidateEventTypes: EventType[],
-  eventDetail: EventDetail,
-  validate: ValidateEventDetail,
-): Promise<void> => {
-  if (validate === false) {
-    return;
-  }
-
-  const eventType = candidateEventTypes.find(
-    ({ type }) => type === eventDetail.type,
-  );
-
-  if (eventType === undefined) {
-    if (validate === true) {
-      throw new EventDetailTypeDoesNotExistError({
-        type: eventDetail.type,
-        allowedTypes: candidateEventTypes.map(({ type }) => type),
-      });
-    }
-    return;
-  }
-
-  if (eventType.parseEventDetail === undefined) {
-    if (validate === true) {
-      throw new EventDetailParserNotDefinedError(eventDetail.type);
-    }
-    return;
-  }
-
-  const result = await eventType.parseEventDetail(eventDetail);
-
-  if (!result.isValid) {
-    const messages = result.parsingErrors.map(e => e.message);
-    throw new Error(messages.join('; '));
-  }
-};
 
 export class EventStore<
   EVENT_STORE_ID extends string = string,
@@ -81,97 +47,14 @@ export class EventStore<
   AGGREGATE extends Aggregate = ReturnType<REDUCER>,
   $AGGREGATE extends Aggregate = $Contravariant<AGGREGATE, Aggregate>,
 > {
-  static pushEventGroup: EventGroupPusher = async <
-    GROUPED_EVENTS extends [GroupedEvent, ...GroupedEvent[]],
-    OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent | { force?: boolean } =
-      GroupedEvent,
-  >(
-    optionsOrGroupedEvent: OPTIONS_OR_GROUPED_EVENTS_HEAD,
-    ..._groupedEvents: GROUPED_EVENTS
-  ) => {
-    const groupedEvents = (
-      optionsOrGroupedEvent instanceof GroupedEvent
-        ? [optionsOrGroupedEvent, ..._groupedEvents]
-        : _groupedEvents
-    ) as [GroupedEvent, ...GroupedEvent[]];
-
-    const options = (
-      optionsOrGroupedEvent instanceof GroupedEvent ? {} : optionsOrGroupedEvent
-    ) as { force?: boolean };
-
-    const [groupedEventsHead] = groupedEvents;
-
-    // Validate all grouped events that have validation configured
-    await Promise.all(
-      groupedEvents.map(async groupedEvent => {
-        const validate = groupedEvent.validate ?? 'auto';
-        if (validate === false) {
-          return;
-        }
-        if (groupedEvent.eventStore === undefined) {
-          if (validate === true) {
-            throw new Error(
-              'Cannot validate grouped event: no eventStore is assigned. Use eventStore.groupEvent() to create grouped events with validation.',
-            );
-          }
-          return;
-        }
-
-        await resolveEventValidation(
-          groupedEvent.eventStore.eventTypes,
-          groupedEvent.event as EventDetail,
-          validate,
-        );
-      }),
-    );
-
-    const { eventGroup: eventGroupWithoutAggregates } =
-      await groupedEventsHead.eventStorageAdapter.pushEventGroup(
-        options,
-        ...groupedEvents,
-      );
-
-    const eventGroupWithAggregates = eventGroupWithoutAggregates.map(
-      ({ event }, eventIndex) => {
-        const groupedEvent = groupedEvents[eventIndex];
-
-        let nextAggregate: Aggregate | undefined = undefined;
-        const prevAggregate = groupedEvent?.prevAggregate;
-
-        if (
-          (prevAggregate !== undefined || event.version === 1) &&
-          groupedEvent?.eventStore !== undefined
-        ) {
-          nextAggregate = groupedEvent.eventStore.reducer(prevAggregate, event);
-        }
-
-        return {
-          event,
-          ...(nextAggregate !== undefined ? { nextAggregate } : {}),
-        };
-      },
-    );
-
-    await Promise.all(
-      groupedEvents.map((groupedEvent, eventIndex) => {
-        const eventStore = groupedEvent.eventStore;
-        const pushEventResponse = eventGroupWithAggregates[eventIndex];
-
-        return pushEventResponse !== undefined &&
-          eventStore?.onEventPushed !== undefined
-          ? eventStore.onEventPushed(pushEventResponse)
-          : null;
-      }),
-    );
-
-    return { eventGroup: eventGroupWithAggregates } as {
-      eventGroup: OPTIONS_OR_GROUPED_EVENTS_HEAD extends GroupedEvent
-        ? EventGroupPusherResponse<
-            [OPTIONS_OR_GROUPED_EVENTS_HEAD, ...GROUPED_EVENTS]
-          >
-        : EventGroupPusherResponse<GROUPED_EVENTS>;
-    };
-  };
+  /**
+   * Commit a group of events across one or more aggregates atomically — either
+   * all of them are pushed, or none are (see
+   * [Event Groups](https://hamstore.github.io/hamstore/docs/event-sourcing/joining-data)).
+   */
+  // Re-assignment of the `this`-free {@link pushEventGroup}, so the
+  // `AggregateHandle` factories can share it without a runtime import cycle.
+  static pushEventGroup: EventGroupPusher = pushEventGroup;
 
   _types?: {
     details: EVENT_DETAILS;
@@ -209,6 +92,29 @@ export class EventStore<
   simulateAggregate: AggregateSimulator<$EVENT_DETAILS, AGGREGATE>;
   eventStorageAdapter?: EventStorageAdapter;
   getEventStorageAdapter: () => EventStorageAdapter;
+
+  /**
+   * Read an aggregate and wrap it in an immutable, version-pinned
+   * {@link AggregateHandle} that auto-fills `aggregateId`/`version`/
+   * `prevAggregate` on every push. Open a fresh handle per command attempt
+   * (a handle held across an optimistic-concurrency retry is stale).
+   *
+   * For the unusual case where you already hold an aggregate (replay,
+   * projection, simulation) and want to skip the read, use the static
+   * {@link AggregateHandle.from} — it is deliberately not an instance method, as
+   * a pre-loaded aggregate is stale on retry and so does not belong in commands.
+   */
+  openAggregate: AggregateOpener<this>;
+
+  /** Like {@link openAggregate}, but throws if the aggregate does not exist. */
+  openExistingAggregate: ExistingAggregateOpener<this>;
+
+  /**
+   * Open a handle for an aggregate that does not exist yet (first event at
+   * version 1). Does not read storage — use when the aggregate is known to be
+   * new (first-event / bulk-import paths).
+   */
+  openNewAggregate: NewAggregateOpener<this>;
 
   constructor({
     eventStoreId,
@@ -430,5 +336,14 @@ export class EventStore<
 
       return this.buildAggregate(sortedEventsWithSideEffects);
     };
+
+    this.openAggregate = (aggregateId, options) =>
+      AggregateHandle.open(this, aggregateId, options);
+
+    this.openExistingAggregate = (aggregateId, options) =>
+      AggregateHandle.openExisting(this, aggregateId, options);
+
+    this.openNewAggregate = aggregateId =>
+      AggregateHandle.forNew(this, aggregateId);
   }
 }
