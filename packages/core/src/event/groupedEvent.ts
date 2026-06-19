@@ -5,6 +5,7 @@ import type {
 } from '~/eventStorageAdapter';
 import type { EventStore } from '~/eventStore/eventStore';
 import type { ValidateEventDetail } from '~/eventStore/types';
+import type { SeedSnapshot } from '~/snapshot';
 
 import type { EventDetail, OptionalTimestamp } from './eventDetail';
 
@@ -19,6 +20,13 @@ export class GroupedEvent<
   event: OptionalTimestamp<EVENT_DETAILS>;
   context?: EventStoreContext;
   prevAggregate?: AGGREGATE;
+  /**
+   * The snapshot that seeded `prevAggregate`, threaded to the write so the
+   * snapshot policy can evaluate spacing for this aggregate when the group is
+   * committed. Set by `EventStore.groupEvent` / an `AggregateHandle`. See
+   * {@link SeedSnapshot}.
+   */
+  seedSnapshot?: SeedSnapshot<AGGREGATE>;
 
   eventStorageAdapter: EventStorageAdapter;
   eventStore?: EventStore;

@@ -48,6 +48,9 @@ describe('event store', () => {
         'onEventPushed',
         'eventStorageAdapter',
         'getEventStorageAdapter',
+        'snapshotStorageAdapter',
+        'getSnapshotStorageAdapter',
+        'snapshotConfig',
         'getEvents',
         'pushEvent',
         'groupEvent',
@@ -102,6 +105,7 @@ describe('event store', () => {
           pokemonsReducer,
           undefined as unknown as PokemonAggregate,
         ),
+        seedSnapshot: { status: 'absent' },
       });
     });
   });
@@ -122,6 +126,7 @@ describe('event store', () => {
           pokemonsReducer,
           undefined as unknown as PokemonAggregate,
         ),
+        seedSnapshot: { status: 'absent' },
       });
     });
 

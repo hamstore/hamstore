@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 
 import { pokemonsEventStore } from '~/eventStore/eventStore.fixtures.test';
+import { absentSeedSnapshot } from '~/snapshot';
 
 import {
   notificationMessageQueue,
@@ -52,7 +53,7 @@ describe('publishPushedEvent', () => {
 
     const getAggregate = vi
       .spyOn(pokemonsEventStoreWithStateCarryingMessageBus, 'getAggregate')
-      .mockResolvedValue({ aggregate: v2Aggregate });
+      .mockResolvedValue({ aggregate: v2Aggregate, seedSnapshot: absentSeedSnapshot });
 
     const publishStateCarryingMessageMock = vi
       .spyOn(stateCarryingMessageBus, 'publishMessage')

@@ -173,6 +173,7 @@ describe('ConnectedEventStore', () => {
           prevAggregate: pokemonsEventStore.buildAggregate([
             pikachuAppearedEvent,
           ]),
+          seedSnapshot: { status: 'absent' },
         },
       );
 
