@@ -1,0 +1,30 @@
+export type {
+  Snapshot,
+  SnapshotKey,
+  SnapshotStorageAdapter,
+  ListSnapshotsOptions,
+  ListSnapshotsOutput,
+} from './snapshotStorageAdapter';
+export type { SeedSnapshot } from './seedSnapshot';
+export {
+  presentSeedSnapshot,
+  absentSeedSnapshot,
+  seedSnapshotValue,
+} from './seedSnapshot';
+export type {
+  SnapshotConfig,
+  SnapshotPolicy,
+  PruningPolicy,
+  ShouldSaveSnapshot,
+  ShouldSaveSnapshotArgs,
+  ShouldKeepSnapshot,
+  ShouldKeepSnapshotArgs,
+} from './snapshotConfig';
+export { compileSnapshotPolicy } from './policy';
+export { compilePruningPolicy } from './pruningPolicy';
+export { cleanUpOutdatedSnapshots } from './cleanUpOutdatedSnapshots';
+export {
+  pruneAggregateSnapshots,
+  pruneEventStoreSnapshots,
+} from './pruneSnapshots';
+export { UndefinedSnapshotStorageAdapterError } from './errors';

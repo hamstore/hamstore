@@ -1,6 +1,7 @@
 import type { Aggregate } from '~/aggregate';
 import type { EventDetail } from '~/event/eventDetail';
 import { GroupedEvent } from '~/event/groupedEvent';
+import type { SeedSnapshot } from '~/snapshot';
 
 import { resolveEventValidation } from './resolveEventValidation';
 import type { EventGroupPusher, EventGroupPusherResponse } from './types';
@@ -95,6 +96,57 @@ export const pushEventGroup: EventGroupPusher = async <
         ? eventStore.onEventPushed(pushEventResponse)
         : null;
     }),
+  );
+
+  // Opportunistic snapshot save, one per aggregate touched in the group:
+  // collapse a same-aggregate run to its highest-version result so we evaluate
+  // the policy once against the committed state rather than per event.
+  // Derive the store type from `GroupedEvent` rather than importing
+  // `EventStore` directly: the reverse (value) edge already exists
+  // (`EventStore` re-exports this function), so a direct type import here
+  // would introduce a module cycle.
+  type SnapshotSaveCandidate = {
+    eventStore: NonNullable<GroupedEvent['eventStore']>;
+    aggregate: Aggregate;
+    seedSnapshot: SeedSnapshot | undefined;
+    newEventCount: number;
+  };
+  const snapshotSaves = new Map<string, SnapshotSaveCandidate>();
+
+  groupedEvents.forEach((groupedEvent, eventIndex) => {
+    const eventStore = groupedEvent.eventStore;
+    const nextAggregate = eventGroupWithAggregates[eventIndex]?.nextAggregate;
+    if (eventStore === undefined || nextAggregate === undefined) {
+      return;
+    }
+
+    const key = `${eventStore.eventStoreId}:${nextAggregate.aggregateId}`;
+    const existing = snapshotSaves.get(key);
+    if (existing === undefined) {
+      snapshotSaves.set(key, {
+        eventStore,
+        aggregate: nextAggregate,
+        seedSnapshot: groupedEvent.seedSnapshot,
+        newEventCount: 1,
+      });
+
+      return;
+    }
+
+    existing.newEventCount += 1;
+    if (nextAggregate.version > existing.aggregate.version) {
+      existing.aggregate = nextAggregate;
+    }
+  });
+
+  await Promise.all(
+    [...snapshotSaves.values()].map(candidate =>
+      candidate.eventStore._dispatchSnapshotSave({
+        aggregate: candidate.aggregate,
+        seedSnapshot: candidate.seedSnapshot,
+        newEventCount: candidate.newEventCount,
+      }),
+    ),
   );
 
   return { eventGroup: eventGroupWithAggregates } as {

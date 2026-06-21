@@ -1,5 +1,7 @@
 /* eslint-disable max-lines */
 import type { EventDetail } from '~/event/eventDetail';
+import { absentSeedSnapshot } from '~/snapshot';
+import type { SeedSnapshot } from '~/snapshot';
 
 import type { EventStore } from './eventStore';
 import type { EventStoreAggregate, EventStoreEventDetails } from './generics';
@@ -118,6 +120,16 @@ export class AggregateHandle<
     : EventStoreAggregate<ES> | undefined;
   readonly nextVersion: number;
 
+  /**
+   * The snapshot that seeded the read this handle was opened with — auto-filled
+   * into every push so the snapshot policy can evaluate spacing without the
+   * caller threading it manually. `undefined` for {@link AggregateHandle.from}
+   * (the aggregate came from elsewhere, so the snapshot history is unknown);
+   * `{ status: 'absent' }` for {@link AggregateHandle.forNew} (a brand-new
+   * aggregate provably has no prior snapshot). See {@link SeedSnapshot}.
+   */
+  readonly seedSnapshot: SeedSnapshot<EventStoreAggregate<ES>> | undefined;
+
   // `store` is deliberately public (like `GroupedEvent`'s fields): TS
   // `private`/`#` members are nominal, which would make two copies of
   // `@hamstore/core` produce mutually-incompatible `AggregateHandle` (and thus
@@ -129,15 +141,18 @@ export class AggregateHandle<
     store,
     aggregateId,
     aggregate,
+    seedSnapshot,
   }: {
     store: ES;
     aggregateId: string;
     aggregate: AggregateHandle<ES, SHOULD_EXIST>['aggregate'];
+    seedSnapshot?: SeedSnapshot<EventStoreAggregate<ES>>;
   }) {
     this.store = store;
     this.aggregateId = aggregateId;
     this.aggregate = aggregate;
     this.nextVersion = (aggregate?.version ?? 0) + 1;
+    this.seedSnapshot = seedSnapshot;
   }
 
   /**
@@ -160,12 +175,16 @@ export class AggregateHandle<
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<ES>> {
-    const { aggregate } = await store.getAggregate(aggregateId, options);
+    const { aggregate, seedSnapshot } = await store.getAggregate(
+      aggregateId,
+      options,
+    );
 
     return new AggregateHandle({
       store,
       aggregateId,
       aggregate,
+      seedSnapshot: seedSnapshot as SeedSnapshot<EventStoreAggregate<ES>>,
     });
   }
 
@@ -178,12 +197,16 @@ export class AggregateHandle<
     aggregateId: string,
     options?: GetAggregateOptions,
   ): Promise<AggregateHandle<ES, true>> {
-    const { aggregate } = await store.getExistingAggregate(aggregateId, options);
+    const { aggregate, seedSnapshot } = await store.getExistingAggregate(
+      aggregateId,
+      options,
+    );
 
     return new AggregateHandle({
       store,
       aggregateId,
       aggregate,
+      seedSnapshot: seedSnapshot as SeedSnapshot<EventStoreAggregate<ES>>,
     });
   }
 
@@ -201,6 +224,9 @@ export class AggregateHandle<
       store,
       aggregateId,
       aggregate: undefined,
+      // A brand-new aggregate provably has no prior snapshot, so the first
+      // push should be allowed to establish one (known-absent, not unknown).
+      seedSnapshot: absentSeedSnapshot as SeedSnapshot<EventStoreAggregate<ES>>,
     });
   }
 
@@ -287,6 +313,7 @@ export class AggregateHandle<
           this.store.groupEvent(event, {
             ...options,
             prevAggregate,
+            seedSnapshot: this.seedSnapshot,
           }) as ReturnType<ES['groupEvent']>,
         );
         acc.version += 1;
@@ -315,6 +342,7 @@ export class AggregateHandle<
     return this.store.groupEvent(this.fill(input, this.nextVersion), {
       ...options,
       prevAggregate: this.aggregate,
+      seedSnapshot: this.seedSnapshot,
     }) as ReturnType<ES['groupEvent']>;
   }
 
@@ -340,9 +368,11 @@ export class AggregateHandle<
   }> {
     const { event, nextAggregate } = await this.store.pushEvent(
       this.fill(input, this.nextVersion) as Parameters<ES['pushEvent']>[0],
-      { ...options, prevAggregate: this.aggregate } as Parameters<
-        ES['pushEvent']
-      >[1],
+      {
+        ...options,
+        prevAggregate: this.aggregate,
+        seedSnapshot: this.seedSnapshot,
+      } as Parameters<ES['pushEvent']>[1],
     );
 
     return {

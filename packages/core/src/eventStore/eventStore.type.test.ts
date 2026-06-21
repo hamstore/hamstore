@@ -7,6 +7,7 @@ import type { EventTypeDetail } from '~/event/eventType';
 import type { GroupedEvent } from '~/event/groupedEvent';
 import type { EventsQueryOptions } from '~/eventStorageAdapter';
 import type { ValidateEventDetail } from '~/eventStore/types';
+import type { SeedSnapshot } from '~/snapshot';
 import {
   EventStore,
   EventStoreAggregate,
@@ -93,6 +94,7 @@ const assertGetAggregateOutput: A.Equals<
   ReturnType<typeof pokemonsEventStore.getAggregate>,
   Promise<{
     aggregate: PokemonAggregate | undefined;
+    seedSnapshot: SeedSnapshot<PokemonAggregate>;
   }>
 > = 1;
 assertGetAggregateOutput;
@@ -115,6 +117,33 @@ const assertGetAggregateAndEventsOutput: A.Equals<
 > = 1;
 assertGetAggregateAndEventsOutput;
 
+// `getExistingAggregateAndEvents` narrows `lastEvent` to `EVENT_DETAIL` for
+// the default / `maxVersion`-only call shape, since the events array is the
+// full aggregate history (and an existing aggregate has at least one event).
+const assertGetExistingAggregateAndEventsDefaultLastEvent: A.Equals<
+  Awaited<
+    ReturnType<typeof pokemonsEventStore.getExistingAggregateAndEvents>
+  >['lastEvent'],
+  PokemonEventDetails
+> = 1;
+assertGetExistingAggregateAndEventsDefaultLastEvent;
+
+// With an event-filtering option, `lastEvent` widens back to
+// `EVENT_DETAIL | undefined` because the returned events array can be empty
+// (e.g. `fromVersion` past the aggregate's last version, an empty tail on top
+// of a snapshot, or `lastN: 0`).
+const assertGetExistingAggregateAndEventsFromVersionLastEvent: A.Equals<
+  Awaited<
+    ReturnType<
+      typeof pokemonsEventStore.getExistingAggregateAndEvents<{
+        fromVersion: number;
+      }>
+    >
+  >['lastEvent'],
+  PokemonEventDetails | undefined
+> = 1;
+assertGetExistingAggregateAndEventsFromVersionLastEvent;
+
 // --- PUSH EVENTS ---
 
 const assertPushEventInput1: A.Equals<
@@ -127,7 +156,13 @@ assertPushEventInput1;
 
 const assertPushEventInput2: A.Equals<
   Parameters<typeof pokemonsEventStore.pushEvent>[1],
-  { prevAggregate?: PokemonAggregate | undefined; force?: boolean; validate?: ValidateEventDetail } | undefined
+  | {
+      prevAggregate?: PokemonAggregate | undefined;
+      seedSnapshot?: SeedSnapshot<PokemonAggregate> | undefined;
+      force?: boolean;
+      validate?: ValidateEventDetail;
+    }
+  | undefined
 > = 1;
 assertPushEventInput2;
 
@@ -152,7 +187,12 @@ assertGroupEventInput1;
 
 const assertGroupEventInput2: A.Equals<
   Parameters<typeof pokemonsEventStore.groupEvent>[1],
-  { prevAggregate?: PokemonAggregate | undefined; validate?: ValidateEventDetail } | undefined
+  | {
+      prevAggregate?: PokemonAggregate | undefined;
+      seedSnapshot?: SeedSnapshot<PokemonAggregate> | undefined;
+      validate?: ValidateEventDetail;
+    }
+  | undefined
 > = 1;
 assertGroupEventInput2;
 
